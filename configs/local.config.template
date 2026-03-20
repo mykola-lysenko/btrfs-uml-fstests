@@ -1,0 +1,19 @@
+# fstests local.config template for UML + BTRFS
+# Copy to /opt/xfstests/local.config inside the UML rootfs
+#
+# UML device naming:
+#   ubda = root filesystem (ext4)
+#   ubdb = test device     (btrfs TEST_DEV)
+#   ubdc = scratch device  (btrfs SCRATCH_DEV)
+
+FSTYP=btrfs
+TEST_DEV=/dev/ubdb
+TEST_DIR=/mnt/test
+SCRATCH_DEV=/dev/ubdc
+SCRATCH_MNT=/mnt/scratch
+RESULT_BASE=/results
+RECREATE_TEST_DEV=true
+
+# Optional: reduce fsstress load for faster runs
+# TIME_FACTOR=0
+# LOAD_FACTOR=0

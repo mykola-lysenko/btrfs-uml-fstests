@@ -1,0 +1,30 @@
+# Large binary files — never commit these
+*.img
+*.iso
+*.tar.xz
+*.tar.gz
+
+# Kernel build artifacts
+linux-*/
+*.o
+*.ko
+*.a
+
+# UML runtime artifacts
+/dev/shm/uml-shard-*/
+nohup.out
+
+# fstests result files (populated at runtime)
+results/*.log
+results/*.txt
+results/shard-*.log
+results/runner_output.txt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor artifacts
+.vscode/
+*.swp
+*~
