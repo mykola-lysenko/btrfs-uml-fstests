@@ -38,7 +38,13 @@ build-xfstests-hostside.sh # build xfstests on host via userns bind-mount (~12s)
 install-btrfs-progs.sh     # bump userspace btrfs-progs to latest upstream static release
 ```
 
-Then boot one UML instance:
+Then either boot one UML instance, or run many in parallel:
+
+- **Parallel (recommended):** `SHARDS=16 LIST=quick-fast.txt ./run-fast-sharded.sh`
+  distributes the list over N seccomp=on shards (one ubd image set each) and
+  aggregates results. ~4x faster than serial-seccomp on this host; scaling is
+  sub-linear (each UML ~30% CPU at 16x — host-side seccomp/hostfs/timer overhead).
+
 
 - **Smoke + feature probe** (seconds): boot `smoke-init.sh` as init with 4 ubd
   devices. Proves mkfs/mount/subvol/snapshot plus RAID1/10, compression, and
