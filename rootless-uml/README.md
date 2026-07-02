@@ -54,6 +54,7 @@ Then boot one UML instance:
   ubda; pass a dummy ubda and use ubdb/ubdc.
 - **util-linux `mount` EPERMs under UML** even as uid 0 — busybox mount works, so
   we point `MOUNT_PROG`/`UMOUNT_PROG` at `bin/bbmount`.
+- **`seccomp=on` ~1.7x** faster (avoids ptrace per-syscall). See docs/PERF-FINDINGS.md.
 - **Per-test time is high** (single slow UML CPU): 15–90s per test, and fsstress
   soak tests (btrfs/002) are >10 min. Parallelize across host cores; exclude soak
   tests from "smoke".

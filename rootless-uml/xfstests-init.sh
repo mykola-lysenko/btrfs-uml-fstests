@@ -5,7 +5,10 @@
 #   timeout 900 $BASE/linux-<ver>/linux \
 #     rootfstype=hostfs rootflags=$BASE/rootfs-xfs rw init=/xfstests-init.sh \
 #     ubda=$BASE/ubda_dummy.img ubdb=$BASE/test.img ubdc=$BASE/test2.img \
-#     mem=8000M con0=fd:0,fd:1 con=null
+#     seccomp=on mem=8000M con0=fd:0,fd:1 con=null
+#
+# seccomp=on avoids UML's ptrace-per-syscall overhead — ~1.7x faster on the
+# fork/exec-heavy xfstests harness (see docs/PERF-FINDINGS.md). Strongly recommended.
 #
 # Device note: UML sets a phantom root=98:0 (=/dev/ubda), so TEST/SCRATCH must NOT
 # be ubda. Pass a dummy ubda (so the ubd subsystem sets up /dev/ubdb,c), use
