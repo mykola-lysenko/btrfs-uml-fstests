@@ -25,14 +25,34 @@ mapfile -t TESTS < <(grep -vE '^\s*#|^\s*$' "$LIST")
 [ "${#TESTS[@]}" -gt 0 ] || { echo "no tests in $LIST"; exit 1; }
 log "distributing ${#TESTS[@]} tests over $SHARDS shards; kernel=$(basename "$(dirname "$KERNEL")")"
 
-# One UML per image set: fresh images + round-robin RUN_ARGS per shard.
+# One UML per image set: fresh images + per-shard RUN_ARGS.
 rm -rf "$BASE/shards"
 for ((n=0; n<SHARDS; n++)); do
   d="$BASE/shards/$n"; mkdir -p "$d/results"
   : > "$d/RUN_ARGS"
   truncate -s 64M "$d/dummy.img"; truncate -s "$IMG_SIZE" "$d/test.img" "$d/scratch.img"
 done
-for i in "${!TESTS[@]}"; do echo "${TESTS[$i]}" >> "$BASE/shards/$((i % SHARDS))/RUN_ARGS"; done
+
+# Distribution. With a TIMES file (lines "test seconds", e.g. results/measured-times.txt)
+# use greedy longest-processing-time bin-packing so shards finish evenly — round-robin
+# leaves one shard the long pole when a few tests dominate (measured ~4x vs ~10x). Without
+# TIMES, fall back to round-robin.
+TIMES="${TIMES:-}"
+if [ -n "$TIMES" ] && [ -f "$TIMES" ]; then
+  log "load-balancing by measured time ($TIMES, greedy LPT)"
+  # emit "seconds test" for each test (unknown times default to the median-ish 12s), sort desc,
+  # then assign each to the least-loaded shard.
+  paste <(printf '%s\n' "${TESTS[@]}") \
+        <(for t in "${TESTS[@]}"; do awk -v k="$t" '$1==k{print $2; f=1} END{if(!f)print 12}' "$TIMES"; done) \
+    | sort -k2 -rn | while read -r t secs; do
+        n=$(for ((s=0;s<SHARDS;s++)); do printf '%s %s\n' "$s" "$(awk '{x+=$2}END{print x+0}' "$BASE/shards/$s/RUN_ARGS.load" 2>/dev/null)"; done | sort -k2 -n | head -1 | cut -d' ' -f1)
+        echo "$t" >> "$BASE/shards/$n/RUN_ARGS"
+        echo "x $secs" >> "$BASE/shards/$n/RUN_ARGS.load"
+      done
+  rm -f "$BASE"/shards/*/RUN_ARGS.load
+else
+  for i in "${!TESTS[@]}"; do echo "${TESTS[$i]}" >> "$BASE/shards/$((i % SHARDS))/RUN_ARGS"; done
+fi
 
 log "launching $SHARDS UML shards (seccomp=on, mem=$MEM)..."
 t0=$(date +%s)

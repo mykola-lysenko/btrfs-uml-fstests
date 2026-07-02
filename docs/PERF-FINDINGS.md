@@ -49,12 +49,39 @@ A/B on the same 7 tests (btrfs/001,007,017,025 generic/002,005,011):
 
 Just add `seccomp=on` to the boot command. No downside observed (tests still pass).
 
-## Lever 2: parallel sharding (the big one, not yet built)
+## Lever 2: parallel sharding (built — `run-fast-sharded.sh`) — measured ~10x
 
-Each UML is single-core; the host has 32. Run N UML shards, each with its own
-rootfs copy + ubd image set (one UML per image — UML flocks backing files).
-~16 shards is realistic. This is a near-linear throughput multiplier and composes
-with seccomp.
+N single-core UML shards, seccomp=on, one ubd image set each, shared read-only
+rootfs via hostfs. Measured on this 32-core host, btrfs for-next 7.1.0-rc7:
+
+**119 measured-fast tests, 16 shards: 129 s wall, all passed, balanced 7-8/shard.**
+Serial (sum of per-test times) ~1369 s → **10.6x speedup** (composed on top of
+seccomp).
+
+**Load balance is the whole game.** The same harness on the *heuristic* fast set
+(which hides 30-230 s tests) gave only ~4x, because round-robin hands one shard
+several slow tests and it becomes the long pole while others idle. Two fixes,
+both applied:
+- Classify by **measured** time, not markers (see below) — keep genuine outliers
+  out of the fast set.
+- The harness now supports greedy longest-processing-time bin-packing when given
+  a `TIMES=` file (e.g. `results/measured-times.txt`), so even a mixed set packs
+  evenly instead of round-robin.
+
+Scaling is still sub-linear at high concurrency: each UML runs at ~30% CPU at 16x
+(host ~50% idle, ~35% sys) — host-side seccomp-trap / hostfs / timer-signal
+overhead. So more shards help less past ~16; the ~10x is the realistic ceiling
+here, not 16x.
+
+## The classifier must be measured, not heuristic
+
+The marker heuristic (fsstress/fsx/dbench/fio/populate) is unreliable: on a sample
+of 206 quick-"fast" tests, **44% actually ran >=15 s** (median 14 s, p90 26 s,
+max 230 s e.g. btrfs/034). The reliable split comes from a measured baseline —
+which the sharded harness now makes cheap to produce. Artifacts:
+`rootless-uml/measured-times.txt` (test -> seconds), `confirmed-fast.txt` (<15 s),
+`confirmed-slow.txt` (>=15 s). Regenerate/extend by running the full quick group
+once through the harness and harvesting the per-test times.
 
 ## Lever 3: split off the soak tail
 
