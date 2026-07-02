@@ -10,10 +10,28 @@ the full walkthrough and every gotcha, and
 [`../docs/SMOKE-TEST-FINDINGS.md`](../docs/SMOKE-TEST-FINDINGS.md) for measured
 speed and feature-coverage results.
 
+## Kernel source (what "upstream" means here)
+
+To actually find btrfs bugs, test the **btrfs development tree**, not a stale
+release. `build-uml-kernel.sh` takes `REPO`/`REF`:
+
+```
+# btrfs maintainer integration branch (recommended for bug finding):
+REPO=kdave/btrfs-devel REF=heads/for-next NAME=btrfs-for-next ./build-uml-kernel.sh
+# mainline tip / a release, if you prefer:
+REPO=torvalds/linux REF=heads/master   NAME=mainline ./build-uml-kernel.sh
+REPO=torvalds/linux REF=tags/v6.12     NAME=v6.12    ./build-uml-kernel.sh
+```
+
+A branch tarball is a moving snapshot, so each build writes `SOURCE.txt` in the
+kernel dir recording repo, ref, fetch time, and `make kernelversion` — keep it
+with results for reproducibility. (Verified: `for-next` builds and boots as a UML
+kernel and passes xfstests; e.g. 7.1.0-rc7.)
+
 ## Pipeline
 
 ```
-build-uml-kernel.sh        # ARCH=um kernel + btrfs + device-mapper (~30s on many cores)
+build-uml-kernel.sh        # ARCH=um kernel + btrfs + device-mapper (~30-60s on many cores)
 fetch-rootfs-pkgs.sh       # apt-get download the full dep closure (rootless)
 assemble-rootfs.sh         # extract debs -> rootfs tree; fix merged-/usr, aliases, mount wrappers
 build-xfstests-hostside.sh # build xfstests on host via userns bind-mount (~12s)

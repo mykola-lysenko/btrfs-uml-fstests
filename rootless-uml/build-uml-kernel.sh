@@ -6,20 +6,38 @@
 # full tree). A UML defconfig kernel is tiny (~1k objects) and builds in ~30s on
 # a many-core host.
 #
-# Usage: KVER=6.12 BASE=~/uml-smoke ./build-uml-kernel.sh
+# Source selection (pick what "upstream" means for you):
+#   Mainline release:   REPO=torvalds/linux    REF=tags/v6.12         (default)
+#   Mainline tip:       REPO=torvalds/linux     REF=heads/master
+#   btrfs dev tree:     REPO=kdave/btrfs-devel  REF=heads/for-next    <-- for btrfs bug finding
+#   btrfs misc-next:    REPO=kdave/btrfs-devel  REF=heads/misc-next
+# NAME defaults to a slug of REF; a branch tarball is a moving snapshot, so the
+# build records the source and HEAD in $DIR/SOURCE.txt for reproducibility.
+#
+# Usage: REPO=kdave/btrfs-devel REF=heads/for-next NAME=btrfs-for-next ./build-uml-kernel.sh
 set -euo pipefail
-KVER="${KVER:-6.12}"
 BASE="${BASE:-$HOME/uml-smoke}"
-SRC_URL="https://codeload.github.com/torvalds/linux/tar.gz/refs/tags/v${KVER}"
+REPO="${REPO:-torvalds/linux}"
+REF="${REF:-tags/v${KVER:-6.12}}"
+NAME="${NAME:-$(echo "$REF" | sed 's#.*/##')}"
+SRC_URL="https://codeload.github.com/${REPO}/tar.gz/refs/${REF}"
+DIR="linux-${NAME}"
 mkdir -p "$BASE"; cd "$BASE"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 t0=$(date +%s)
 
-if [ ! -d "linux-${KVER}" ]; then
-  [ -f "linux-${KVER}.tar.gz" ] || { log "Downloading linux-${KVER}..."; wget -q "$SRC_URL" -O "linux-${KVER}.tar.gz"; }
-  log "Extracting ($(du -h "linux-${KVER}.tar.gz" | cut -f1))..."; tar xf "linux-${KVER}.tar.gz"
+if [ ! -d "$DIR" ]; then
+  [ -f "${DIR}.tar.gz" ] || { log "Downloading ${REPO} ${REF}..."; wget -q "$SRC_URL" -O "${DIR}.tar.gz"; }
+  log "Extracting ($(du -h "${DIR}.tar.gz" | cut -f1))..."
+  # GitHub tarballs unpack to <repo>-<ref-slug>/ ; extract to a temp dir then
+  # normalize to $DIR (avoids `tar t | head`, which trips SIGPIPE under pipefail).
+  rm -rf _extract && mkdir _extract
+  tar xf "${DIR}.tar.gz" -C _extract
+  mv _extract/* "$DIR"; rmdir _extract
 fi
-cd "linux-${KVER}"
+cd "$DIR"
+printf 'repo=%s\nref=%s\nfetched=%s\nversion=%s\n' "$REPO" "$REF" "$(date -u +%FT%TZ)" \
+  "$(make kernelversion 2>/dev/null)" > SOURCE.txt
 
 log "Configuring (ARCH=um defconfig + btrfs/dm/crypto)..."
 make ARCH=um defconfig >/dev/null 2>&1
@@ -42,4 +60,4 @@ log "Building UML kernel with $(nproc) cores..."
 make ARCH=um -j"$(nproc)" >build.log 2>&1 \
   && log "BUILD OK ($(( $(date +%s)-t0 ))s): $(ls -lh linux | awk '{print $5}')" \
   || { log "BUILD FAILED"; tail -25 build.log; exit 1; }
-log "kernel: $BASE/linux-${KVER}/linux"
+log "kernel: $BASE/$DIR/linux  ($(cat SOURCE.txt | tr '\n' ' '))"
