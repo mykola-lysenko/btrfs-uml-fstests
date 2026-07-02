@@ -35,6 +35,7 @@ build-uml-kernel.sh        # ARCH=um kernel + btrfs + device-mapper (~30-60s on 
 fetch-rootfs-pkgs.sh       # apt-get download the full dep closure (rootless)
 assemble-rootfs.sh         # extract debs -> rootfs tree; fix merged-/usr, aliases, mount wrappers
 build-xfstests-hostside.sh # build xfstests on host via userns bind-mount (~12s)
+install-btrfs-progs.sh     # bump userspace btrfs-progs to latest upstream static release
 ```
 
 Then boot one UML instance:
