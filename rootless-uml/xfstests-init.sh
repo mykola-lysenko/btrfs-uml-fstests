@@ -45,13 +45,17 @@ TEST_DIR=/mnt/test
 SCRATCH_DEV=/dev/ubdc
 SCRATCH_MNT=/mnt/scratch
 RESULT_BASE=/host/results
-RECREATE_TEST_DEV=true
 MOUNT_PROG=/usr/local/bin/bbmount
 UMOUNT_PROG=/usr/local/bin/bbumount
 CFG
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$(cat /host/RUN_ARGS 2>/dev/null)"; [ -z "$ARGS" ] && ARGS="btrfs/001 generic/001"
-mkfs.btrfs -f -q /dev/ubdb 2>/dev/null
+# Pre-mkfs TEST_DEV ourselves (with -f) and mount the existing fs — do NOT set
+# RECREATE_TEST_DEV. xfstests' recreate path decides whether to pass -f by
+# grepping `mkfs.btrfs --help`, which breaks on btrfs-progs v7.0 (the -f line is
+# no longer indented); build-xfstests-hostside.sh patches that, but pre-mkfs is
+# the robust path regardless of progs version.
+mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
 echo "-- running: ./check $ARGS --"
 ./check $ARGS 2>&1 | tee /host/results/run.log | $BB grep -vE '^[[:space:]]*$'
 echo "==== XFSTESTS DONE (uptime $($BB cut -d. -f1 /proc/uptime)s) ===="

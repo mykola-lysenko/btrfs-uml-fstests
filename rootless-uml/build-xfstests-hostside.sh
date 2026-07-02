@@ -26,5 +26,13 @@ unshare --map-root-user --mount bash -c "
   make -j\$(nproc)
 "
 log "built binaries: $(ls /tmp/xfsbuild/ltp/fsstress /tmp/xfsbuild/src/fsx 2>/dev/null | wc -l)/2"
+
+# btrfs-progs v7.0 compat: xfstests decides whether to add `-f` to mkfs.btrfs by
+# grepping `mkfs.btrfs --help` for an indented `-f`; v7.0 prints it at column 0,
+# so `-f` is never added and scratch/recreate mkfs fails on an existing fs. Allow
+# the option at line start too.
+sed -i 's#grep -q "\[\[:space:\]\]-f\[\[:space:\]|,\]"#grep -qE "(^\|[[:space:]])-f[[:space:]|,]"#' \
+  /tmp/xfsbuild/common/config
+
 rm -rf "$BASE/xfstests-built" && cp -a /tmp/xfsbuild "$BASE/xfstests-built"
 log "persisted to $BASE/xfstests-built (guest restores this to tmpfs)"
