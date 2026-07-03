@@ -22,6 +22,15 @@ if [ ! -x usr/bin/getconf ] && [ -x /usr/bin/getconf ]; then
   mkdir -p usr/bin; cp /usr/bin/getconf usr/bin/getconf; log "added getconf (from host)"
 fi
 
+# libproc2.so.0: procps `ps` needs it (e.g. btrfs/036); some deb sets ship ps but
+# not the split-out libproc2-0. Fall back to the host copy.
+if ! ls usr/lib/x86_64-linux-gnu/libproc2.so.0* >/dev/null 2>&1 \
+   && ls /usr/lib/x86_64-linux-gnu/libproc2.so.0* >/dev/null 2>&1; then
+  mkdir -p usr/lib/x86_64-linux-gnu
+  cp -a /usr/lib/x86_64-linux-gnu/libproc2.so.0* usr/lib/x86_64-linux-gnu/
+  log "added libproc2 (from host)"
+fi
+
 log "Merged-/usr symlinks..."
 for dir in bin sbin lib lib64; do
   if [ -d "$dir" ] && [ ! -L "$dir" ]; then
