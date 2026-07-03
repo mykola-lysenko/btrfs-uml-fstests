@@ -16,6 +16,7 @@
 #
 # Usage: REPO=kdave/btrfs-devel REF=heads/for-next NAME=btrfs-for-next ./build-uml-kernel.sh
 set -euo pipefail
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="${BASE:-$HOME/uml-smoke}"
 REPO="${REPO:-torvalds/linux}"
 REF="${REF:-tags/v${KVER:-6.12}}"
@@ -34,6 +35,16 @@ if [ ! -d "$DIR" ]; then
   rm -rf _extract && mkdir _extract
   tar xf "${DIR}.tar.gz" -C _extract
   mv _extract/* "$DIR"; rmdir _extract
+  # Apply local kernel patches once, on fresh extraction (e.g. the experimental
+  # UML adaptive-spin handoff). Set UML_PATCHES=none to skip.
+  PATCHDIR="${UML_PATCHES:-$SCRIPTDIR/patches}"
+  if [ "$PATCHDIR" != none ] && ls "$PATCHDIR"/*.patch >/dev/null 2>&1; then
+    for p in "$PATCHDIR"/*.patch; do
+      log "Applying $(basename "$p")..."
+      (cd "$DIR" && patch -p1 --no-backup-if-mismatch < "$p") \
+        || { log "PATCH FAILED: $p"; exit 1; }
+    done
+  fi
 fi
 cd "$DIR"
 printf 'repo=%s\nref=%s\nfetched=%s\nversion=%s\n' "$REPO" "$REF" "$(date -u +%FT%TZ)" \

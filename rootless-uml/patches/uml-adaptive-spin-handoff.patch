@@ -1,0 +1,64 @@
+--- a/arch/um/include/shared/skas/stub-data.h	2026-06-29 17:03:26.000000000 -0700
++++ b/arch/um/include/shared/skas/stub-data.h	2026-07-02 14:30:38.748385482 -0700
+@@ -17,6 +17,17 @@
+ #define FUTEX_IN_CHILD 0
+ #define FUTEX_IN_KERN 1
+ 
++/*
++ * EXPERIMENTAL: adaptive spin before FUTEX_WAIT in the stub<->kernel handoff.
++ * A handoff completes in a few microseconds, so spin-checking the shared futex
++ * word first avoids the FUTEX_WAIT syscall and the blocking context switch in
++ * the common case (the peer flips the futex before we exhaust the budget).
++ * FUTEX_WAIT remains the fallback for slow syscalls. 0 disables the spin.
++ */
++#ifndef STUB_HANDOFF_SPINS
++#define STUB_HANDOFF_SPINS 2000000
++#endif
++
+ struct stub_init_data {
+ 	int seccomp;
+ 
+--- a/arch/um/kernel/skas/stub.c	2026-06-29 17:03:26.000000000 -0700
++++ b/arch/um/kernel/skas/stub.c	2026-07-02 14:27:31.387536454 -0700
+@@ -125,7 +125,15 @@
+ 				    FUTEX_WAKE, 1);
+ 	} while (res == -EINTR);
+ 
++	/* Adaptive spin: usually the kernel flips the futex within a few us. */
++	for (int spins = STUB_HANDOFF_SPINS;
++	     spins > 0 && *(volatile unsigned int *)&d->futex == FUTEX_IN_KERN;
++	     spins--)
++		;
++
+ 	do {
++		if (*(volatile unsigned int *)&d->futex != FUTEX_IN_KERN)
++			break;	/* fast path: peer already handed control back */
+ 		res = stub_syscall4(__NR_futex, (unsigned long)&d->futex,
+ 				    FUTEX_WAIT, FUTEX_IN_KERN, 0);
+ 	} while (res == -EINTR || d->futex == FUTEX_IN_KERN);
+--- a/arch/um/os-Linux/skas/process.c	2026-06-29 17:03:26.000000000 -0700
++++ b/arch/um/os-Linux/skas/process.c	2026-07-02 14:27:50.929323082 -0700
+@@ -192,6 +192,13 @@
+ 					    FUTEX_WAKE, 1, NULL, NULL, 0));
+ 		}
+ 
++		/* Adaptive spin: usually the child traps back within a few us. */
++		for (int spins = STUB_HANDOFF_SPINS;
++		     spins > 0 && __READ_ONCE(data->futex) == FUTEX_IN_CHILD &&
++		     __READ_ONCE(mm_idp->pid) >= 0;
++		     spins--)
++			;
++
+ 		do {
+ 			/*
+ 			 * We need to check whether the child is still alive
+@@ -207,6 +214,9 @@
+ 			if (__READ_ONCE(mm_idp->pid) < 0)
+ 				goto out_kill;
+ 
++			if (__READ_ONCE(data->futex) != FUTEX_IN_CHILD)
++				break;	/* fast path: child already trapped back */
++
+ 			ret = syscall(__NR_futex, &data->futex,
+ 				      FUTEX_WAIT, FUTEX_IN_CHILD,
+ 				      NULL, NULL, 0);
