@@ -16,6 +16,12 @@ rm -rf "$R"; mkdir -p "$R"; cd "$R"
 log "Extracting $(ls "$BASE"/fullpkgs/*.deb | wc -l) packages..."
 for d in "$BASE"/fullpkgs/*.deb; do dpkg-deb -x "$d" . 2>/dev/null; done
 
+# getconf: some tests (e.g. btrfs/053) need it, but recent libc-bin debs omit the
+# binary. Fall back to the host copy (tiny, links only libc which is in the rootfs).
+if [ ! -x usr/bin/getconf ] && [ -x /usr/bin/getconf ]; then
+  mkdir -p usr/bin; cp /usr/bin/getconf usr/bin/getconf; log "added getconf (from host)"
+fi
+
 log "Merged-/usr symlinks..."
 for dir in bin sbin lib lib64; do
   if [ -d "$dir" ] && [ ! -L "$dir" ]; then

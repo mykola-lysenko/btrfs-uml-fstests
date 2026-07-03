@@ -24,6 +24,11 @@ BB=/usr/bin/busybox   # util-linux mount EPERMs under UML; busybox mount works
 $BB mount -t proc proc /proc
 $BB mount -t sysfs sysfs /sys
 $BB mount -t devtmpfs devtmpfs /dev 2>/dev/null
+# /dev/fd + std streams: needed by tests using bash process substitution `<(...)`
+$BB ln -sf /proc/self/fd /dev/fd 2>/dev/null
+$BB ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null
+$BB ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null
+$BB ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null
 $BB mount -t tmpfs -o size=90% tmpfs /tmp
 $BB mount -t tmpfs tmpfs /run 2>/dev/null
 mkdir -p /dev/pts /dev/shm

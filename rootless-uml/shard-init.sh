@@ -17,6 +17,7 @@ BB=/usr/bin/busybox
 $BB mount -t proc proc /proc
 $BB mount -t sysfs sysfs /sys
 $BB mount -t devtmpfs devtmpfs /dev 2>/dev/null
+$BB ln -sf /proc/self/fd /dev/fd 2>/dev/null; $BB ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null; $BB ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null; $BB ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null
 $BB mount -t tmpfs -o size=90% tmpfs /tmp
 $BB mount -t tmpfs tmpfs /run 2>/dev/null
 mkdir -p /dev/shm; $BB mount -t tmpfs tmpfs /dev/shm 2>/dev/null
@@ -46,6 +47,7 @@ mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
   mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
+  export FSTESTS_PER_TEST_TIMEOUT=120
   ./check $ARGS >"$SDIR/results/run.log" 2>&1
 fi
 echo "==== SHARD $SHARD DONE (uptime $($BB cut -d. -f1 /proc/uptime)s) ===="

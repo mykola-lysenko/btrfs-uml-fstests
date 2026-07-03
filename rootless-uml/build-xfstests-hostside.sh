@@ -34,5 +34,10 @@ log "built binaries: $(ls /tmp/xfsbuild/ltp/fsstress /tmp/xfsbuild/src/fsx 2>/de
 sed -i 's#grep -q "\[\[:space:\]\]-f\[\[:space:\]|,\]"#grep -qE "(^\|[[:space:]])-f[[:space:]|,]"#' \
   /tmp/xfsbuild/common/config
 
+# Per-test timeout: wrap each test in `timeout` so a hang (or a slow test) is
+# bounded instead of stalling the shard. Overridable via FSTESTS_PER_TEST_TIMEOUT.
+sed -i 's#local cmd=(bash -c "test -w \${OOM_SCORE_ADJ}#local cmd=(timeout -k 10 ${FSTESTS_PER_TEST_TIMEOUT:-300} bash -c "test -w ${OOM_SCORE_ADJ}#' \
+  /tmp/xfsbuild/check
+
 rm -rf "$BASE/xfstests-built" && cp -a /tmp/xfsbuild "$BASE/xfstests-built"
 log "persisted to $BASE/xfstests-built (guest restores this to tmpfs)"
