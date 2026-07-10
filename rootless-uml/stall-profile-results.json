@@ -1,0 +1,98 @@
+[
+  {
+    "test": "btrfs/050",
+    "outcome": "pass",
+    "wall_s": 241,
+    "guest_dur_s": 228,
+    "samples": 9,
+    "bottleneck": "(no signal)"
+  },
+  {
+    "test": "generic/324",
+    "outcome": "pass",
+    "wall_s": 277,
+    "guest_dur_s": 264,
+    "samples": 11,
+    "bottleneck": "xfs_io in 4/11 samples"
+  },
+  {
+    "test": "generic/032",
+    "outcome": "pass",
+    "wall_s": 280,
+    "guest_dur_s": 269,
+    "samples": 11,
+    "bottleneck": "xfs_io in 14/11 samples"
+  },
+  {
+    "test": "generic/037",
+    "outcome": "pass",
+    "wall_s": 280,
+    "guest_dur_s": 267,
+    "samples": 11,
+    "bottleneck": "(no signal)"
+  },
+  {
+    "test": "generic/371",
+    "outcome": "pass",
+    "wall_s": 217,
+    "guest_dur_s": 205,
+    "samples": 8,
+    "bottleneck": "xfs_io in 14/8 samples"
+  },
+  {
+    "test": "generic/069",
+    "outcome": "pass",
+    "wall_s": 509,
+    "guest_dur_s": 497,
+    "samples": 19,
+    "bottleneck": "(no signal)"
+  },
+  {
+    "test": "generic/626",
+    "outcome": "pass",
+    "wall_s": 319,
+    "guest_dur_s": 306,
+    "samples": 12,
+    "bottleneck": "(no signal)"
+  },
+  {
+    "test": "generic/738",
+    "outcome": "pass",
+    "wall_s": 208,
+    "guest_dur_s": 195,
+    "samples": 8,
+    "bottleneck": "(no signal)"
+  },
+  {
+    "test": "generic/615",
+    "outcome": "pass",
+    "wall_s": 506,
+    "guest_dur_s": 492,
+    "samples": 19,
+    "bottleneck": "xfs_io in 13/19 samples"
+  },
+  {
+    "test": "btrfs/036",
+    "outcome": "pass",
+    "wall_s": 1074,
+    "guest_dur_s": 1062,
+    "samples": 40,
+    "bottleneck": "xfs_io in 30/40 samples"
+  },
+  {
+    "test": "generic/748",
+    "outcome": "pass",
+    "wall_s": 670,
+    "guest_dur_s": 657,
+    "samples": 25,
+    "bottleneck": "xfs_io in 17/25 samples"
+  },
+  {
+    "test": "generic/449",
+    "outcome": "HANG(killed@wallcap)",
+    "wall_s": 1503,
+    "guest_dur_s": null,
+    "samples": 57,
+    "bottleneck": "(no signal)"
+  }
+]
