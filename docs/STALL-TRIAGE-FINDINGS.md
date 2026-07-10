@@ -4,8 +4,9 @@
 
 All 13 profiled "stall" tests from the supervised runner's blacklist were run to
 completion in isolated UML probes (1800s in-guest timeout, 1500s host wall-cap):
-**12 of 13 PASS**. None crashed. None produced a wrong result. The 200s stall
-detector was mislabeling slow tests as hangs.
+**13 of 13 PASS** (generic/449 initially hit the batch wall-cap; a later solo run
+passed in 1497s unpatched / 322s patched). None crashed. None produced a wrong
+result. The 200s stall detector was mislabeling slow tests as hangs.
 
 | test         | outcome              | guest dur* | bottleneck signal            |
 |--------------|----------------------|-----------|-------------------------------|
@@ -21,7 +22,7 @@ detector was mislabeling slow tests as hangs.
 | generic/069  | pass                 | 497s      | —                             |
 | generic/748  | pass                 | 657s      | xfs_io-heavy                  |
 | btrfs/036    | pass                 | 1062s     | xfs_io-heavy                  |
-| generic/449  | killed @1500s wall-cap | —       | progressing (scratch growing); needs a solo re-run |
+| generic/449  | pass (solo re-run)   | 1497s     | fork-bound (322s with the spin patch) |
 
 \* batch durations ran at 6-way concurrency and are inflated by contention
 (btrfs/036 was ~211s solo in an earlier run vs 1062s here). Classification is

@@ -15,6 +15,19 @@ blocking syscall + context switch when the peer flips it within the spin budget
 Measured on this WSL2 box: **327→71 context switches per fork+exec (~4.6× fewer),
 ~4.2–4.85× fork/exec throughput**, btrfs check still passes.
 
+Validated on real xfstests (paired solo runs, same 7.2-rc1 source, patched and
+unpatched simultaneously under identical host conditions; all 8 runs PASS):
+
+| test        | patched | unpatched | speedup |
+|-------------|---------|-----------|---------|
+| btrfs/033   | 164s    | 508s      | 3.1x    |
+| btrfs/036   | 201s    | 860s      | 4.3x    |
+| generic/069 | 22s     | 396s      | 18x     |
+| generic/449 | 322s    | 1497s     | 4.6x    |
+
+i.e. the entire former "stall blacklist" (see docs/STALL-TRIAGE-FINDINGS.md)
+drops back under a ~350s ceiling with the patch on.
+
 Caveats (not yet upstream-ready): best case is an idle multi-core host (a spinning
 thread burns a core); WSL2 exaggerates context-switch cost; needs bare-metal
 validation and an adaptive spin-then-block backoff before it's mergeable. Set

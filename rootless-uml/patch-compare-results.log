@@ -1,0 +1,14 @@
+[15:30:47] paired comparison: btrfs/033 btrfs/036 generic/069 generic/449 (wallcap=2000s per pair)
+[15:30:47] === btrfs/033: launching patched + unpatched ===
+[15:39:27] btrfs/033 RESULT: patched=PASS/164s unpatched=PASS/508s
+[15:39:27] === btrfs/036: launching patched + unpatched ===
+[15:53:57] btrfs/036 RESULT: patched=PASS/201s unpatched=PASS/860s
+[15:53:57] === generic/069: launching patched + unpatched ===
+[16:00:47] generic/069 RESULT: patched=PASS/22s unpatched=PASS/396s
+[16:00:47] === generic/449: launching patched + unpatched ===
+[16:25:58] generic/449 RESULT: patched=PASS/322s unpatched=PASS/1497s
+[16:25:58] === COMPARISON DONE ===
+[16:25:58]   btrfs/033: patched=PASS/164s unpatched=PASS/508s
+[16:25:58]   btrfs/036: patched=PASS/201s unpatched=PASS/860s
+[16:25:58]   generic/069: patched=PASS/22s unpatched=PASS/396s
+[16:25:58]   generic/449: patched=PASS/322s unpatched=PASS/1497s
