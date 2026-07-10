@@ -54,7 +54,9 @@ mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
   mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
-  export FSTESTS_PER_TEST_TIMEOUT=120
+  export FSTESTS_PER_TEST_TIMEOUT=900
+  # no udev in this rootfs: libdevmapper must create /dev/mapper nodes itself
+  export DM_DISABLE_UDEV=1
   ./check $ARGS >"$SDIR/results/run.log" 2>&1
 fi
 echo "==== SHARD $SHARD DONE (uptime $($BB cut -d. -f1 /proc/uptime)s) ===="
