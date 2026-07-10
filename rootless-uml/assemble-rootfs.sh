@@ -31,6 +31,18 @@ if ! ls usr/lib/x86_64-linux-gnu/libproc2.so.0* >/dev/null 2>&1 \
   log "added libproc2 (from host)"
 fi
 
+# su: util-linux su is PAM-based and the rootfs has no PAM stack, so
+# `su fsgqa -c ...` fails ("fsgqa cannot execute commands") and ~27 tests
+# notrun. Route su through busybox (PAM-free); /usr/local/bin wins on PATH.
+mkdir -p usr/local/bin
+printf '#!/bin/sh\nexec /usr/bin/busybox su "$@"\n' > usr/local/bin/su
+chmod 755 usr/local/bin/su
+log "added busybox su wrapper (PAM-free)"
+
+# fsgqa home dirs (tests run commands as fsgqa/fsgqa2)
+mkdir -p home/fsgqa home/fsgqa2
+chmod 777 home/fsgqa home/fsgqa2
+
 log "Merged-/usr symlinks..."
 for dir in bin sbin lib lib64; do
   if [ -d "$dir" ] && [ ! -L "$dir" ]; then

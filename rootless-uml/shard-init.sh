@@ -37,12 +37,19 @@ cat > local.config <<CFG
 FSTYP=btrfs
 TEST_DEV=/dev/ubdb
 TEST_DIR=/mnt/test
-SCRATCH_DEV=/dev/ubdc
 SCRATCH_MNT=/mnt/scratch
 RESULT_BASE=$SDIR/results
 MOUNT_PROG=/usr/local/bin/bbmount
 UMOUNT_PROG=/usr/local/bin/bbumount
 CFG
+# Multi-device scratch pool when the launcher provided extra ubd devices
+# (unlocks _require_scratch_dev_pool tests: btrfs raid/replace/etc).
+# With SCRATCH_DEV_POOL set, xfstests derives SCRATCH_DEV from the pool.
+if [ -b /dev/ubdg ]; then
+  echo 'SCRATCH_DEV_POOL="/dev/ubdc /dev/ubdd /dev/ubde /dev/ubdf /dev/ubdg"' >> local.config
+else
+  echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
+fi
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
