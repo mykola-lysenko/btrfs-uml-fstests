@@ -1,0 +1,20 @@
+--- a/common/verity
++++ b/common/verity
+@@ -5,11 +5,15 @@
+ 
+ # btrfs will return IO errors on corrupted data with or without fs-verity.
+ # to really test fs-verity, use nodatasum.
++# Also disable inline extents (max_inline=0): _fsv_scratch_corrupt_bytes
++# corrupts data via the extents reported by fiemap, but inline extents have
++# no usable physical address, so corruption of files small enough to be
++# inlined silently misses and the test misreports verity as broken.
+ if [ "$FSTYP" == "btrfs" ]; then
+         if [ -z "$MOUNT_OPTIONS" ]; then
+-                export MOUNT_OPTIONS="-o nodatasum"
++                export MOUNT_OPTIONS="-o nodatasum,max_inline=0"
+         else
+-                export MOUNT_OPTIONS+=" -o nodatasum"
++                export MOUNT_OPTIONS+=" -o nodatasum,max_inline=0"
+         fi
+ fi
+ 

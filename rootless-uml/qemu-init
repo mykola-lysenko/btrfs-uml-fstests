@@ -12,6 +12,8 @@ $BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
 echo "=== QEMU cross-check ($(uname -r)) ==="
 cp -a /opt/xfstests /tmp/xfstests 2>/dev/null
 cd /tmp/xfstests
+MOPTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qmopts=//p' | $BB tr ',' ' ')"
+[ -n "$MOPTS" ] && MOPTS="export MOUNT_OPTIONS=\"$MOPTS\""
 cat > local.config <<CFG
 export FSTYP=btrfs
 export TEST_DEV=/dev/vdb
@@ -19,6 +21,7 @@ export TEST_DIR=/mnt/test
 export SCRATCH_DEV=/dev/vdc
 export SCRATCH_MNT=/mnt/scratch
 export FSTESTS_PER_TEST_TIMEOUT=900
+$MOPTS
 CFG
 $BB mkdir -p /mnt/test /mnt/scratch
 mkfs.btrfs -f /dev/vdb >/dev/null 2>&1
