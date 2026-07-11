@@ -14,8 +14,10 @@ cp -a /opt/xfstests /tmp/xfstests 2>/dev/null
 cd /tmp/xfstests
 MOPTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qmopts=//p' | $BB tr ',' ' ')"
 [ -n "$MOPTS" ] && MOPTS="export MOUNT_OPTIONS=\"$MOPTS\""
+QFSTYP="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qfstyp=//p')"
+[ -z "$QFSTYP" ] && QFSTYP=btrfs
 cat > local.config <<CFG
-export FSTYP=btrfs
+export FSTYP=$QFSTYP
 export TEST_DEV=/dev/vdb
 export TEST_DIR=/mnt/test
 export SCRATCH_DEV=/dev/vdc
@@ -24,10 +26,29 @@ export FSTESTS_PER_TEST_TIMEOUT=900
 $MOPTS
 CFG
 $BB mkdir -p /mnt/test /mnt/scratch
-mkfs.btrfs -f /dev/vdb >/dev/null 2>&1
+if [ "$QFSTYP" = btrfs ]; then mkfs.btrfs -f /dev/vdb >/dev/null 2>&1; else mkfs.$QFSTYP -Fq /dev/vdb >/dev/null 2>&1; fi
 TESTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qtests=//p' | $BB tr ',' ' ')"
 [ -z "$TESTS" ] && TESTS="generic/574"
-echo "--- running $TESTS ---"
-./check $TESTS
-echo "=== QEMU RUN DONE rc=$? ==="
+LOOP="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qloop=//p')"
+[ -z "$LOOP" ] && LOOP=1
+echo "--- running $TESTS x$LOOP ---"
+i=1
+while [ "$i" -le "$LOOP" ]; do
+  ./check $TESTS > /tmp/iter.log 2>&1
+  rc=$?
+  fails=$($BB grep -oE 'Failures: .*' /tmp/iter.log)
+  echo "QITER $i rc=$rc ${fails:-all-passed}"
+  if [ -n "$fails" ]; then
+    for f in /tmp/xfstests/results/*/*.out.bad; do
+      [ -f "$f" ] || continue
+      echo "---- $f ----"; $BB head -25 "$f"
+    done
+    for f in /tmp/xfstests/results/*/*.full; do
+      [ -f "$f" ] || continue
+      echo "---- tail $f ----"; $BB tail -15 "$f"
+    done
+  fi
+  i=$((i+1))
+done
+echo "=== QEMU RUN DONE rc=0 ==="
 $BB poweroff -f 2>/dev/null || { echo o > /proc/sysrq-trigger; }
