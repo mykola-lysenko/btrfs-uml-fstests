@@ -52,6 +52,8 @@ recover(){ local n=$1 bad=$2 reason=$3
     BL["$bad"]=1; echo "$bad" >> "$BLACKLIST_FILE"; echo "$bad" >> "$BASE/results/$reason.txt"; fi
   kill -9 "${PID[$n]}" 2>/dev/null; pkill -9 -f "$BASE/shards/$n/test.img" 2>/dev/null; sleep 1
   mv "$BASE/shards/$n/results/run.log" "$BASE/shards/$n/results/run.log.r${RESTARTS[$n]}" 2>/dev/null
+  # keep the crash-time console for forensics (panic signature: SIGBUS vs oops)
+  cp "$BASE/shards/$n/boot.out" "$BASE/shards/$n/boot.out.r${RESTARTS[$n]}" 2>/dev/null
   mapfile -t rem < <(comm -23 <(sort -u "$BASE/shards/$n/RUN_ARGS") \
                               <({ comp_tests $n; for t in "${!BL[@]}"; do echo "$t"; done; } | sort -u))
   if [ "${#rem[@]}" -gt 0 ] && [ "${RESTARTS[$n]}" -lt "$MAX_RESTARTS" ]; then
