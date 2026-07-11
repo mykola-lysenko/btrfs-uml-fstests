@@ -28,3 +28,30 @@
  
  # Exclusive ops should be blocked on manual pause of balance
  check_exclusive_ops
+@@ -71,12 +81,21 @@
+ _run_fsstress $args
+ 
+ # Now pause->resume balance. This ensures balance paused is properly set in
+-# the kernel and won't trigger an assertion failure.
++# the kernel and won't trigger an assertion failure. Same start-vs-pause race
++# as above: retry with more block groups until the pause wins.
+ echo "Start balance" >>$seqres.full
+-_run_btrfs_balance_start --bg "$SCRATCH_MNT"
+-$BTRFS_UTIL_PROG balance pause "$SCRATCH_MNT"
+-$BTRFS_UTIL_PROG balance status "$SCRATCH_MNT" | grep -q paused
+-[ $? -eq 0 ] || _fail "Balance not paused"
++paused=0
++for i in $(seq 1 5); do
++	_run_btrfs_balance_start --bg "$SCRATCH_MNT"
++	$BTRFS_UTIL_PROG balance pause "$SCRATCH_MNT" >>$seqres.full 2>&1
++	if $BTRFS_UTIL_PROG balance status "$SCRATCH_MNT" | grep -q paused; then
++		paused=1
++		break
++	fi
++	echo "balance finished before pause (attempt $i), adding data" >>$seqres.full
++	_run_fsstress $args >>$seqres.full
++done
++[ $paused -eq 1 ] || _fail "Balance not paused"
+ $BTRFS_UTIL_PROG balance resume "$SCRATCH_MNT" &>/dev/null
+ [ $? -eq 0 ] || _fail "Balance can't be resumed via IOCTL"
+ 

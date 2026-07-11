@@ -1,0 +1,26 @@
+# memory-hungry tests -> fat shards only (seeded from the 21 overcommit crashers + ENOSPC/large tests)
+btrfs/010
+btrfs/046
+btrfs/213
+btrfs/250
+btrfs/261
+btrfs/290
+btrfs/309
+generic/027
+generic/083
+generic/133
+generic/175
+generic/211
+generic/247
+generic/251
+generic/263
+generic/275
+generic/299
+generic/323
+generic/358
+generic/415
+generic/449
+generic/531
+generic/579
+generic/615
+generic/627

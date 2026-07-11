@@ -7,30 +7,84 @@
 # it sits on one test longer than STALL seconds (i.e. past the per-test timeout,
 # so it's a true hang), it kills the shard, blacklists that test, and relaunches
 # the shard with only its REMAINING tests. Results accumulate across restarts.
+#
+# Scheduling (v2):
+#  - LPT assignment: tests sorted by known duration (TIMES_DB, harvested from
+#    every run) land on the least-loaded shard; unknown tests assume the median.
+#  - Memory tiering: tests listed in BIGMEM run only on BIG_SHARDS fat shards
+#    (MEM_BIG); everything else on SHARDS slim shards (MEM). Prevents the
+#    host-overcommit SIGBUS "crashes" that memory-hungry stress tests caused.
+#  - Results of a previous run are archived (results/archive-*/), never deleted.
 set -uo pipefail
 BASE="${BASE:-$HOME/uml-smoke}"
-SHARDS="${SHARDS:-16}"
-KERNEL="${KERNEL:-$BASE/linux-btrfs-for-next/linux.nofp}"
+SHARDS="${SHARDS:-9}"                 # slim shards
+BIG_SHARDS="${BIG_SHARDS:-3}"         # fat shards for memory-hungry tests
+TOT=$((SHARDS+BIG_SHARDS))
+KERNEL="${KERNEL:-$BASE/linux-mainline/linux}"
 LIST="${LIST:-$BASE/results/quick-all.txt}"
 BLACKLIST_FILE="${BLACKLIST:-$BASE/results/blacklist.txt}"
-MEM="${MEM:-1500M}"; IMG_SIZE="${IMG_SIZE:-3G}"; INIT="/shard-init.sh"
+MEM="${MEM:-1500M}"; MEM_BIG="${MEM_BIG:-2500M}"
+IMG_SIZE="${IMG_SIZE:-8G}"; INIT="/shard-init.sh"
+TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
+BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
 ROOTFS="$BASE/rootfs-xfs"
-STALL="${STALL:-200}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
+STALL="${STALL:-600}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 
 declare -A BL
 BL[__none__]=1; unset 'BL[__none__]'
-touch "$BLACKLIST_FILE"
+touch "$BLACKLIST_FILE" "$TIMES_DB" "$BIGMEM_FILE"
 while read -r t; do [ -n "$t" ] && BL["$t"]=1; done < <(grep -vE '^#|^\s*$' "$BLACKLIST_FILE")
 mapfile -t ALL < <(grep -vE '^#|^\s*$' "$LIST")
 TESTS=(); for t in "${ALL[@]}"; do [ -n "${BL[$t]:-}" ] || TESTS+=("$t"); done
-log "${#TESTS[@]} tests (of ${#ALL[@]}) after blacklist(${#BL[@]}); $SHARDS shards; stall=${STALL}s"
+log "${#TESTS[@]} tests (of ${#ALL[@]}) after blacklist(${#BL[@]}); $SHARDS slim + $BIG_SHARDS big shards; stall=${STALL}s"
 
-rm -rf "$BASE/shards"
-for ((n=0;n<SHARDS;n++)); do mkdir -p "$BASE/shards/$n/results"; : > "$BASE/shards/$n/RUN_ARGS"; done
-for i in "${!TESTS[@]}"; do echo "${TESTS[$i]}" >> "$BASE/shards/$((i%SHARDS))/RUN_ARGS"; done
+# Archive previous run's results (never lose per-test times / out.bads).
+if [ -d "$BASE/shards" ]; then
+  ARC="$BASE/results/archive-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$ARC"
+  for d in "$BASE"/shards/*/; do
+    n=$(basename "$d")
+    [ -d "$d/results" ] && mkdir -p "$ARC/$n" && mv "$d/results" "$ARC/$n/" 2>/dev/null
+    for b in "$d"/boot.out*; do [ -f "$b" ] && mv "$b" "$ARC/$n/" 2>/dev/null; done
+  done
+  rm -rf "$BASE/shards"
+  log "previous run archived to $ARC"
+fi
+for ((n=0;n<TOT;n++)); do mkdir -p "$BASE/shards/$n/results"; : > "$BASE/shards/$n/RUN_ARGS"; done
+
+# LPT assignment (python: sorts by known time desc, greedy least-loaded shard;
+# bigmem tests only onto the fat shards [SHARDS..TOT), others onto [0..SHARDS)).
+# NOTE: the test list goes via a file — the heredoc already occupies stdin.
+printf '%s\n' "${TESTS[@]}" > "$BASE/shards/.alltests"
+python3 - "$TIMES_DB" "$BIGMEM_FILE" "$SHARDS" "$BIG_SHARDS" "$BASE/shards" <<'PY'
+import sys
+db_f, bm_f, slim, big, outdir = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]
+times = {}
+for line in open(db_f):
+    p = line.split()
+    if len(p) == 2 and p[1].isdigit(): times[p[0]] = int(p[1])
+bigmem = set(l.strip() for l in open(bm_f) if l.strip() and not l.startswith('#'))
+tests = [l.strip() for l in open(outdir + "/.alltests") if l.strip()]
+known = sorted(times.values())
+med = known[len(known)//2] if known else 15
+def lpt(items, shard_ids):
+    load = {s: 0 for s in shard_ids}
+    for t in sorted(items, key=lambda t: -times.get(t, med)):
+        s = min(load, key=load.get)
+        load[s] += times.get(t, med)
+        open(f"{outdir}/{s}/RUN_ARGS", "a").write(t + "\n")
+    return load
+slim_ids = list(range(slim)); big_ids = list(range(slim, slim + big))
+l1 = lpt([t for t in tests if t not in bigmem], slim_ids)
+l2 = lpt([t for t in tests if t in bigmem], big_ids) if big else {}
+pl = lambda d: " ".join(f"{k}:{v}s" for k, v in sorted(d.items()))
+print(f"LPT loads slim: {pl(l1)}")
+if l2: print(f"LPT loads big:  {pl(l2)}")
+PY
 
 declare -A PID DONE RESTARTS CURTEST CURSINCE
+shard_mem(){ [ "$1" -ge "$SHARDS" ] && echo "$MEM_BIG" || echo "$MEM"; }
 launch(){ local n=$1 d="$BASE/shards/$1"
   truncate -s 64M "$d/dummy.img"; truncate -s "$IMG_SIZE" "$d/test.img" "$d/scratch.img"
   # extra scratch-pool devices (sparse) -> guest enables SCRATCH_DEV_POOL
@@ -39,7 +93,7 @@ launch(){ local n=$1 d="$BASE/shards/$1"
     ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
     ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
     ubdh="$d/logw.img" \
-    seccomp=on mem="$MEM" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1 &
+    seccomp=on mem="$(shard_mem $n)" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1 &
   PID[$n]=$!; CURTEST[$n]=""; CURSINCE[$n]=$(date +%s)
 }
 # completed/running derived from ALL run.log parts in the shard dir
@@ -67,12 +121,12 @@ recover(){ local n=$1 bad=$2 reason=$3
 }
 
 t0=$(date +%s)
-for ((n=0;n<SHARDS;n++)); do DONE[$n]=0; RESTARTS[$n]=0; [ -s "$BASE/shards/$n/RUN_ARGS" ] && launch $n || DONE[$n]=1; done
+for ((n=0;n<TOT;n++)); do DONE[$n]=0; RESTARTS[$n]=0; [ -s "$BASE/shards/$n/RUN_ARGS" ] && launch $n || DONE[$n]=1; done
 log "launched; monitoring..."
 
 while :; do
   active=0
-  for ((n=0;n<SHARDS;n++)); do
+  for ((n=0;n<TOT;n++)); do
     [ "${DONE[$n]}" = 1 ] && continue
     if ! kill -0 "${PID[$n]}" 2>/dev/null; then
       if grep -q 'SHARD.*DONE' "$BASE/shards/$n/boot.out" 2>/dev/null; then
@@ -104,9 +158,17 @@ while :; do
 done
 WALL=$(( $(date +%s)-t0 ))
 
+# Harvest per-test durations into the cumulative times DB (newest wins).
+{ cat "$TIMES_DB"
+  grep -rhoE '^[bg][a-z]*/[0-9]+ +[0-9]+s *$' "$BASE"/shards/*/results/run.log* 2>/dev/null \
+    | awk '{gsub(/s$/,"",$2); print $1, $2}'
+} | awk '{v[$1]=$2} END{for (t in v) print t, v[t]}' | sort > "$TIMES_DB.new" \
+  && mv "$TIMES_DB.new" "$TIMES_DB"
+log "times DB updated: $(wc -l < "$TIMES_DB") tests"
+
 log "=== AGGREGATE (wall ${WALL}s) ==="
 tot=0; pass=0; fail=0; nr=0; failed=""
-for ((n=0;n<SHARDS;n++)); do
+for ((n=0;n<TOT;n++)); do
   logs="$BASE/shards/$n"/results/run.log*
   p=$(grep -hcE '^[bg][a-z]*/[0-9]+ +[0-9]+s *$' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); p=${p:-0}
   nrn=$(grep -hcE 'not run' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); nrn=${nrn:-0}
