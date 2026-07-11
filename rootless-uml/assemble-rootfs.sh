@@ -42,6 +42,11 @@ log "stripped setuid bits (they were setuid-uid1000, breaking mount as root)"
 # /etc/mtab for util-linux tools
 ln -sfn ../proc/self/mounts etc/mtab
 
+# name resolution: src/locktest (generic/131,571,786,787) resolves "localhost";
+# without /etc/hosts + nsswitch, gethostbyname fails ("Couldn't get hostbyname").
+printf '127.0.0.1\tlocalhost\n::1\tlocalhost\n' > etc/hosts
+printf 'hosts: files dns\npasswd: files\ngroup: files\n' > etc/nsswitch.conf
+
 # su: util-linux su is PAM-based and the rootfs has no PAM stack, so
 # `su fsgqa -c ...` fails ("fsgqa cannot execute commands") and ~27 tests
 # notrun. Route su through busybox (PAM-free); /usr/local/bin wins on PATH.

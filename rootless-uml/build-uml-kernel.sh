@@ -64,6 +64,9 @@ make ARCH=um defconfig >/dev/null 2>&1
   --enable CONFIG_MD --enable CONFIG_BLK_DEV_DM --enable CONFIG_DM_FLAKEY \
   --enable CONFIG_DM_LOG_WRITES --enable CONFIG_DM_SNAPSHOT --enable CONFIG_DM_ZERO \
   --enable CONFIG_DM_THIN_PROVISIONING --enable CONFIG_DM_DELAY --enable CONFIG_DM_ERROR \
+  `# loop devices (generic/042 etc); verity + fault-injection coverage` \
+  --enable CONFIG_BLK_DEV_LOOP --enable CONFIG_FS_VERITY --enable CONFIG_FS_VERITY_BUILTIN_SIGNATURES \
+  --enable CONFIG_FAULT_INJECTION --enable CONFIG_FAULT_INJECTION_DEBUG_FS --enable CONFIG_FAIL_MAKE_REQUEST \
   >/dev/null 2>&1
 make ARCH=um olddefconfig >/dev/null 2>&1
 

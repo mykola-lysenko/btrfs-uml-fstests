@@ -25,6 +25,9 @@ mkdir -p /dev/shm; $BB mount -t tmpfs tmpfs /dev/shm 2>/dev/null
 SHARD=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^shard=//p')
 [ -z "$SHARD" ] && SHARD=0
 $BB hostname "uml-shard-$SHARD"
+# loopback up: src/locktest (generic/131,571,786,787) is a TCP client/server on lo
+$BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
+export TERM=linux
 $BB mount -t hostfs -o "$HOST_DIR" none /host 2>/dev/null || echo "HOSTFS_FAIL"
 SDIR="/host/shards/$SHARD"
 mkdir -p "$SDIR/results"
