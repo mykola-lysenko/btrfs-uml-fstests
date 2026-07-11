@@ -1,12 +1,6 @@
 btrfs/058
-btrfs/089
-btrfs/289
-btrfs/295
-btrfs/330
 generic/042
-generic/050
 generic/131
-generic/306
 generic/571
 generic/786
 generic/787
