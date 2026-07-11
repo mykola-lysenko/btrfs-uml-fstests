@@ -1,5 +1,6 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export TERM=linux
 BB=/usr/bin/busybox
 $BB mount -t proc proc /proc 2>/dev/null
 $BB mount -t sysfs sysfs /sys 2>/dev/null
@@ -7,7 +8,8 @@ $BB mount -t devtmpfs devtmpfs /dev 2>/dev/null
 $BB ln -sf /proc/self/fd /dev/fd 2>/dev/null
 $BB ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null; $BB ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null; $BB ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null
 $BB mount -t tmpfs -o size=50% tmpfs /tmp 2>/dev/null
-echo "=== QEMU btrfs/301 repro ($(uname -r)) ==="
+$BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
+echo "=== QEMU cross-check ($(uname -r)) ==="
 cp -a /opt/xfstests /tmp/xfstests 2>/dev/null
 cd /tmp/xfstests
 cat > local.config <<CFG
@@ -16,13 +18,13 @@ export TEST_DEV=/dev/vdb
 export TEST_DIR=/mnt/test
 export SCRATCH_DEV=/dev/vdc
 export SCRATCH_MNT=/mnt/scratch
-export MOUNT_PROG=/usr/local/bin/bbmount
-export UMOUNT_PROG=/usr/local/bin/bbumount
-export FSTESTS_PER_TEST_TIMEOUT=600
+export FSTESTS_PER_TEST_TIMEOUT=900
 CFG
 $BB mkdir -p /mnt/test /mnt/scratch
 mkfs.btrfs -f /dev/vdb >/dev/null 2>&1
-echo "--- running btrfs/301 ---"
-./check btrfs/301
+TESTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qtests=//p' | $BB tr ',' ' ')"
+[ -z "$TESTS" ] && TESTS="generic/574"
+echo "--- running $TESTS ---"
+./check $TESTS
 echo "=== QEMU RUN DONE rc=$? ==="
 $BB poweroff -f 2>/dev/null || { echo o > /proc/sysrq-trigger; }

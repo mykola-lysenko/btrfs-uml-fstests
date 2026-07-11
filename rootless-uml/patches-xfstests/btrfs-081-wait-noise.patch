@@ -1,0 +1,11 @@
+--- a/tests/btrfs/081
++++ b/tests/btrfs/081
+@@ -81,7 +81,7 @@
+ 	$SCRATCH_MNT/foo $SCRATCH_MNT/bar
+ 
+ kill $reader_pid > /dev/null 2>&1
+-wait $reader_pid
++wait $reader_pid 2>/dev/null
+ 
+ # Now both foo and bar should have exactly the same content.
+ # This didn't use to be the case before the btrfs kernel fix mentioned

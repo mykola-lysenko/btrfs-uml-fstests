@@ -1,0 +1,30 @@
+--- a/tests/btrfs/049
++++ b/tests/btrfs/049
+@@ -41,12 +41,22 @@
+ echo "Run fsstress $args" >>$seqres.full
+ _run_fsstress $args >>$seqres.full
+ 
+-# Start and pause balance to ensure it will be restored on remount
++# Start and pause balance to ensure it will be restored on remount.
++# On fast setups the balance can complete before the pause lands, so retry
++# with more block groups until the pause wins the race.
+ echo "Start balance" >>$seqres.full
+-_run_btrfs_balance_start --bg "$SCRATCH_MNT"
+-$BTRFS_UTIL_PROG balance pause "$SCRATCH_MNT"
+-$BTRFS_UTIL_PROG balance status "$SCRATCH_MNT" | grep -q paused
+-[ $? -eq 0 ] || _fail "Balance not paused"
++paused=0
++for i in $(seq 1 5); do
++	_run_btrfs_balance_start --bg "$SCRATCH_MNT"
++	$BTRFS_UTIL_PROG balance pause "$SCRATCH_MNT" >>$seqres.full 2>&1
++	if $BTRFS_UTIL_PROG balance status "$SCRATCH_MNT" | grep -q paused; then
++		paused=1
++		break
++	fi
++	echo "balance finished before pause (attempt $i), adding data" >>$seqres.full
++	_run_fsstress $args >>$seqres.full
++done
++[ $paused -eq 1 ] || _fail "Balance not paused"
+ 
+ # Exclusive ops should be blocked on manual pause of balance
+ check_exclusive_ops

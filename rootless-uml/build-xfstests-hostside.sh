@@ -18,6 +18,15 @@ log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 [ -d "$XFSSRC" ] || { echo "xfstests source not found at $XFSSRC"; exit 1; }
 rm -rf /tmp/xfsbuild && cp -a "$XFSSRC" /tmp/xfsbuild
 
+# Local test stabilizations (see patches-xfstests/*.patch; upstream candidates)
+PATCHDIR="$(cd "$(dirname "$0")" && pwd)/patches-xfstests"
+if ls "$PATCHDIR"/*.patch >/dev/null 2>&1; then
+  for p in "$PATCHDIR"/*.patch; do
+    patch -p1 -d /tmp/xfsbuild < "$p" >/dev/null && log "applied $(basename "$p")" \
+      || log "WARN: $(basename "$p") did not apply"
+  done
+fi
+
 log "Building xfstests in userns (bind /usr -> rootfs prefix)..."
 unshare --map-root-user --mount bash -c "
   mount --bind '$R/usr' /usr
