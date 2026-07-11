@@ -11,7 +11,10 @@ make x86_64_defconfig >/dev/null 2>&1
   --enable BTRFS_FS --enable BTRFS_FS_POSIX_ACL --enable BTRFS_FS_CHECK_INTEGRITY \
   --enable VIRTIO --enable VIRTIO_PCI --enable VIRTIO_BLK --enable VIRTIO_CONSOLE \
   --enable EXT4_FS --enable SERIAL_8250 --enable SERIAL_8250_CONSOLE \
-  --enable BLK_DEV --enable DEVTMPFS --enable DEVTMPFS_MOUNT
+  --enable BLK_DEV --enable DEVTMPFS --enable DEVTMPFS_MOUNT \
+  --enable FS_VERITY --enable FS_VERITY_BUILTIN_SIGNATURES --enable BLK_DEV_LOOP \
+  --enable BLK_DEV_DM --enable DM_FLAKEY --enable DM_LOG_WRITES --enable DM_SNAPSHOT \
+  --enable DM_THIN_PROVISIONING --enable DM_DELAY --enable DM_ZERO --enable MD
 make olddefconfig >/dev/null 2>&1
 echo "[x86] building bzImage ($(nproc) cores)..."
 t0=$(date +%s)

@@ -49,6 +49,7 @@ CFG
 # (unlocks _require_scratch_dev_pool tests: btrfs raid/replace/etc).
 # With SCRATCH_DEV_POOL set, xfstests derives SCRATCH_DEV from the pool.
 if [ -b /dev/ubdg ]; then
+  [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV_POOL="/dev/ubdc /dev/ubdd /dev/ubde /dev/ubdf /dev/ubdg"' >> local.config
 else
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config

@@ -34,10 +34,11 @@ declare -A PID DONE RESTARTS CURTEST CURSINCE
 launch(){ local n=$1 d="$BASE/shards/$1"
   truncate -s 64M "$d/dummy.img"; truncate -s "$IMG_SIZE" "$d/test.img" "$d/scratch.img"
   # extra scratch-pool devices (sparse) -> guest enables SCRATCH_DEV_POOL
-  truncate -s "$IMG_SIZE" "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img"
+  truncate -s "$IMG_SIZE" "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
   "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard="$n" \
     ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
     ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
+    ubdh="$d/logw.img" \
     seccomp=on mem="$MEM" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1 &
   PID[$n]=$!; CURTEST[$n]=""; CURSINCE[$n]=$(date +%s)
 }

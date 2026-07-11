@@ -22,7 +22,7 @@ fio gawk sed grep findutils perl diffutils file dash busybox-static \
 bc psmisc procps time hostname \
 libmount1 libsmartcols1 libfdisk1 libncursesw6 libtinfo6 libreadline8 ncurses-base \
 libudev1 libselinux1 libpcre2-8-0 dmsetup libdevmapper1.02.1 \
-quota fsverity libfsverity0 libtirpc3t64 libnsl2"
+quota fsverity libfsverity0 libtirpc3t64 libnsl2 libcap2-bin"
 
 log "Computing full closure (incl pre-depends)..."
 CLOSURE=$(apt-cache depends --recurse --no-recommends --no-suggests \
