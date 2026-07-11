@@ -17,14 +17,14 @@
 #  - Results of a previous run are archived (results/archive-*/), never deleted.
 set -uo pipefail
 BASE="${BASE:-$HOME/uml-smoke}"
-SHARDS="${SHARDS:-9}"                 # slim shards
+SHARDS="${SHARDS:-8}"                 # slim shards
 BIG_SHARDS="${BIG_SHARDS:-3}"         # fat shards for memory-hungry tests
 TOT=$((SHARDS+BIG_SHARDS))
 KERNEL="${KERNEL:-$BASE/linux-mainline/linux}"
 LIST="${LIST:-$BASE/results/quick-all.txt}"
 BLACKLIST_FILE="${BLACKLIST:-$BASE/results/blacklist.txt}"
-MEM="${MEM:-1500M}"; MEM_BIG="${MEM_BIG:-2500M}"
-IMG_SIZE="${IMG_SIZE:-8G}"; INIT="/shard-init.sh"
+MEM="${MEM:-1500M}"; MEM_BIG="${MEM_BIG:-3000M}"
+IMG_SIZE="${IMG_SIZE:-3G}"; IMG_SIZE_BIG="${IMG_SIZE_BIG:-8G}"; INIT="/shard-init.sh"
 TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
 BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
 ROOTFS="$BASE/rootfs-xfs"
@@ -86,9 +86,13 @@ PY
 declare -A PID DONE RESTARTS CURTEST CURSINCE
 shard_mem(){ [ "$1" -ge "$SHARDS" ] && echo "$MEM_BIG" || echo "$MEM"; }
 launch(){ local n=$1 d="$BASE/shards/$1"
-  truncate -s 64M "$d/dummy.img"; truncate -s "$IMG_SIZE" "$d/test.img" "$d/scratch.img"
+  # image size follows the tier: slim shards keep small images (ENOSPC-fill
+  # tests finish fast, slim guests stay within memory); fat shards get big
+  # images for the genuinely large tests.
+  local isz; isz=$([ "$n" -ge "$SHARDS" ] && echo "$IMG_SIZE_BIG" || echo "$IMG_SIZE")
+  truncate -s 64M "$d/dummy.img"; truncate -s "$isz" "$d/test.img" "$d/scratch.img"
   # extra scratch-pool devices (sparse) -> guest enables SCRATCH_DEV_POOL
-  truncate -s "$IMG_SIZE" "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
+  truncate -s "$isz" "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
   "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard="$n" \
     ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
     ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
