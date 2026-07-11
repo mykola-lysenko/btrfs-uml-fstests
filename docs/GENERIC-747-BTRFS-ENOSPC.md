@@ -38,15 +38,37 @@ them.
    → longstanding behavior.
 5. Reproducer is upstream fstests as-is (no local patches involved).
 
-## Assessment
+## Assessment — REVISED after -o enospc_debug instrumentation
 
-Class: btrfs ENOSPC/space-reclaim weakness under high fill + delete/overwrite
-concurrency — a user-visible wart ("deleted files but still ENOSPC") with a
-clean deterministic reproducer. May be a known pain point for btrfs
-maintainers; the value here is the tight reproducer + cross-fs control.
-Candidate disposition: report/question to linux-btrfs with this table, or a
-btrfs-specific `_notrun`/requirement in fstests if maintainers declare it
-expected behavior.
+The enospc_debug dump at the moment of failure exonerates the kernel:
+
+    space_info DATA has 0 free, is full
+    total=8035237888, used=8035237888, pinned=0, reserved=0, may_use=0
+    failing ticket with 4096 bytes
+
+pinned=0 means every deleted byte had ALREADY been reclaimed — data space
+was genuinely, exactly full. The real mechanism is the test's fill
+controller: it drives on statfs used%, and btrfs's f_bavail counts
+unallocated space as available to data at factor 1 while DUP metadata
+growth consumes it at 2x (fs/btrfs/super.c btrfs_statfs). As the test
+creates hundreds of files, metadata expands, the controller's "available"
+evaporates, and a write starts into a pool with only KB free. ext4 passes
+because its statfs is exact — same control result, different meaning.
+
+**Verdict: fstests robustness issue (third of its kind after generic/574
+and btrfs/049), not a kernel bug.** The kernel-side alternative (modeling
+worst-case metadata growth in f_bavail) is the perennial "btrfs df is
+approximate" debate — not a realistic patch.
+
+## Fix (validated)
+
+patches-xfstests/generic-747-tolerate-enospc.patch: the mixed
+write/delete phase treats dd ENOSPC as "filesystem actually full" — drop
+the partial file, take the delete branch, keep accounting intact. This
+matches the GC-stress intent. Validated 3/3 PASS on QEMU/KVM btrfs
+(previously 0/10 fail) and applies cleanly to fstests upstream HEAD.
+Disposition: fstests patch with this evidence chain; optional FYI CC to
+linux-btrfs as a concrete f_bavail-optimism case.
 
 ## Related closures from the same investigation
 

@@ -1,0 +1,45 @@
+--- a/tests/generic/747
++++ b/tests/generic/747
+@@ -32,12 +32,24 @@
+ 	local file_name=${SCRATCH_MNT}/data_$1
+ 	local file_sz=$2
+ 	local dd_extra=$3
++	local out
+ 
+-	POSIXLY_CORRECT=yes dd if=/dev/zero of=${file_name} \
++	out=$(POSIXLY_CORRECT=yes dd if=/dev/zero of=${file_name} \
+ 		bs=${bs} count=$(( $file_sz / ${bs} )) \
+-		status=none $dd_extra  2>&1
++		status=none $dd_extra  2>&1)
+ 
+ 	if [ $? -ne 0 ]; then
++		# Filesystems whose statfs is approximate (btrfs: unallocated
++		# space is reported available to data but may be consumed by
++		# metadata growth) can legitimately hit ENOSPC while our
++		# statfs-based fill accounting still reads below the target.
++		# Treat that as "actually full": drop the partial file and let
++		# the caller switch to deleting, which is the point of this GC
++		# stress test anyway.
++		if echo "$out" | grep -q "No space left on device"; then
++			rm -f ${file_name}
++			return 1
++		fi
+ 		_fail "Failed writing $file_name"
+ 	fi
+ }
+@@ -84,9 +96,12 @@
+ 		if [ $(_used_percent) -lt $fill_percent ]; then
+ 			local fsz=$(_get_random_fsz)
+ 
+-			_create_file $testseq $fsz "$dd_extra"
+-			written_M=$((${written_M} + ${fsz}/${M}))
+-			testseq=$((${testseq} + 1))
++			if _create_file $testseq $fsz "$dd_extra"; then
++				written_M=$((${written_M} + ${fsz}/${M}))
++				testseq=$((${testseq} + 1))
++			else
++				_delete_random_file
++			fi
+ 		else
+ 			_delete_random_file
+ 		fi
