@@ -18,8 +18,10 @@ wget -q "$URL" -O "$R/usr/sbin/btrfs.box"
 chmod +x "$R/usr/sbin/btrfs.box"
 
 # All tool names the box dispatches on (superset; harmless if unused by a test).
+# NOTE: btrfs-corrupt-block is NOT in the box (symlinking it silently runs plain
+# `btrfs` -> "Unknown global option"). It must be a real binary built from source.
 TOOLS="mkfs.btrfs btrfs btrfs-image btrfstune fsck.btrfs btrfsck btrfs-map-logical \
-btrfs-corrupt-block btrfs-select-super btrfs-find-root btrfs-convert btrfs-zero-log"
+btrfs-select-super btrfs-find-root btrfs-convert btrfs-zero-log"
 cd "$R"
 for t in $TOOLS; do
   for d in usr/bin usr/sbin bin sbin; do

@@ -32,8 +32,8 @@ TEST_DIR=/mnt/test
 SCRATCH_DEV=/dev/ubdc
 SCRATCH_MNT=/mnt/scratch
 RESULT_BASE=$SDIR/results
-MOUNT_PROG=/usr/local/bin/bbmount
-UMOUNT_PROG=/usr/local/bin/bbumount
+# util-linux mount works now (setuid-to-uid1000 trap fixed by stripping the bit)
+
 CFG
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"

@@ -31,6 +31,17 @@ if ! ls usr/lib/x86_64-linux-gnu/libproc2.so.0* >/dev/null 2>&1 \
   log "added libproc2 (from host)"
 fi
 
+# setuid bits: dpkg-deb -x preserves the setuid BIT but ownership becomes the
+# assembling uid (1000) — which in the guest is fsgqa. A setuid-fsgqa mount
+# DROPS root to uid 1000, so mount(2) gets EPERM: the long-standing
+# "must be superuser to use mount" (in QEMU too) was exactly this. Root
+# needs no setuid, so strip the bit everywhere.
+find . -perm -4000 -type f -exec chmod u-s {} + 2>/dev/null
+log "stripped setuid bits (they were setuid-uid1000, breaking mount as root)"
+
+# /etc/mtab for util-linux tools
+ln -sfn ../proc/self/mounts etc/mtab
+
 # su: util-linux su is PAM-based and the rootfs has no PAM stack, so
 # `su fsgqa -c ...` fails ("fsgqa cannot execute commands") and ~27 tests
 # notrun. Route su through busybox (PAM-free); /usr/local/bin wins on PATH.

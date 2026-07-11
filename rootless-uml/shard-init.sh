@@ -39,8 +39,8 @@ TEST_DEV=/dev/ubdb
 TEST_DIR=/mnt/test
 SCRATCH_MNT=/mnt/scratch
 RESULT_BASE=$SDIR/results
-MOUNT_PROG=/usr/local/bin/bbmount
-UMOUNT_PROG=/usr/local/bin/bbumount
+# util-linux mount works now (setuid-to-uid1000 trap fixed by stripping the bit)
+
 CFG
 # Multi-device scratch pool when the launcher provided extra ubd devices
 # (unlocks _require_scratch_dev_pool tests: btrfs raid/replace/etc).
