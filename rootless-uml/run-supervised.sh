@@ -86,8 +86,15 @@ while :; do
     ct=$(curtest $n); now=$(date +%s)
     [ "$ct" != "${CURTEST[$n]}" ] && { CURTEST[$n]="$ct"; CURSINCE[$n]=$now; }
     if [ -n "$ct" ] && [ $((now-${CURSINCE[$n]})) -ge $STALL ]; then
-      log "shard $n STALLED on $ct for $((now-${CURSINCE[$n]}))s -> blacklist + recover"
-      recover $n "$ct" hang
+      # A delta far beyond STALL means the host slept (wall clock jumped),
+      # not that the test hung — reset the timer instead of blacklisting.
+      if [ $((now-${CURSINCE[$n]})) -ge $((4*STALL)) ]; then
+        log "shard $n clock jump ($((now-${CURSINCE[$n]}))s) — host suspend? resetting timer for $ct"
+        CURSINCE[$n]=$now
+      else
+        log "shard $n STALLED on $ct for $((now-${CURSINCE[$n]}))s -> blacklist + recover"
+        recover $n "$ct" hang
+      fi
     fi
   done
   [ "$active" = 0 ] && break
