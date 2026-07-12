@@ -1,1 +1,5 @@
+# too slow for UML (QEMU-verified healthy: passes real x86 in 289s; UML needs >30min)
+btrfs/187
 btrfs/301
+# too slow for UML (QEMU-verified healthy: passes real x86 in 730s; UML exceeds 900s cap)
+generic/027
