@@ -146,6 +146,12 @@ while :; do
     fi
     active=1
     ct=$(curtest $n); now=$(date +%s)
+    # RSS sampling: VmRSS of the UML main process, tagged with the running
+    # test — feeds data-driven memory-tier sizing (max-RSS-per-test).
+    if [ "${RSS_SAMPLE:-1}" = 1 ] && [ -n "$ct" ]; then
+      rss=$(awk '/VmRSS/{print $2}' /proc/${PID[$n]}/status 2>/dev/null)
+      [ -n "$rss" ] && echo "$ct $rss" >> "$BASE/results/rss-samples.txt"
+    fi
     [ "$ct" != "${CURTEST[$n]}" ] && { CURTEST[$n]="$ct"; CURSINCE[$n]=$now; }
     # fat shards host the known-slow/big tests: give them a longer stall
     local_stall=$STALL; [ "$n" -ge "$SHARDS" ] && local_stall=$STALL_BIG
@@ -173,6 +179,17 @@ WALL=$(( $(date +%s)-t0 ))
 } | awk '{v[$1]=$2} END{for (t in v) print t, v[t]}' | sort > "$TIMES_DB.new" \
   && mv "$TIMES_DB.new" "$TIMES_DB"
 log "times DB updated: $(wc -l < "$TIMES_DB") tests"
+
+# Aggregate RSS samples: keep the max KB seen per test (merged across runs).
+if [ -s "$BASE/results/rss-samples.txt" ]; then
+  { cat "$BASE/results/rss-per-test.txt" 2>/dev/null
+    cat "$BASE/results/rss-samples.txt"
+  } | awk '{if ($2+0 > m[$1]) m[$1]=$2+0} END{for (t in m) print t, m[t]}' \
+    | sort > "$BASE/results/rss-per-test.new" \
+    && mv "$BASE/results/rss-per-test.new" "$BASE/results/rss-per-test.txt" \
+    && rm -f "$BASE/results/rss-samples.txt"
+  log "rss-per-test DB: $(wc -l < "$BASE/results/rss-per-test.txt") tests"
+fi
 
 log "=== AGGREGATE (wall ${WALL}s) ==="
 tot=0; pass=0; fail=0; nr=0; failed=""
