@@ -1,0 +1,52 @@
+From 5969626c0a5a9f5a933f02baed4ea62cf3e135ce Mon Sep 17 00:00:00 2001
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Date: Sun, 12 Jul 2026 16:02:38 -0700
+Subject: [PATCH 2/5] common/verity: fail loudly when corrupting a file without
+ fiemap extents
+
+_fsv_scratch_corrupt_bytes locates file data via fiemap and overwrites
+it directly on the block device.  Files whose data is not visible
+through fiemap -- notably btrfs inline extents (file size <=
+max_inline, default 2048) -- expose no usable physical address, so the
+dd silently misses and the caller then "verifies" data that was never
+corrupted.
+
+This turned generic/574's block_size=1024 cases into false positives on
+btrfs: every read of the supposedly corrupted file succeeded, and the
+test reported fs-verity as failing to detect corruption while the
+kernel had nothing to detect (confirmed via dmesg: no csum or
+verity errors; identical behaviour on 6.x-era and current kernels,
+and on both UML and KVM).
+
+Fail the helper loudly instead of corrupting nothing: tests that
+corrupt small files must ensure real extents (e.g. btrfs
+-o max_inline=0) or use an fs-specific corruption tool.
+
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+ common/verity | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/common/verity b/common/verity
+index 11e839d..9140931 100644
+--- a/common/verity
++++ b/common/verity
+@@ -337,6 +337,15 @@ _fsv_scratch_corrupt_bytes()
+ 
+ 	_scratch_sync	# Sync to avoid unwritten extents
+ 
++	# Inline extents (e.g. btrfs files <= max_inline) expose no usable
++	# physical address via fiemap, so the dd below would silently miss
++	# and the caller would test uncorrupted data. Fail loudly instead;
++	# tests corrupting small files must ensure real extents (btrfs:
++	# -o max_inline=0) or use an fs-specific corruption tool.
++	if ! $XFS_IO_PROG -r -c "fiemap" "$file" | grep -qE '\.\.'; then
++		_fail "_fsv_scratch_corrupt_bytes: '$file' has no fiemap extents (inline?); corruption would silently miss"
++	fi
++
+ 	cat > $tmp.bytes
+ 	local end=$(( offset + $(_get_filesize $tmp.bytes ) ))
+ 
+-- 
+2.43.0
+

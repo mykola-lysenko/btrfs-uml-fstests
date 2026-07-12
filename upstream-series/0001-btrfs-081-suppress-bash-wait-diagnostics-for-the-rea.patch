@@ -1,0 +1,40 @@
+From 70f46fb783c46418b191406c7279e728ff8f4416 Mon Sep 17 00:00:00 2001
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Date: Sun, 12 Jul 2026 16:02:38 -0700
+Subject: [PATCH 1/5] btrfs/081: suppress bash wait diagnostics for the reaped
+ reader pid
+
+The test kills its background reader-loop subshell and then waits for
+it.  With bash >= 5.2 the subshell may already have been reaped, and
+wait prints "wait_for: No record of process <pid>" to stderr.  That
+line lands in the test output and fails the golden output comparison
+even though the actual verification (the md5 comparison of the cloned
+files) passed.
+
+Discard wait's stderr; its exit status is not consumed and the test's
+correctness signal is the md5 output.
+
+Observed as an intermittent failure on btrfs test runs with bash 5.2
+(Ubuntu 24.04).
+
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+ tests/btrfs/081 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/btrfs/081 b/tests/btrfs/081
+index 35db6dd..040f18d 100755
+--- a/tests/btrfs/081
++++ b/tests/btrfs/081
+@@ -81,7 +81,7 @@ $CLONER_PROG -s 0 -d 0 -l $(($num_extents * $extent_size)) \
+ 	$SCRATCH_MNT/foo $SCRATCH_MNT/bar
+ 
+ kill $reader_pid > /dev/null 2>&1
+-wait $reader_pid
++wait $reader_pid 2>/dev/null
+ 
+ # Now both foo and bar should have exactly the same content.
+ # This didn't use to be the case before the btrfs kernel fix mentioned
+-- 
+2.43.0
+

@@ -1,0 +1,46 @@
+From 24770fd35c01749ea5a470124d305e7ba7928e32 Mon Sep 17 00:00:00 2001
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Date: Sun, 12 Jul 2026 16:02:38 -0700
+Subject: [PATCH 3/5] generic/574: force real extents on btrfs for sub-page
+ corruption cases
+
+The block_size=1024 cases corrupt files as small as 1024 and 2048
+bytes.  On btrfs those are stored as inline extents (default
+max_inline=2048), which _fsv_scratch_corrupt_bytes cannot corrupt --
+fiemap exposes no physical address for inline data -- so the test
+misreported fs-verity as broken while no corruption ever reached disk.
+
+Mount with -o max_inline=0 on btrfs so every test file gets a regular,
+corruptible extent.  The option is scoped to this test rather than
+common/verity because btrfs/290 deliberately corrupts inline extents
+and must keep them available.
+
+With this and the previous patch, generic/574 passes on btrfs
+(previously the 1024 section failed 100% of runs) and btrfs/290 is
+unaffected.
+
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+ tests/generic/574 | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/tests/generic/574 b/tests/generic/574
+index ebe081e..6734999 100755
+--- a/tests/generic/574
++++ b/tests/generic/574
+@@ -25,6 +25,12 @@ _cleanup()
+ . ./common/verity
+ 
+ _require_scratch_verity
++# btrfs: files <= max_inline become inline extents, which
++# _fsv_scratch_corrupt_bytes cannot corrupt (no physical fiemap address) —
++# the block_size=1024 cases below use files that small. Force real extents.
++if [ $FSTYP == "btrfs" ]; then
++	export MOUNT_OPTIONS+=" -o max_inline=0"
++fi
+ _disable_fsverity_signatures
+ _require_fsverity_corruption
+ 
+-- 
+2.43.0
+

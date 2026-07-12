@@ -1,0 +1,48 @@
+From a423793b584c89b9fcd01acd64d90339371258a9 Mon Sep 17 00:00:00 2001
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Date: Sun, 12 Jul 2026 16:03:16 -0700
+Subject: [PATCH 0/5] fstests: five fixes from a btrfs UML/QEMU test campaign
+
+These five patches fix test problems found while running the full btrfs
+auto group repeatedly on User Mode Linux with QEMU/KVM cross-checking.
+Each started as a suspected kernel bug and was root-caused to a test
+issue with kernel-side instrumentation; the corresponding kernel was
+exonerated in every case (details in each commit message).
+
+- btrfs/081: bash >=5.2 wait diagnostics pollute the golden output.
+- common/verity + generic/574: the generic corruption helper silently
+  misses btrfs inline extents, producing a false "fs-verity does not
+  detect corruption" failure; the helper now fails loudly and
+  generic/574 forces real extents. Scoped per-test because btrfs/290
+  corrupts inline extents on purpose (a global option broke it).
+- btrfs/049: balance completes before "balance pause" lands on fast
+  setups; retry with more block groups. Deterministic against current
+  btrfs for-next.
+- generic/747: btrfs statfs f_bavail counts unallocated space that DUP
+  metadata growth then consumes, so the test's fill controller
+  overshoots into genuine ENOSPC (pinned=0 at the failure instant);
+  treat ENOSPC in the write phase as "actually full", which is the GC
+  pressure the test wants anyway.
+
+All five apply to current xfstests-dev HEAD and were validated on
+btrfs (UML + QEMU/KVM, kernels 7.1-rc7, 7.2-rc1, btrfs for-next) and,
+where relevant, ext4.
+
+Mykola Lysenko (5):
+  btrfs/081: suppress bash wait diagnostics for the reaped reader pid
+  common/verity: fail loudly when corrupting a file without fiemap
+    extents
+  generic/574: force real extents on btrfs for sub-page corruption cases
+  btrfs/049: retry when balance completes before it can be paused
+  generic/747: tolerate ENOSPC from filesystems with approximate statfs
+
+ common/verity     |  9 +++++++++
+ tests/btrfs/049   | 39 +++++++++++++++++++++++++++++----------
+ tests/btrfs/081   |  2 +-
+ tests/generic/574 |  6 ++++++
+ tests/generic/747 | 25 ++++++++++++++++++++-----
+ 5 files changed, 65 insertions(+), 16 deletions(-)
+
+-- 
+2.43.0
+
