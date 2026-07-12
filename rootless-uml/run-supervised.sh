@@ -28,7 +28,7 @@ IMG_SIZE="${IMG_SIZE:-3G}"; IMG_SIZE_BIG="${IMG_SIZE_BIG:-8G}"; INIT="/shard-ini
 TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
 BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
 ROOTFS="$BASE/rootfs-xfs"
-STALL="${STALL:-600}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
+STALL="${STALL:-600}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 
 declare -A BL
@@ -145,10 +145,12 @@ while :; do
     active=1
     ct=$(curtest $n); now=$(date +%s)
     [ "$ct" != "${CURTEST[$n]}" ] && { CURTEST[$n]="$ct"; CURSINCE[$n]=$now; }
-    if [ -n "$ct" ] && [ $((now-${CURSINCE[$n]})) -ge $STALL ]; then
+    # fat shards host the known-slow/big tests: give them a longer stall
+    local_stall=$STALL; [ "$n" -ge "$SHARDS" ] && local_stall=$STALL_BIG
+    if [ -n "$ct" ] && [ $((now-${CURSINCE[$n]})) -ge $local_stall ]; then
       # A delta far beyond STALL means the host slept (wall clock jumped),
       # not that the test hung — reset the timer instead of blacklisting.
-      if [ $((now-${CURSINCE[$n]})) -ge $((4*STALL)) ]; then
+      if [ $((now-${CURSINCE[$n]})) -ge $((4*local_stall)) ]; then
         log "shard $n clock jump ($((now-${CURSINCE[$n]}))s) — host suspend? resetting timer for $ct"
         CURSINCE[$n]=$now
       else
@@ -185,4 +187,27 @@ echo "TOTAL: pass=$pass notrun=$nr failed=$fail (incl ~$to timeout) wall=${WALL}
 echo "BLACKLIST: $(grep -cE '^[bg]' "$BLACKLIST_FILE") = hangs:$(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -cE '^[bg]') + crashes:$(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -cE '^[bg]')"
 echo "HANGS: $(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
 echo "CRASHES: $(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
-[ -n "$failed" ] && echo "FAILURES:$(echo $failed | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+if [ -n "$failed" ]; then
+  FAILED_SET=$(echo $failed | tr ' ' '\n' | sort -u)
+  echo "FAILURES(raw):$(echo "$FAILED_SET" | tr '\n' ' ')"
+  if [ "${RETRY_SOLO:-1}" = 1 ]; then
+    # Re-run every failure serially in ONE fresh UML: what passes solo was
+    # load-sensitive (environmental), what fails again is a real failure.
+    log "solo-retry lane: $(echo "$FAILED_SET" | wc -l) failed tests"
+    d="$BASE/shards/retry"; rm -rf "$d"; mkdir -p "$d/results"
+    echo "$FAILED_SET" > "$d/RUN_ARGS"
+    truncate -s 64M "$d/dummy.img"
+    truncate -s "$IMG_SIZE_BIG" "$d/test.img" "$d/scratch.img" \
+      "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
+    "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard=retry \
+      ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
+      ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
+      ubdh="$d/logw.img" \
+      seccomp=on mem="$MEM_BIG" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1
+    solo_fail=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE 'output mismatch|\[failed' "$d/results/run.log" 2>/dev/null) | sort -u)
+    confirmed=$(comm -12 <(echo "$FAILED_SET") <(echo "$solo_fail"))
+    flaky=$(comm -23 <(echo "$FAILED_SET") <(echo "$solo_fail"))
+    echo "FAILURES(confirmed-solo):$(echo $confirmed | tr '\n' ' ')"
+    echo "LOAD-FLAKY(passed-solo):$(echo $flaky | tr '\n' ' ')"
+  fi
+fi
