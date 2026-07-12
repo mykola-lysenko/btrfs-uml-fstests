@@ -1,0 +1,18 @@
+--- a/common/verity
++++ b/common/verity
+@@ -337,6 +337,15 @@
+ 
+ 	_scratch_sync	# Sync to avoid unwritten extents
+ 
++	# Inline extents (e.g. btrfs files <= max_inline) expose no usable
++	# physical address via fiemap, so the dd below would silently miss
++	# and the caller would test uncorrupted data. Fail loudly instead;
++	# tests corrupting small files must ensure real extents (btrfs:
++	# -o max_inline=0) or use an fs-specific corruption tool.
++	if ! $XFS_IO_PROG -r -c "fiemap" "$file" | grep -qE '\.\.'; then
++		_fail "_fsv_scratch_corrupt_bytes: '$file' has no fiemap extents (inline?); corruption would silently miss"
++	fi
++
+ 	cat > $tmp.bytes
+ 	local end=$(( offset + $(_get_filesize $tmp.bytes ) ))
+ 

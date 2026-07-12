@@ -60,3 +60,23 @@ This is the second finding killed by the cross-check pipeline before an
 embarrassing upstream report (first: btrfs/301, a UML artifact). Pipeline:
 UML triage → QEMU confirm → version A/B → hypothesis experiment
 (`max_inline=0`) → verdict. Total cost: ~4 QEMU boots.
+
+## Postscript (2026-07-11): v1 fix broke btrfs/290 — refined to v2
+
+The original fix (global `max_inline=0` in common/verity) broke btrfs/290,
+which DELIBERATELY tests corruption of inline extents (42-byte file; with
+max_inline=0 it became a regular extent, the corrupted disk_bytenr field
+tripped the tree-checker, and the scratch fs failed to mount: "can't read
+superblock" — a failure mode btrfs/290's own header documents).
+
+v2 (validated: btrfs/290 + generic/574 both pass):
+- common/verity: global option REVERTED; instead `_fsv_scratch_corrupt_bytes`
+  now FAILS LOUDLY when the target file has no fiemap-visible extents
+  (patches-xfstests/verity-guard-inline-corruption.patch) — the silent
+  false-positive class is structurally closed.
+- generic/574: `-o max_inline=0` scoped to the one test whose tiny files
+  need real extents (patches-xfstests/generic-574-btrfs-max-inline.patch).
+
+Lesson for the upstream series: scope fs-behavior-altering options to the
+tests that need them; put invariants (corruption must actually corrupt)
+into the helpers as loud failures.

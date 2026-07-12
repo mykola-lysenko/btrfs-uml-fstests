@@ -1,0 +1,15 @@
+--- a/tests/generic/574
++++ b/tests/generic/574
+@@ -25,6 +25,12 @@
+ . ./common/verity
+ 
+ _require_scratch_verity
++# btrfs: files <= max_inline become inline extents, which
++# _fsv_scratch_corrupt_bytes cannot corrupt (no physical fiemap address) —
++# the block_size=1024 cases below use files that small. Force real extents.
++if [ $FSTYP == "btrfs" ]; then
++	export MOUNT_OPTIONS+=" -o max_inline=0"
++fi
+ _disable_fsverity_signatures
+ _require_fsverity_corruption
+ 
