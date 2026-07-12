@@ -28,7 +28,9 @@ IMG_SIZE="${IMG_SIZE:-3G}"; IMG_SIZE_BIG="${IMG_SIZE_BIG:-8G}"; INIT="/shard-ini
 TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
 BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
 ROOTFS="$BASE/rootfs-xfs"
-STALL="${STALL:-600}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
+# STALL must exceed the in-guest per-test timeout (900s in shard-init) so the
+# timeout fails a slow test cleanly before the supervisor calls it a hang.
+STALL="${STALL:-1000}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 
 declare -A BL

@@ -18,7 +18,6 @@ btrfs/297
 btrfs/301
 btrfs/309
 btrfs/338
-generic/027
 generic/083
 generic/133
 generic/172
@@ -31,7 +30,6 @@ generic/275
 generic/299
 generic/323
 generic/358
-generic/415
 generic/449
 generic/531
 generic/579
