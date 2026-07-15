@@ -82,7 +82,7 @@ unaffected.
 | UML | 7.2.0-rc1 unpatched | btrfs/297 fails `_check_dmesg` (WARN in dmesg) |
 | QEMU/KVM x86-64 | 7.2.0-rc1 unpatched | iter 1 fails with identical stack; iters 2–3 "pass" (WARN_ON_ONCE) — `results/qemu-297-raid6warn.out` |
 | QEMU/KVM x86-64 | 7.2.0-rc1 + fix | btrfs/297 ×3 all pass, zero warnings — `results/qemu-297-fixed.out` |
-| UML | 7.2.0-rc1 + fix | (raid-group regression run — see below) |
+| UML | 7.2.0-rc1 + fix | btrfs/297 passes (7s); full fstests raid group (66 tests): 52 pass / 14 notrun / 0 fail, zero dmesg artifacts (per-test verified, not just aggregate) |
 
 ## Notes for the report / submission
 
