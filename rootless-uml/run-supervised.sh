@@ -82,8 +82,12 @@ def lpt(items, shard_ids):
         open(f"{outdir}/{s}/RUN_ARGS", "a").write(t + "\n")
     return load
 slim_ids = list(range(slim)); big_ids = list(range(slim, slim + big))
-l1 = lpt([t for t in tests if t not in bigmem], slim_ids)
-l2 = lpt([t for t in tests if t in bigmem], big_ids) if big else {}
+if big:
+    l1 = lpt([t for t in tests if t not in bigmem], slim_ids)
+    l2 = lpt([t for t in tests if t in bigmem], big_ids)
+else:
+    # no fat shards -> bigmem tests still must run somewhere: one pool
+    l1 = lpt(tests, slim_ids); l2 = {}
 pl = lambda d: " ".join(f"{k}:{v}s" for k, v in sorted(d.items()))
 print(f"LPT loads slim: {pl(l1)}")
 if l2: print(f"LPT loads big:  {pl(l2)}")
