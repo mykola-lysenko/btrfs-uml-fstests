@@ -25,6 +25,13 @@ export SCRATCH_MNT=/mnt/scratch
 export FSTESTS_PER_TEST_TIMEOUT=900
 $MOPTS
 CFG
+# multi-device tests (raid/scrub): pool over every extra virtio disk present
+if [ -b /dev/vdd ]; then
+  POOL="/dev/vdc /dev/vdd"
+  for d in /dev/vde /dev/vdf /dev/vdg; do [ -b "$d" ] && POOL="$POOL $d"; done
+  $BB sed -i '/SCRATCH_DEV=/d' local.config
+  echo "export SCRATCH_DEV_POOL=\"$POOL\"" >> local.config
+fi
 $BB mkdir -p /mnt/test /mnt/scratch
 if [ "$QFSTYP" = btrfs ]; then mkfs.btrfs -f /dev/vdb >/dev/null 2>&1; else mkfs.$QFSTYP -Fq /dev/vdb >/dev/null 2>&1; fi
 TESTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qtests=//p' | $BB tr ',' ' ')"
@@ -46,6 +53,10 @@ while [ "$i" -le "$LOOP" ]; do
     for f in /tmp/xfstests/results/*/*.full; do
       [ -f "$f" ] || continue
       echo "---- tail $f ----"; $BB tail -15 "$f"
+    done
+    for f in /tmp/xfstests/results/*/*.dmesg; do
+      [ -f "$f" ] || continue
+      echo "---- dmesg $f ----"; $BB grep -A40 'cut here' "$f" || $BB tail -40 "$f"
     done
   fi
   i=$((i+1))

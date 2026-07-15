@@ -1,0 +1,89 @@
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Subject: [PATCH] btrfs: handle 3-device RAID6 without calling the raid6 library
+
+Commit 2790045a62eb ("raid6: warn when using less than four devices")
+made raid6_gen_syndrome() WARN when called with less than
+RAID6_MIN_DISKS (4) devices, since the library has never supported the
+degenerate 3-unit geometry.  btrfs however allows RAID6 chunks with a
+single data stripe (btrfs_raid_array sets devs_min = 3 for RAID6), so
+any write through the RMW path or any parity scrub of such a chunk now
+triggers the warning:
+
+  WARNING: lib/raid/raid6/algos.c:48 at raid6_gen_syndrome+0x4d/0x60
+  Workqueue: btrfs-rmw rmw_rbio_work
+  Call Trace:
+   rmw_rbio+0x810/0xc82
+   rmw_rbio_work+0x30/0x34
+   process_scheduled_works+0x1cb/0x2ba
+
+Reproducible with fstests btrfs/297 against a 3-device scratch pool
+(only on the first raid6 test of a boot -- WARN_ON_ONCE swallows the
+rest), verified on both x86-64/KVM and UML.
+
+For a single data stripe the P/Q algorithm degenerates to P = D0 and
+Q = g^0 * D0 = D0: both parities are plain copies of the data, as the
+offending commit itself points out.  Compute them with memcpy() and
+call the library only for geometries it supports.
+
+The recovery helpers (raid6_recov_2data(), raid6_recov_datap()) did not
+grow a minimum-disks assertion, so the read-repair path is left
+untouched.
+
+Fixes: 2790045a62eb ("raid6: warn when using less than four devices")
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1385,6 +1385,30 @@
+ 	return kmap_local_page(phys_to_page(paddr)) + offset_in_page(paddr);
+ }
+ 
++/*
++ * Generate RAID6 P/Q parity for one vertical step.
++ *
++ * @pointers holds one sector from each data stripe followed by P and Q.
++ *
++ * The raid6 library requires at least RAID6_MIN_DISKS (4) devices, but btrfs
++ * allows RAID6 chunks with a single data stripe (3 devices).  For that
++ * degenerate geometry both P and Q equal the data by definition of the P/Q
++ * algorithm (P is the XOR of one term, Q is g^0 * that term), so fill them
++ * with memcpy() instead of calling the library.
++ */
++static void rbio_gen_syndrome(struct btrfs_raid_bio *rbio, u32 step,
++			      void **pointers)
++{
++	assert_rbio(rbio);
++
++	if (rbio->real_stripes < RAID6_MIN_DISKS) {
++		memcpy(pointers[rbio->nr_data], pointers[0], step);
++		memcpy(pointers[rbio->nr_data + 1], pointers[0], step);
++		return;
++	}
++	raid6_gen_syndrome(rbio->real_stripes, step, pointers);
++}
++
+ static void generate_pq_vertical_step(struct btrfs_raid_bio *rbio, unsigned int sector_nr,
+ 				      unsigned int step_nr)
+ {
+@@ -1409,8 +1433,7 @@
+ 		pointers[stripe++] = kmap_local_paddr(
+ 				rbio_qstripe_paddr(rbio, sector_nr, step_nr));
+ 
+-		assert_rbio(rbio);
+-		raid6_gen_syndrome(rbio->real_stripes, step, pointers);
++		rbio_gen_syndrome(rbio, step, pointers);
+ 	} else {
+ 		/* raid5 */
+ 		memcpy(pointers[rbio->nr_data], pointers[0], step);
+@@ -2642,9 +2665,8 @@
+ 						     step_nr, 0));
+ 
+ 	if (has_qstripe) {
+-		assert_rbio(rbio);
+-		/* RAID6, call the library function to fill in our P/Q. */
+-		raid6_gen_syndrome(rbio->real_stripes, step, pointers);
++		/* RAID6, fill in our P/Q. */
++		rbio_gen_syndrome(rbio, step, pointers);
+ 	} else {
+ 		/* RAID5. */
+ 		memcpy(pointers[nr_data], pointers[0], step);

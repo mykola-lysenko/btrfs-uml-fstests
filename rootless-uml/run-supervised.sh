@@ -107,7 +107,12 @@ launch(){ local n=$1 d="$BASE/shards/$1"
   PID[$n]=$!; CURTEST[$n]=""; CURSINCE[$n]=$(date +%s)
 }
 # completed/running derived from ALL run.log parts in the shard dir
-comp_tests(){ grep -hoE '^[bg][a-z]*/[0-9]+ +([0-9]+s|.*not run)' "$BASE/shards/$1"/results/run.log* 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+'; }
+# completed = any per-test verdict line: pass (Ns), notrun, or ANY failure
+# form. Failures must count as completed or crash recovery re-runs them.
+comp_tests(){ grep -hoE '^[bg][a-z]*/[0-9]+ +([0-9]+s|.*not run|.*output mismatch|.*\[failed|.*_check_[a-z_]*)' "$BASE/shards/$1"/results/run.log* 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+'; }
+# every failure form ./check prints on the test's own line: golden-output
+# mismatch, nonzero exit, dmesg hit, post-test fsck inconsistency
+FAIL_RE='output mismatch|\[failed|_check_dmesg|_check_[a-z_]*filesystem|inconsistent'
 curtest(){ local l; l=$(tail -1 "$BASE/shards/$1/results/run.log" 2>/dev/null); echo "$l"|grep -qE '[0-9]+s *$|not run' && echo "" || echo "$l"|grep -oE '^[bg][a-z]*/[0-9]+'; }
 # Why did a guest die? The console tells us, and the answer decides whether the
 # running test deserves the blame:
@@ -230,7 +235,7 @@ for ((n=0;n<TOT;n++)); do
   logs="$BASE/shards/$n"/results/run.log*
   p=$(grep -hcE '^[bg][a-z]*/[0-9]+ +[0-9]+s *$' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); p=${p:-0}
   nrn=$(grep -hcE 'not run' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); nrn=${nrn:-0}
-  fl=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE 'output mismatch|\[failed' $logs 2>/dev/null) | sort -u)
+  fl=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE "$FAIL_RE" $logs 2>/dev/null) | sort -u)
   fn=$(echo "$fl"|grep -cE '^[bg]'); pass=$((pass+p)); nr=$((nr+nrn)); fail=$((fail+fn))
   [ -n "$fl" ] && failed="$failed $fl"
 done
@@ -262,7 +267,7 @@ if [ -n "$failed" ] || [ -n "$DEFERRED_SET" ]; then
       ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
       ubdh="$d/logw.img" \
       seccomp=on mem="$MEM_BIG" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1
-    solo_fail=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE 'output mismatch|\[failed' "$d/results/run.log" 2>/dev/null) | sort -u)
+    solo_fail=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE "$FAIL_RE" "$d/results/run.log" 2>/dev/null) | sort -u)
     if [ -n "$FAILED_SET" ]; then
       confirmed=$(comm -12 <(echo "$FAILED_SET") <(echo "$solo_fail"))
       flaky=$(comm -23 <(echo "$FAILED_SET") <(echo "$solo_fail"))
