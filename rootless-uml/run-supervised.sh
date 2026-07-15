@@ -27,6 +27,9 @@ MEM="${MEM:-1500M}"; MEM_BIG="${MEM_BIG:-3000M}"
 IMG_SIZE="${IMG_SIZE:-3G}"; IMG_SIZE_BIG="${IMG_SIZE_BIG:-8G}"; INIT="/shard-init.sh"
 TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
 BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
+# Memory victims land here instead of the blacklist: they are re-run on the fat
+# retry lane so a memory-tier miscalibration can never silently cost coverage.
+DEFERRED_FILE="$BASE/results/deferred.txt"
 ROOTFS="$BASE/rootfs-xfs"
 # STALL must exceed the in-guest per-test timeout (900s in shard-init) so the
 # timeout fails a slow test cleanly before the supervisor calls it a hang.
@@ -36,6 +39,7 @@ log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 declare -A BL
 BL[__none__]=1; unset 'BL[__none__]'
 touch "$BLACKLIST_FILE" "$TIMES_DB" "$BIGMEM_FILE"
+: > "$DEFERRED_FILE"
 while read -r t; do [ -n "$t" ] && BL["$t"]=1; done < <(grep -vE '^#|^\s*$' "$BLACKLIST_FILE")
 mapfile -t ALL < <(grep -vE '^#|^\s*$' "$LIST")
 TESTS=(); for t in "${ALL[@]}"; do [ -n "${BL[$t]:-}" ] || TESTS+=("$t"); done
@@ -105,11 +109,36 @@ launch(){ local n=$1 d="$BASE/shards/$1"
 # completed/running derived from ALL run.log parts in the shard dir
 comp_tests(){ grep -hoE '^[bg][a-z]*/[0-9]+ +([0-9]+s|.*not run)' "$BASE/shards/$1"/results/run.log* 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+'; }
 curtest(){ local l; l=$(tail -1 "$BASE/shards/$1/results/run.log" 2>/dev/null); echo "$l"|grep -qE '[0-9]+s *$|not run' && echo "" || echo "$l"|grep -oE '^[bg][a-z]*/[0-9]+'; }
-# recover a shard (from a stall OR a crash): blacklist the bad test, save this
-# attempt's results, and relaunch with the remaining tests.
+# Why did a guest die? The console tells us, and the answer decides whether the
+# running test deserves the blame:
+#   shm-sigbus — host /dev/shm is exhausted. Guest RAM lives in /dev/shm (see
+#                wsl2-memory-cap), so the page fault the guest cannot satisfy
+#                surfaces as "Kernel mode signal 7". This is a host budget
+#                error; the test running when it landed is an innocent
+#                bystander and must not be blacklisted for it.
+#   oom        — the guest kernel ran out of its own mem=: this test really
+#                does need the fat tier.
+#   crash      — a genuine kernel bug. Blacklisting it is the entire point.
+death_kind(){ local f="$BASE/shards/$1/boot.out"
+  grep -q 'Kernel mode signal 7' "$f" 2>/dev/null && { echo shm-sigbus; return; }
+  grep -qE 'Out of memory: Killed|oom-kill:|Out of memory and no killable' "$f" 2>/dev/null \
+    && { echo oom; return; }
+  echo crash
+}
+# recover a shard (from a stall OR a crash): sideline the bad test, save this
+# attempt's results, and relaunch with the remaining tests. A memory victim is
+# sidelined from THIS lane but deferred to the fat retry lane, never blacklisted.
 recover(){ local n=$1 bad=$2 reason=$3
   if [ -n "$bad" ] && [ -z "${BL[$bad]:-}" ]; then
-    BL["$bad"]=1; echo "$bad" >> "$BLACKLIST_FILE"; echo "$bad" >> "$BASE/results/$reason.txt"; fi
+    BL["$bad"]=1                       # skip on this lane whatever the reason
+    echo "$bad" >> "$BASE/results/$reason.txt"
+    case "$reason" in
+      oom|shm-sigbus)                  # memory victim: keep the coverage
+        echo "$bad" >> "$DEFERRED_FILE"
+        [ "$reason" = oom ] && echo "$bad" >> "$BIGMEM_FILE" ;;
+      *) echo "$bad" >> "$BLACKLIST_FILE" ;;
+    esac
+  fi
   kill -9 "${PID[$n]}" 2>/dev/null; pkill -9 -f "$BASE/shards/$n/test.img" 2>/dev/null; sleep 1
   mv "$BASE/shards/$n/results/run.log" "$BASE/shards/$n/results/run.log.r${RESTARTS[$n]}" 2>/dev/null
   # keep the crash-time console for forensics (panic signature: SIGBUS vs oops)
@@ -138,9 +167,13 @@ while :; do
       if grep -q 'SHARD.*DONE' "$BASE/shards/$n/boot.out" 2>/dev/null; then
         DONE[$n]=1; log "shard $n finished cleanly (completed=$(comp_tests $n|sort -u|wc -l))"
       else
-        ct=$(curtest $n)
-        log "shard $n CRASHED on ${ct:-?} (completed=$(comp_tests $n|sort -u|wc -l)) -> blacklist + recover"
-        recover $n "$ct" crash
+        ct=$(curtest $n); kind=$(death_kind $n)
+        case "$kind" in
+          shm-sigbus) log "shard $n SIGBUS on ${ct:-?} — host /dev/shm exhausted, NOT a test bug; deferring to fat retry lane. Lane budget is too big for $(df -h --output=size /dev/shm|tail -1|tr -d ' ')." ;;
+          oom)        log "shard $n guest-OOM on ${ct:-?} — promoting to BIGMEM (fat tier), deferring to fat retry lane" ;;
+          crash)      log "shard $n CRASHED on ${ct:-?} (completed=$(comp_tests $n|sort -u|wc -l)) -> blacklist + recover" ;;
+        esac
+        recover $n "$ct" "$kind"
       fi
       continue
     fi
@@ -206,15 +239,21 @@ echo "TOTAL: pass=$pass notrun=$nr failed=$fail (incl ~$to timeout) wall=${WALL}
 echo "BLACKLIST: $(grep -cE '^[bg]' "$BLACKLIST_FILE") = hangs:$(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -cE '^[bg]') + crashes:$(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -cE '^[bg]')"
 echo "HANGS: $(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
 echo "CRASHES: $(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
-if [ -n "$failed" ]; then
-  FAILED_SET=$(echo $failed | tr ' ' '\n' | sort -u)
-  echo "FAILURES(raw):$(echo "$FAILED_SET" | tr '\n' ' ')"
+DEFERRED_SET=$(grep -hE '^[bg]' "$DEFERRED_FILE" 2>/dev/null | sort -u)
+[ -n "$DEFERRED_SET" ] && echo "DEFERRED(memory-victims):$(echo $DEFERRED_SET | tr '\n' ' ')"
+if [ -n "$failed" ] || [ -n "$DEFERRED_SET" ]; then
+  FAILED_SET=$(echo $failed | tr ' ' '\n' | grep -E '^[bg]' | sort -u)
+  [ -n "$FAILED_SET" ] && echo "FAILURES(raw):$(echo "$FAILED_SET" | tr '\n' ' ')"
   if [ "${RETRY_SOLO:-1}" = 1 ]; then
     # Re-run every failure serially in ONE fresh UML: what passes solo was
     # load-sensitive (environmental), what fails again is a real failure.
-    log "solo-retry lane: $(echo "$FAILED_SET" | wc -l) failed tests"
+    # This lane is fat (MEM_BIG), so it doubles as the recovery lane for tests
+    # their own lane could not give enough memory: a memory-tier miscalibration
+    # costs wall-clock here, never coverage.
+    RERUN_SET=$(printf '%s\n%s\n' "$FAILED_SET" "$DEFERRED_SET" | grep -E '^[bg]' | sort -u)
+    log "solo-retry lane (mem=$MEM_BIG): $(echo "$RERUN_SET"|grep -c .) tests = $(echo "$FAILED_SET"|grep -c .) failed + $(echo "$DEFERRED_SET"|grep -c .) memory-deferred"
     d="$BASE/shards/retry"; rm -rf "$d"; mkdir -p "$d/results"
-    echo "$FAILED_SET" > "$d/RUN_ARGS"
+    echo "$RERUN_SET" > "$d/RUN_ARGS"
     truncate -s 64M "$d/dummy.img"
     truncate -s "$IMG_SIZE_BIG" "$d/test.img" "$d/scratch.img" \
       "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
@@ -224,9 +263,21 @@ if [ -n "$failed" ]; then
       ubdh="$d/logw.img" \
       seccomp=on mem="$MEM_BIG" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1
     solo_fail=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE 'output mismatch|\[failed' "$d/results/run.log" 2>/dev/null) | sort -u)
-    confirmed=$(comm -12 <(echo "$FAILED_SET") <(echo "$solo_fail"))
-    flaky=$(comm -23 <(echo "$FAILED_SET") <(echo "$solo_fail"))
-    echo "FAILURES(confirmed-solo):$(echo $confirmed | tr '\n' ' ')"
-    echo "LOAD-FLAKY(passed-solo):$(echo $flaky | tr '\n' ' ')"
+    if [ -n "$FAILED_SET" ]; then
+      confirmed=$(comm -12 <(echo "$FAILED_SET") <(echo "$solo_fail"))
+      flaky=$(comm -23 <(echo "$FAILED_SET") <(echo "$solo_fail"))
+      echo "FAILURES(confirmed-solo):$(echo $confirmed | tr '\n' ' ')"
+      echo "LOAD-FLAKY(passed-solo):$(echo $flaky | tr '\n' ' ')"
+    fi
+    if [ -n "$DEFERRED_SET" ]; then
+      # A deferred test that passes on the fat lane got its coverage back and
+      # only cost us time; one that still fails needs a human.
+      drec=$(comm -23 <(echo "$DEFERRED_SET") <(echo "$solo_fail"))
+      dfail=$(comm -12 <(echo "$DEFERRED_SET") <(echo "$solo_fail"))
+      echo "DEFERRED(recovered-on-fat):$(echo $drec | tr '\n' ' ')"
+      echo "DEFERRED(still-failing):$(echo $dfail | tr '\n' ' ')"
+    fi
+  elif [ -n "$DEFERRED_SET" ]; then
+    echo "WARNING: RETRY_SOLO=0 and $(echo "$DEFERRED_SET"|grep -c .) tests were memory-deferred — they did NOT run. Coverage is incomplete."
   fi
 fi
