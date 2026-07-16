@@ -89,9 +89,12 @@ Why we think this is a kernel gap rather than a test gap
   auto_da_alloc since the 2009 delalloc null-files episode).
 - There is precedent for treating this class as data loss on NO_HOLES:
   76b42abbf748 ("Btrfs: fix data loss after truncate when using the
-  no-holes feature", Filipe Manana) and "btrfs: fix encoded write i_size
-  corruption with no-holes" (Boris Burkov) both fixed bugs in this exact
-  disk_i_size-without-file_extent_tree shortcut.
+  no-holes feature") and e7db9e5c6b96 ("btrfs: fix encoded write i_size
+  corruption with no-holes") both fixed bugs in this area; the latter
+  patched btrfs_inode_safe_disk_i_size_write() itself, carries
+  Fixes: 41a2ee75aab0 and went to stable 5.10+ — i.e. the NO_HOLES
+  disk_i_size shortcut has already produced stable-worthy corruption
+  once.
 - The alternative — declaring null files after crash acceptable on
   NO_HOLES and gating 044-046 — would silently regress the default-mkfs
   crash semantics relative to every other major fs, via a flag most users
@@ -121,9 +124,11 @@ or to draft option (a) if that is the preferred shape.
 (No patch file — send as a plain report mail, e.g. via the Gmail draft.)
 
 ## Open items before sending
-1. Re-verify the exact btrfs-progs version that flipped the NO_HOLES
-   default (we cite 5.15) — check `btrfs-progs` CHANGES.
+1. ~~progs version~~ VERIFIED 2026-07-16: btrfs-progs 5.15 (Nov 2021),
+   changelog: "mkfs: new defaults! no-holes".
 2. Optionally re-run the 0/8 ^no-holes arm once more on for-next to have
    a same-kernel A/B pair in the mail (current arms span two builds).
-3. Boris's encoded-write fix: pull the exact commit hash before citing
-   (title verified, hash not).
+   ~1h rig time; the mail is defensible without it.
+3. ~~Boris hash~~ VERIFIED 2026-07-16: e7db9e5c6b96, touches
+   fs/btrfs/file-item.c, Fixes: 41a2ee75aab0, CC stable 5.10+,
+   landed v6.4-rc2.
