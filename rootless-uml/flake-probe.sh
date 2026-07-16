@@ -42,7 +42,7 @@ for ((it=1;it<=ITER;it++)); do
   mkshard "fp" $SUSPECTS
   boot "fp" 2000M
   res=$(grep -E 'Passed all|Failures:' $BASE/shards/fp/results/run.log 2>/dev/null | tail -1)
-  fails=$(grep -rh 'output mismatch|\[failed' $BASE/shards/fp/results/run.log 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+' | sort -u | tr '\n' ' ')
+  fails=$(grep -rh 'output mismatch|\[failed' $BASE/shards/fp/results/run.log 2>/dev/null | grep -oE '^[begx][a-z0-9]*/[0-9]+' | sort -u | tr '\n' ' ')
   log "iter $it: ${res:-no-result} ${fails:+FAILED: $fails}"
   cp -a $BASE/shards/fp/results $OUT/iter$it 2>/dev/null
 done

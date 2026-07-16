@@ -77,10 +77,10 @@ tot_ran=0 tot_notrun=0 tot_fail=0; failed_list=""
 for ((n=0; n<SHARDS; n++)); do
   rl="$BASE/shards/$n/results/run.log"
   [ -f "$rl" ] || { echo "shard $n: no run.log"; continue; }
-  ran=$(grep -oE 'Ran: .*' "$rl" | tr ' ' '\n' | grep -cE '^[bg].*/[0-9]+')
-  notrun=$(grep -oE 'Not run: .*' "$rl" | tr ' ' '\n' | grep -cE '^[bg].*/[0-9]+')
+  ran=$(grep -oE 'Ran: .*' "$rl" | tr ' ' '\n' | grep -cE '^[begx].*/[0-9]+')
+  notrun=$(grep -oE 'Not run: .*' "$rl" | tr ' ' '\n' | grep -cE '^[begx].*/[0-9]+')
   fails=$(grep -oE 'Failures: .*' "$rl" | sed 's/Failures: //')
-  nfail=$(echo "$fails" | tr ' ' '\n' | grep -cE '^[bg].*/[0-9]+')
+  nfail=$(echo "$fails" | tr ' ' '\n' | grep -cE '^[begx].*/[0-9]+')
   tot_ran=$((tot_ran+ran)); tot_notrun=$((tot_notrun+notrun)); tot_fail=$((tot_fail+nfail))
   [ -n "$fails" ] && failed_list="$failed_list $fails"
   printf "  shard %2d: ran=%-4s notrun=%-4s fail=%-3s\n" "$n" "$ran" "$notrun" "$nfail"

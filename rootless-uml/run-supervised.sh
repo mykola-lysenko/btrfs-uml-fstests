@@ -21,6 +21,7 @@ SHARDS="${SHARDS:-14}"                # slim shards
 BIG_SHARDS="${BIG_SHARDS:-2}"         # fat shards for memory-hungry tests
 TOT=$((SHARDS+BIG_SHARDS))
 KERNEL="${KERNEL:-$BASE/linux-mainline/linux}"
+FSTYP="${FSTYP:-btrfs}"   # fs under test; shard-init reads fstyp= from cmdline
 LIST="${LIST:-$BASE/results/quick-all.txt}"
 BLACKLIST_FILE="${BLACKLIST:-$BASE/results/blacklist.txt}"
 # T3-validated tiering (docs/SCHEDULER-NOTES.md): 14x1000M + 2x3000M = 20G
@@ -105,7 +106,7 @@ launch(){ local n=$1 d="$BASE/shards/$1"
   truncate -s 64M "$d/dummy.img"; truncate -s "$isz" "$d/test.img" "$d/scratch.img"
   # extra scratch-pool devices (sparse) -> guest enables SCRATCH_DEV_POOL
   truncate -s "$isz" "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
-  "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard="$n" \
+  "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard="$n" fstyp="$FSTYP" \
     ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
     ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
     ubdh="$d/logw.img" \
@@ -115,11 +116,11 @@ launch(){ local n=$1 d="$BASE/shards/$1"
 # completed/running derived from ALL run.log parts in the shard dir
 # completed = any per-test verdict line: pass (Ns), notrun, or ANY failure
 # form. Failures must count as completed or crash recovery re-runs them.
-comp_tests(){ grep -hoE '^[bg][a-z]*/[0-9]+ +([0-9]+s|.*not run|.*output mismatch|.*\[failed|.*_check_[a-z_]*)' "$BASE/shards/$1"/results/run.log* 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+'; }
+comp_tests(){ grep -hoE '^[begx][a-z0-9]*/[0-9]+ +([0-9]+s|.*not run|.*output mismatch|.*\[failed|.*_check_[a-z_]*)' "$BASE/shards/$1"/results/run.log* 2>/dev/null | grep -oE '^[begx][a-z0-9]*/[0-9]+'; }
 # every failure form ./check prints on the test's own line: golden-output
 # mismatch, nonzero exit, dmesg hit, post-test fsck inconsistency
 FAIL_RE='output mismatch|\[failed|_check_dmesg|_check_[a-z_]*filesystem|inconsistent'
-curtest(){ local l; l=$(tail -1 "$BASE/shards/$1/results/run.log" 2>/dev/null); echo "$l"|grep -qE '[0-9]+s *$|not run' && echo "" || echo "$l"|grep -oE '^[bg][a-z]*/[0-9]+'; }
+curtest(){ local l; l=$(tail -1 "$BASE/shards/$1/results/run.log" 2>/dev/null); echo "$l"|grep -qE '[0-9]+s *$|not run' && echo "" || echo "$l"|grep -oE '^[begx][a-z0-9]*/[0-9]+'; }
 # Why did a guest die? The console tells us, and the answer decides whether the
 # running test deserves the blame:
 #   shm-sigbus — host /dev/shm is exhausted. Guest RAM lives in /dev/shm (see
@@ -218,7 +219,7 @@ WALL=$(( $(date +%s)-t0 ))
 
 # Harvest per-test durations into the cumulative times DB (newest wins).
 { cat "$TIMES_DB"
-  grep -rhoE '^[bg][a-z]*/[0-9]+ +[0-9]+s *$' "$BASE"/shards/*/results/run.log* 2>/dev/null \
+  grep -rhoE '^[begx][a-z0-9]*/[0-9]+ +[0-9]+s *$' "$BASE"/shards/*/results/run.log* 2>/dev/null \
     | awk '{gsub(/s$/,"",$2); print $1, $2}'
 } | awk '{v[$1]=$2} END{for (t in v) print t, v[t]}' | sort > "$TIMES_DB.new" \
   && mv "$TIMES_DB.new" "$TIMES_DB"
@@ -239,21 +240,21 @@ log "=== AGGREGATE (wall ${WALL}s) ==="
 tot=0; pass=0; fail=0; nr=0; failed=""
 for ((n=0;n<TOT;n++)); do
   logs="$BASE/shards/$n"/results/run.log*
-  p=$(grep -hcE '^[bg][a-z]*/[0-9]+ +[0-9]+s *$' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); p=${p:-0}
+  p=$(grep -hcE '^[begx][a-z0-9]*/[0-9]+ +[0-9]+s *$' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); p=${p:-0}
   nrn=$(grep -hcE 'not run' $logs 2>/dev/null | paste -sd+ | bc 2>/dev/null); nrn=${nrn:-0}
-  fl=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE "$FAIL_RE" $logs 2>/dev/null) | sort -u)
-  fn=$(echo "$fl"|grep -cE '^[bg]'); pass=$((pass+p)); nr=$((nr+nrn)); fail=$((fail+fn))
+  fl=$(grep -hoE '^[begx][a-z0-9]*/[0-9]+' <(grep -hE "$FAIL_RE" $logs 2>/dev/null) | sort -u)
+  fn=$(echo "$fl"|grep -cE '^[begx]'); pass=$((pass+p)); nr=$((nr+nrn)); fail=$((fail+fn))
   [ -n "$fl" ] && failed="$failed $fl"
 done
-to=$(grep -rhoE '^[bg][a-z]*/[0-9]+ +\[failed, exit status 124\]' "$BASE"/shards/*/results/run.log* 2>/dev/null | grep -oE '^[bg][a-z]*/[0-9]+' | sort -u | wc -l)
+to=$(grep -rhoE '^[begx][a-z0-9]*/[0-9]+ +\[failed, exit status 124\]' "$BASE"/shards/*/results/run.log* 2>/dev/null | grep -oE '^[begx][a-z0-9]*/[0-9]+' | sort -u | wc -l)
 echo "TOTAL: pass=$pass notrun=$nr failed=$fail (incl ~$to timeout) wall=${WALL}s"
-echo "BLACKLIST: $(grep -cE '^[bg]' "$BLACKLIST_FILE") = hangs:$(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -cE '^[bg]') + crashes:$(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -cE '^[bg]')"
-echo "HANGS: $(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
-echo "CRASHES: $(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -hE '^[bg]'|tr '\n' ' ')"
-DEFERRED_SET=$(grep -hE '^[bg]' "$DEFERRED_FILE" 2>/dev/null | sort -u)
+echo "BLACKLIST: $(grep -cE '^[begx]' "$BLACKLIST_FILE") = hangs:$(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -cE '^[begx]') + crashes:$(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -cE '^[begx]')"
+echo "HANGS: $(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -hE '^[begx]'|tr '\n' ' ')"
+echo "CRASHES: $(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -hE '^[begx]'|tr '\n' ' ')"
+DEFERRED_SET=$(grep -hE '^[begx]' "$DEFERRED_FILE" 2>/dev/null | sort -u)
 [ -n "$DEFERRED_SET" ] && echo "DEFERRED(memory-victims):$(echo $DEFERRED_SET | tr '\n' ' ')"
 if [ -n "$failed" ] || [ -n "$DEFERRED_SET" ]; then
-  FAILED_SET=$(echo $failed | tr ' ' '\n' | grep -E '^[bg]' | sort -u)
+  FAILED_SET=$(echo $failed | tr ' ' '\n' | grep -E '^[begx]' | sort -u)
   [ -n "$FAILED_SET" ] && echo "FAILURES(raw):$(echo "$FAILED_SET" | tr '\n' ' ')"
   if [ "${RETRY_SOLO:-1}" = 1 ]; then
     # Re-run every failure serially in ONE fresh UML: what passes solo was
@@ -261,19 +262,19 @@ if [ -n "$failed" ] || [ -n "$DEFERRED_SET" ]; then
     # This lane is fat (MEM_BIG), so it doubles as the recovery lane for tests
     # their own lane could not give enough memory: a memory-tier miscalibration
     # costs wall-clock here, never coverage.
-    RERUN_SET=$(printf '%s\n%s\n' "$FAILED_SET" "$DEFERRED_SET" | grep -E '^[bg]' | sort -u)
+    RERUN_SET=$(printf '%s\n%s\n' "$FAILED_SET" "$DEFERRED_SET" | grep -E '^[begx]' | sort -u)
     log "solo-retry lane (mem=$MEM_BIG): $(echo "$RERUN_SET"|grep -c .) tests = $(echo "$FAILED_SET"|grep -c .) failed + $(echo "$DEFERRED_SET"|grep -c .) memory-deferred"
     d="$BASE/shards/retry"; rm -rf "$d"; mkdir -p "$d/results"
     echo "$RERUN_SET" > "$d/RUN_ARGS"
     truncate -s 64M "$d/dummy.img"
     truncate -s "$IMG_SIZE_BIG" "$d/test.img" "$d/scratch.img" \
       "$d/pool1.img" "$d/pool2.img" "$d/pool3.img" "$d/pool4.img" "$d/logw.img"
-    "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard=retry \
+    "$KERNEL" rootfstype=hostfs rootflags="$ROOTFS" rw init="$INIT" shard=retry fstyp="$FSTYP" \
       ubda="$d/dummy.img" ubdb="$d/test.img" ubdc="$d/scratch.img" \
       ubdd="$d/pool1.img" ubde="$d/pool2.img" ubdf="$d/pool3.img" ubdg="$d/pool4.img" \
       ubdh="$d/logw.img" \
       seccomp=on mem="$MEM_BIG" con0=fd:0,fd:1 con=null > "$d/boot.out" 2>&1
-    solo_fail=$(grep -hoE '^[bg][a-z]*/[0-9]+' <(grep -hE "$FAIL_RE" "$d/results/run.log" 2>/dev/null) | sort -u)
+    solo_fail=$(grep -hoE '^[begx][a-z0-9]*/[0-9]+' <(grep -hE "$FAIL_RE" "$d/results/run.log" 2>/dev/null) | sort -u)
     if [ -n "$FAILED_SET" ]; then
       confirmed=$(comm -12 <(echo "$FAILED_SET") <(echo "$solo_fail"))
       flaky=$(comm -23 <(echo "$FAILED_SET") <(echo "$solo_fail"))
