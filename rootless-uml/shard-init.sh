@@ -24,6 +24,9 @@ mkdir -p /dev/shm; $BB mount -t tmpfs tmpfs /dev/shm 2>/dev/null
 
 SHARD=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^shard=//p')
 [ -z "$SHARD" ] && SHARD=0
+# fstyp=btrfs|xfs|ext4 on the kernel cmdline picks the fs under test
+FSTYP=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^fstyp=//p')
+[ -z "$FSTYP" ] && FSTYP=btrfs
 $BB hostname "uml-shard-$SHARD"
 # loopback up: src/locktest (generic/131,571,786,787) is a TCP client/server on lo
 $BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
@@ -37,7 +40,7 @@ echo "==== SHARD $SHARD ($(uname -r)) ===="
 cp -a /host/xfstests-built /tmp/xfstests
 cd /tmp/xfstests
 cat > local.config <<CFG
-FSTYP=btrfs
+FSTYP=$FSTYP
 TEST_DEV=/dev/ubdb
 TEST_DIR=/mnt/test
 SCRATCH_MNT=/mnt/scratch
@@ -48,10 +51,12 @@ CFG
 # Multi-device scratch pool when the launcher provided extra ubd devices
 # (unlocks _require_scratch_dev_pool tests: btrfs raid/replace/etc).
 # With SCRATCH_DEV_POOL set, xfstests derives SCRATCH_DEV from the pool.
-if [ -b /dev/ubdg ]; then
+# Only btrfs consumes a pool; other fs get a plain SCRATCH_DEV.
+if [ "$FSTYP" = btrfs ] && [ -b /dev/ubdg ]; then
   [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV_POOL="/dev/ubdc /dev/ubdd /dev/ubde /dev/ubdf /dev/ubdg"' >> local.config
 else
+  [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
 fi
 # optional per-shard config overrides (MOUNT_OPTIONS, MKFS_OPTIONS, ...)
@@ -59,7 +64,10 @@ fi
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
-  mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
+  case "$FSTYP" in
+    ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
+    *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
+  esac
   # 1300, was 900: at 16 concurrent lanes the two longest healthy tests
   # (generic/415 862s, generic/416 713s at 11-lane load) cross 900s and die as
   # exit-124. Keep the supervisor invariant STALL > this timeout.
