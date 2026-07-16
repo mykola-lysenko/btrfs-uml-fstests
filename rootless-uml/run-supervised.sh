@@ -31,9 +31,9 @@ BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
 # retry lane so a memory-tier miscalibration can never silently cost coverage.
 DEFERRED_FILE="$BASE/results/deferred.txt"
 ROOTFS="$BASE/rootfs-xfs"
-# STALL must exceed the in-guest per-test timeout (900s in shard-init) so the
+# STALL must exceed the in-guest per-test timeout (1300s in shard-init) so the
 # timeout fails a slow test cleanly before the supervisor calls it a hang.
-STALL="${STALL:-1000}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
+STALL="${STALL:-1450}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_RESTARTS="${MAX_RESTARTS:-8}"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 
 declare -A BL

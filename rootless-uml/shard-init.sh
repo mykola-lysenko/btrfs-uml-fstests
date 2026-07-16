@@ -58,7 +58,10 @@ mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
   mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
-  export FSTESTS_PER_TEST_TIMEOUT=900
+  # 1300, was 900: at 16 concurrent lanes the two longest healthy tests
+  # (generic/415 862s, generic/416 713s at 11-lane load) cross 900s and die as
+  # exit-124. Keep the supervisor invariant STALL > this timeout.
+  export FSTESTS_PER_TEST_TIMEOUT=1300
   # no udev in this rootfs: libdevmapper must create /dev/mapper nodes itself
   export DM_DISABLE_UDEV=1
   ./check $ARGS >"$SDIR/results/run.log" 2>&1
