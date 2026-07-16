@@ -17,13 +17,15 @@
 #  - Results of a previous run are archived (results/archive-*/), never deleted.
 set -uo pipefail
 BASE="${BASE:-$HOME/uml-smoke}"
-SHARDS="${SHARDS:-8}"                 # slim shards
-BIG_SHARDS="${BIG_SHARDS:-3}"         # fat shards for memory-hungry tests
+SHARDS="${SHARDS:-14}"                # slim shards
+BIG_SHARDS="${BIG_SHARDS:-2}"         # fat shards for memory-hungry tests
 TOT=$((SHARDS+BIG_SHARDS))
 KERNEL="${KERNEL:-$BASE/linux-mainline/linux}"
 LIST="${LIST:-$BASE/results/quick-all.txt}"
 BLACKLIST_FILE="${BLACKLIST:-$BASE/results/blacklist.txt}"
-MEM="${MEM:-1500M}"; MEM_BIG="${MEM_BIG:-3000M}"
+# T3-validated tiering (docs/SCHEDULER-NOTES.md): 14x1000M + 2x3000M = 20G
+# declared inside the 22G /dev/shm cap; bigmem.txt decides who runs fat.
+MEM="${MEM:-1000M}"; MEM_BIG="${MEM_BIG:-3000M}"
 IMG_SIZE="${IMG_SIZE:-3G}"; IMG_SIZE_BIG="${IMG_SIZE_BIG:-8G}"; INIT="/shard-init.sh"
 TIMES_DB="${TIMES_DB:-$BASE/results/times-db.txt}"
 BIGMEM_FILE="${BIGMEM:-$BASE/results/bigmem.txt}"
