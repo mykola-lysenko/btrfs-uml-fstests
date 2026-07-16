@@ -61,14 +61,16 @@ export FSTESTS_PER_TEST_TIMEOUT=1300
 # no udev in this rootfs: libdevmapper must create /dev/mapper nodes itself
 export DM_DISABLE_UDEV=1
 
-# claim one item from queue subdir $1; prints the TEST NAME, remembers marker
-CLAIMED=""
+# claim one item from queue subdir $1; prints the MARKER NAME. The caller
+# runs claim() in a command substitution, so any variable set here is lost
+# in the subshell — the marker must travel via stdout, not via globals
+# (the original CLAIMED accumulator silently never reached the parent and
+# markers were stranded in claimed/ forever).
 claim(){
   local sub=$1 f
   for f in $($BB ls "$QR/$sub" 2>/dev/null | $BB head -6); do
     if $BB mv "$QR/$sub/$f" "$QR/claimed/$f.$SHARD" 2>/dev/null; then
-      CLAIMED="$CLAIMED $f.$SHARD"
-      $BB cat "$QR/claimed/$f.$SHARD"
+      echo "$f.$SHARD"
       return 0
     fi
   done
@@ -80,14 +82,15 @@ next(){ # role-aware: fat drains qbig first, then helps q; slim only q
 }
 
 while :; do
-  batch=""; CLAIMED=""
+  batch=""; markers=""
   for i in 1 2 3; do
-    t=$(next) || break
-    batch="$batch $t"
+    m=$(next) || break
+    markers="$markers $m"
+    batch="$batch $($BB cat "$QR/claimed/$m")"
   done
   [ -z "$batch" ] && break
   ./check $batch >> "$SDIR/results/run.log" 2>&1
-  for m in $CLAIMED; do $BB mv "$QR/claimed/$m" "$QR/done/$m" 2>/dev/null; done
+  for m in $markers; do $BB mv "$QR/claimed/$m" "$QR/done/$m" 2>/dev/null; done
 done
 echo "==== LANE $SHARD DONE (uptime $($BB cut -d. -f1 /proc/uptime)s) ===="
 sync
