@@ -22,6 +22,8 @@ mkdir -p /dev/shm; $BB mount -t tmpfs tmpfs /dev/shm 2>/dev/null
 
 SHARD=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^shard=//p'); [ -z "$SHARD" ] && SHARD=0
 ROLE=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qrole=//p'); [ -z "$ROLE" ] && ROLE=slim
+# fstyp=btrfs|xfs|ext4 on the kernel cmdline picks the fs under test
+FSTYP=$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^fstyp=//p'); [ -z "$FSTYP" ] && FSTYP=btrfs
 $BB hostname "uml-q$SHARD"
 # loopback up: src/locktest (generic/131,571,786,787) is a TCP client/server on lo
 $BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
@@ -34,21 +36,28 @@ echo "==== LANE $SHARD role=$ROLE ($(uname -r)) ===="
 cp -a /host/xfstests-built /tmp/xfstests
 cd /tmp/xfstests
 cat > local.config <<CFG
-FSTYP=btrfs
+FSTYP=$FSTYP
 TEST_DEV=/dev/ubdb
 TEST_DIR=/mnt/test
 SCRATCH_MNT=/mnt/scratch
 RESULT_BASE=$SDIR/results
 CFG
-if [ -b /dev/ubdg ]; then
+# Only btrfs consumes a scratch pool; other fs get a plain SCRATCH_DEV.
+if [ "$FSTYP" = btrfs ] && [ -b /dev/ubdg ]; then
   echo 'SCRATCH_DEV_POOL="/dev/ubdc /dev/ubdd /dev/ubde /dev/ubdf /dev/ubdg"' >> local.config
   [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
 else
+  [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
 fi
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
-mkfs.btrfs -f -q /dev/ubdb >/dev/null 2>&1
-export FSTESTS_PER_TEST_TIMEOUT=900
+case "$FSTYP" in
+  ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
+  *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
+esac
+# 1300 (was 900): T3 lesson — at 16 lanes the longest healthy tests cross
+# 900s and die as exit-124. Keep the supervisor invariant STALL > this.
+export FSTESTS_PER_TEST_TIMEOUT=1300
 # no udev in this rootfs: libdevmapper must create /dev/mapper nodes itself
 export DM_DISABLE_UDEV=1
 
