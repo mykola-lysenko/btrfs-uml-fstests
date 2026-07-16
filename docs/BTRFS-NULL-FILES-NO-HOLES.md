@@ -2,7 +2,12 @@
 
 **Status:** root-caused and A/B-proven 2026-07-15 late session. THIRD real
 finding. Deterministic real-hardware reproducer — no UML needed.
-**Next:** decide framing (kernel fix vs test gating) + report to linux-btrfs.
+**2026-07-16:** T9 done — framing decided (report-first, recommend kernel-side
+clamp, no patch attached). Lore prior-art check: no existing 044-046/no-holes
+thread found (lore Anubis-blocks us; searched via mirrors). Source comment on
+btrfs_inode_safe_disk_i_size_write() confirms the skip was justified on
+metadata validity only. Report draft:
+`upstream-kernel/REPORT-NO-HOLES-NULL-FILES-DRAFT.md` (3 open items inside).
 
 ## Symptom
 generic/044 (and family 045/046): after `_scratch_shutdown` + remount, files
