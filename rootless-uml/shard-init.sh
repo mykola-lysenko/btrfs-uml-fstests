@@ -54,6 +54,8 @@ if [ -b /dev/ubdg ]; then
 else
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
 fi
+# optional per-shard config overrides (MOUNT_OPTIONS, MKFS_OPTIONS, ...)
+[ -f "$SDIR/extra.config" ] && cat "$SDIR/extra.config" >> local.config
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
