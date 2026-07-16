@@ -8,6 +8,9 @@ thread found (lore Anubis-blocks us; searched via mirrors). Source comment on
 btrfs_inode_safe_disk_i_size_write() confirms the skip was justified on
 metadata validity only. Report draft:
 `upstream-kernel/REPORT-NO-HOLES-NULL-FILES-DRAFT.md` (3 open items inside).
+**Same-kernel A/B rerun (for-next-0710, 2026-07-16):** defaults+commit=1
+8/8 FAIL vs ^no-holes+commit=1 0/8, back-to-back under identical 10-guest
+load. All open items closed — report is SEND-READY pending user go.
 
 ## Symptom
 generic/044 (and family 045/046): after `_scratch_shutdown` + remount, files

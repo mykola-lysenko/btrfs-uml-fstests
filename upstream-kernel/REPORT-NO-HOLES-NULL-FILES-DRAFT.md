@@ -67,16 +67,17 @@ Mechanism
    on preserved images). A crash before the next commit yields the
    64KiB file of zeroes. btrfs check reports no error.
 
-Evidence matrix (single-variable toggle)
-----------------------------------------
+Evidence matrix (single-variable toggle; A/B rows are the SAME kernel
+build, btrfs for-next 2026-07-10, same load, same run)
+---------------------------------------------------------------------
     platform                mkfs              mount          generic/044
-    KVM x86-64, idle        defaults          -o commit=1    15/15 fail
     UML, 10-guest load      defaults          -o commit=1     8/8  fail
     UML, 10-guest load      -O ^no-holes      -o commit=1     0/8  fail
+    KVM x86-64, idle        defaults          -o commit=1    15/15 fail
     UML, 10-guest load      defaults          defaults        1/10 fail
 
-Reproduced on mainline 7.2-rc1 and btrfs for-next (2026-07-10); the
-mechanism is present since the file_extent_tree was introduced.
+Also reproduced on mainline 7.2-rc1 (KVM row); the mechanism is present
+since the file_extent_tree was introduced.
 
 Why we think this is a kernel gap rather than a test gap
 --------------------------------------------------------
@@ -126,9 +127,10 @@ or to draft option (a) if that is the preferred shape.
 ## Open items before sending
 1. ~~progs version~~ VERIFIED 2026-07-16: btrfs-progs 5.15 (Nov 2021),
    changelog: "mkfs: new defaults! no-holes".
-2. Optionally re-run the 0/8 ^no-holes arm once more on for-next to have
-   a same-kernel A/B pair in the mail (current arms span two builds).
-   ~1h rig time; the mail is defensible without it.
+2. ~~same-kernel A/B~~ DONE 2026-07-16: both arms rerun back-to-back on
+   for-next-0710 with identical 10-guest load: 8/8 fail (defaults) vs
+   0/8 (^no-holes). Logs: ~/uml-smoke/results/t6-fn-commit1/ and
+   t6-fn-noholes-off/; 8 fresh corrupt images preserved.
 3. ~~Boris hash~~ VERIFIED 2026-07-16: e7db9e5c6b96, touches
    fs/btrfs/file-item.c, Fixes: 41a2ee75aab0, CC stable 5.10+,
    landed v6.4-rc2.
