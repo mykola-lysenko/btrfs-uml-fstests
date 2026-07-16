@@ -1,0 +1,66 @@
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Subject: [PATCH] btrfs: raid56: fix inverted bio-list check in scrub read assembly
+
+Commit 5387bd958180 ("btrfs: raid56: remove sector_ptr structure")
+converted the bio-list membership checks from sector pointers to
+physical addresses.  The two conversions in rmw_assemble_write_bios()
+kept their polarity (skip the sector when it is NOT in the bio list,
+i.e. when there is nothing to write), but scrub_assemble_read_bios()
+has the opposite polarity -- skip the sector when it IS in the bio
+list, because then there is nothing to read -- and the mechanical
+conversion flipped it:
+
+	-	sector = sector_in_rbio(rbio, stripe, sectornr, 1);
+	-	if (sector)
+	+	paddr = sector_paddr_in_rbio(rbio, stripe, sectornr, 1);
+	+	if (paddr == INVALID_PADDR)
+			continue;
+
+Since a parity-scrub rbio's bio list only holds the empty completion
+bio, the result is that scrub_assemble_read_bios() submits no reads at
+all.  finish_parity_scrub() then compares the parity it computes from
+the (cached, correct) data stripes against whatever happens to be in
+the freshly allocated, uninitialized stripe pages:
+
+  - if the garbage differs from the computed parity, the sector is
+    "repaired" and written back -- accidentally producing the correct
+    on-disk result;
+  - if a recycled page happens to still hold the old (correct) parity
+    content, the sector is deemed clean, dropped from dbitmap, and the
+    actually-corrupt on-disk parity is left in place -- silently, with
+    every scrub error counter reading zero.
+
+The second case is intermittent because it depends on page-allocator
+recycling.  Observed with fstests btrfs/297 (raid5, 2 devices): the
+corrupted P stripe intermittently stays corrupt after a scrub that
+reports no errors -- roughly 1/10 runs on x86-64 KVM and up to 7/8 on
+a UML build whose timing favors page reuse.  Instrumentation of
+verify_one_parity_step() showed the "on disk" bytes never matching the
+device content (stale 0xaa / zeroed pages instead of the injected
+0xff), and after this fix the injected corruption is read, detected
+and repaired in every run (8/8 UML, 10/10 KVM).
+
+Restore the original polarity.
+
+Fixes: 5387bd958180 ("btrfs: raid56: remove sector_ptr structure")
+CC: stable@vger.kernel.org # 7.1+
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -2910,11 +2910,11 @@
+ 
+ 		/*
+ 		 * We want to find all the sectors missing from the rbio and
+-		 * read them from the disk. If sector_paddr_in_rbio() finds a sector
+-		 * in the bio list we don't need to read it off the stripe.
++		 * read them from the disk. If sector_paddrs_in_rbio() finds a
++		 * sector in the bio list we don't need to read it off the
++		 * stripe.
+ 		 */
+-		paddrs = sector_paddrs_in_rbio(rbio, stripe, sectornr, 1);
+-		if (paddrs == NULL)
++		if (sector_paddrs_in_rbio(rbio, stripe, sectornr, 1))
+ 			continue;
+ 
+ 		paddrs = rbio_stripe_paddrs(rbio, stripe, sectornr);

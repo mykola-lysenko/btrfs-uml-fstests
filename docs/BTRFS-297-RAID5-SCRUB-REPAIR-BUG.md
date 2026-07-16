@@ -1,7 +1,46 @@
 # btrfs raid5 scrub fails to repair corrupted parity (intermittent) — REAL BUG
 
-**Status:** QEMU/KVM-confirmed 2026-07-15. First real btrfs kernel bug of the
-project. Mechanism instrumentation pending (next session).
+**Status:** SOLVED 2026-07-15 same day — root cause found, one-line fix
+written, validated 8/8 UML + 10/10 KVM. Patch:
+`upstream-kernel/0002-btrfs-raid56-fix-inverted-bio-list-check-in-scrub-re.patch`
+(`Fixes: 5387bd958180`, `CC: stable # 7.1+`).
+
+## ROOT CAUSE (found via printk instrumentation, 7/8 repro rate under UML)
+
+Commit `5387bd958180` ("btrfs: raid56: remove sector_ptr structure",
+2025-10-09, in 7.1) mechanically converted the bio-list membership check in
+`scrub_assemble_read_bios()` and FLIPPED ITS POLARITY:
+
+    -  sector = sector_in_rbio(rbio, stripe, sectornr, 1);
+    -  if (sector)                       /* in bio list -> nothing to read */
+    +  paddr = sector_paddr_in_rbio(rbio, stripe, sectornr, 1);
+    +  if (paddr == INVALID_PADDR)       /* NOT in bio list -> skip?! */
+           continue;
+
+The same commit converted two analogous checks in
+`rmw_assemble_write_bios()` correctly — but those have the OPPOSITE meaning
+(write-what-is-in-the-bio-list vs read-what-is-missing), and the scrub site
+got the write-site polarity.
+
+Consequence: a parity-scrub rbio's bio list holds only the empty completion
+bio, so **scrub_assemble_read_bios() submits no reads at all**.
+`finish_parity_scrub()` then memcmp()s the computed parity against
+freshly-allocated, UNINITIALIZED pages:
+- garbage != computed  -> sector "repaired" and written -> accidentally
+  correct on-disk result (why scrub usually appears to work!)
+- recycled page still holding old correct parity == computed -> sector
+  dropped from dbitmap -> corrupt on-disk parity NEVER rewritten, all scrub
+  counters zero.
+
+Instrumented trace (failing run): ondisk bytes = aa,aa,aa,00x13 while the
+device held ff — the reads never happened. After the fix: ondisk=ff on all
+16 sectors, detected, repaired. All error counters are zero in both modes,
+so no monitoring would ever notice.
+
+**Blast radius:** every parity scrub on raid5/6 since 7.1 verifies parity
+against garbage instead of the device — scrub as a parity-integrity check is
+effectively disabled (it usually *repairs* healthy parity by accident and
+only intermittently leaves real corruption in place).
 
 ## Signature
 fstests btrfs/297, raid5/2-device section: test corrupts the P stripe with
@@ -40,11 +79,18 @@ RAID6_MIN_DISKS issue).
 - ~/uml-smoke/results/qemu-297-x10.out — the KVM confirmation (iter 10)
 - ~/uml-smoke/results/297-*.{out.bad,parity} — failed-iteration artifacts
 
-## Next (mechanism instrumentation, per standing rule before reporting)
-1. dmesg + scrub -BdR statistics on a failing iteration (does scrub even
-   DETECT the parity mismatch? csum_errors/super_errors counters).
-2. Read scrub_rbio/finish_parity_scrub paths: how dbitmap/scrubp decide
-   writeback; suspect: parity verify skipped when data csums all pass +
-   some cached/raced state.
-3. Bisect era: does 6.12 flake? (binary exists: linux-6.12).
-4. Report to linux-btrfs with repro rates + both modes.
+## Validation matrix (final)
+| kernel | result |
+|---|---|
+| UML 7.2-rc1 + instrumentation, unfixed | 7/8 FAIL (printk timing favors page reuse) |
+| UML 7.2-rc1 + fix (instrumented) | 8/8 pass, trace shows ondisk=ff detected+repaired |
+| UML 7.2-rc1 + fix (clean build) | 5/5 pass |
+| QEMU/KVM 7.2-rc1 unfixed | 9/10 (1 unrepaired-parity fail) |
+| QEMU/KVM 7.2-rc1 + fix | 10/10 pass |
+
+## Remaining
+- 7.1-rc7 "mode B" (parity repaired but offline check errored, 1/5 once) —
+  likely the same root cause via a different lucky/unlucky page pattern; not
+  worth chasing separately now the reads are restored.
+- Send 0002 to linux-btrfs (Cc Qu Wenruo, David Sterba, stable). This one is
+  urgent-grade: scrub parity verification has been a no-op since 7.1.
