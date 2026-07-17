@@ -6,6 +6,13 @@ queue mode, 14+2 lanes, for-next-0710 + XFS_DEBUG. Wall 7855s.
 Raw logs: ~/uml-smoke/results/archive-* (next run archives them) +
 xfs-sweep-1.log; solo-retry verdicts in shards/retry/results/.
 
+**FINAL (after straggler classification, same day):** dm-sysfs cluster
+= **97 tests** (89 from solo-retry + xfs/237,240,264 + xfs/438,542,556,
+605,656; xfs/006 suspected too). Unicode-tooling cluster = generic/454 +
+xfs/504. Fully independent: xfs/083, generic/473, generic/270 (solved),
+xfs/013. The 222 raw failures reduce to ~4 unexplained + 2 clusters +
+flakes/timeouts/fuzzers.
+
 ## The one big cluster: 89 of 94 confirmed diffs
 Every dm-backed test (dm-flakey crash-consistency family generic/034-343,
 dm-error reflink family generic/250-283, error-handling 534-557, ...)
@@ -53,6 +60,15 @@ Not yet triaged individually; overlaps the fuzzer drain. Of note:
 firing** — the per-test timeout mechanism has a hole (does it wrap only
 the test script, not post-test fsck/repair? xfs_repair on the huge
 fragmented image may be the sink). Investigate the timeout wrapper.
+
+## Fuzz-robustness note (low priority, dangerous-group territory)
+xfs/401 (dangerous_fuzzers) panics the DEBUG kernel via ASSERT in
+xfs_attr3_leaf_firstused_from_disk (fs/xfs/libxfs/xfs_attr_leaf.c:168,
+"!to->count && !to->usedbytes") reached from the READ VERIFIER
+(xfs_attr3_leaf_verify) during xchk_xattr — i.e. fuzzed on-disk data
+asserts inside the layer whose job is graceful rejection. Semi-expected
+upstream on DEBUG kernels; park unless a fuzz campaign happens. Stack in
+~/uml-smoke/shards/*/boot.out history (xclass, 2026-07-16 ~17:06 PT).
 
 ## Policy decisions this run
 - xfs dangerous_* groups (193 tests) added to blacklist-xfs.txt:
