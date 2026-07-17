@@ -106,7 +106,9 @@ curtest(){ local l; l=$(tail -1 "$BASE/shards/$1/results/run.log" 2>/dev/null); 
 requeue_lane(){ local n=$1 bad=$2 reason=$3
   local m t comp
   comp=$(comp_tests $n | sort -u)
-  for m in "$QR"/claimed/*.$n; do
+  # exact suffix match: the glob *.$n also matched .1$n (lane 5 stole lane
+  # 15's markers and requeued that lane's finished work)
+  for m in $(ls "$QR/claimed" 2>/dev/null | grep -E "\.$n\$" | sed "s|^|$QR/claimed/|"); do
     [ -f "$m" ] || continue
     t=$(cat "$m")
     if echo "$comp" | grep -qx "$t"; then mv "$m" "$QR/done/$(basename "$m")"; continue; fi
