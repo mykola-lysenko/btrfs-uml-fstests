@@ -53,6 +53,10 @@ fi
 # fuse mode = fuse2fs over ext4-formatted ubd devices (see
 # patches-xfstests/fuse2fs-mkfs-and-fsck.patch for the harness side)
 [ "$FSTYP" = fuse ] && echo 'FUSE_SUBTYP=.fuse2fs' >> local.config
+# /mnt lives on the hostfs root SHARED by all guests: cover it with a
+# per-guest tmpfs. Kernel fs never noticed the shared debris; libfuse2
+# refuses non-empty mountpoints, so one guest's leak broke every lane.
+$BB mount -t tmpfs tmpfs /mnt
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 case "$FSTYP" in
   ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
