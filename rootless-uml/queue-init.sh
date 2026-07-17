@@ -50,9 +50,14 @@ else
   [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
 fi
+# fuse mode = fuse2fs over ext4-formatted ubd devices (see
+# patches-xfstests/fuse2fs-mkfs-and-fsck.patch for the harness side)
+[ "$FSTYP" = fuse ] && echo 'FUSE_SUBTYP=.fuse2fs' >> local.config
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 case "$FSTYP" in
   ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
+  fuse) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1
+        mkfs.ext4 -Fq /dev/ubdc >/dev/null 2>&1 ;;
   *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
 esac
 # 1300 (was 900): T3 lesson — at 16 lanes the longest healthy tests cross
@@ -81,6 +86,12 @@ next(){ # role-aware: fat drains qbig first, then helps q; slim only q
   claim q
 }
 
+# Sick-lane guard: a ./check that exits without appending ANY output is a
+# broken environment (dead mount, wiped tree, ...). One silent batch could
+# be a fluke; two in a row means every further claim would be silently
+# destroyed — put the claims back and die loudly instead. (Both fuse
+# sweep collapses drained the whole queue through exactly this hole.)
+silent=0
 while :; do
   batch=""; markers=""
   for i in 1 2 3; do
@@ -88,8 +99,26 @@ while :; do
     markers="$markers $m"
     batch="$batch $($BB cat "$QR/claimed/$m")"
   done
-  [ -z "$batch" ] && break
+  [ -z "$markers" ] && break
+  lines_before=$($BB wc -l < "$SDIR/results/run.log" 2>/dev/null || echo 0)
   ./check $batch >> "$SDIR/results/run.log" 2>&1
+  rc=$?
+  lines_after=$($BB wc -l < "$SDIR/results/run.log" 2>/dev/null || echo 0)
+  echo "$($BB date +%s) rc=$rc dlines=$((lines_after-lines_before)) batch:$batch" >> "$SDIR/results/batches.log"
+  if [ "$lines_after" = "$lines_before" ]; then
+    # silent batch: never destroy the claims — put them back
+    silent=$((silent+1))
+    for m in $markers; do
+      base=${m%.$SHARD}
+      $BB mv "$QR/claimed/$m" "$QR/q/$base" 2>/dev/null
+    done
+    if [ "$silent" -ge 2 ]; then
+      echo "==== LANE $SHARD SICK: ./check silent twice (rc=$rc), claims requeued ===="
+      break
+    fi
+    continue
+  fi
+  silent=0
   for m in $markers; do $BB mv "$QR/claimed/$m" "$QR/done/$m" 2>/dev/null; done
 done
 echo "==== LANE $SHARD DONE (uptime $($BB cut -d. -f1 /proc/uptime)s) ===="
