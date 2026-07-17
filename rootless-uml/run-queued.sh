@@ -28,6 +28,14 @@ STALL="${STALL:-1000}"; STALL_BIG="${STALL_BIG:-1800}"; POLL="${POLL:-15}"; MAX_
 QR="$BASE/queue"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 
+# Interlock: a previous run's supervisor or guests still alive would race
+# this run for the queue and shard dirs (learned the hard way: zombie
+# lanes with a stale init inhaled 345 tests of a fresh queue).
+if pgrep -f 'qrole=' >/dev/null || [ "$(pgrep -cf 'run-queued\.sh')" -gt 1 ]; then
+  log "REFUSING to start: previous run-queued/guests still alive (pgrep qrole= / run-queued.sh)"
+  exit 1
+fi
+
 declare -A BL
 BL[__none__]=1; unset 'BL[__none__]'
 touch "$BLACKLIST_FILE" "$TIMES_DB" "$BIGMEM_FILE"
