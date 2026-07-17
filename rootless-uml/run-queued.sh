@@ -31,7 +31,9 @@ log(){ echo "[$(date '+%H:%M:%S')] $*"; }
 # Interlock: a previous run's supervisor or guests still alive would race
 # this run for the queue and shard dirs (learned the hard way: zombie
 # lanes with a stale init inhaled 345 tests of a fresh queue).
-if pgrep -f 'qrole=' >/dev/null || [ "$(pgrep -cf 'run-queued\.sh')" -gt 1 ]; then
+# ($-anchored so wrapper shells whose cmdline merely CONTAINS the script
+# path don't count — only the real `bash .../run-queued.sh` process does)
+if pgrep -f 'qrole=' >/dev/null || [ "$(pgrep -cf 'run-queued\.sh$')" -gt 1 ]; then
   log "REFUSING to start: previous run-queued/guests still alive (pgrep qrole= / run-queued.sh)"
   exit 1
 fi
