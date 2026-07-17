@@ -16,7 +16,11 @@ opts=$(echo "$opts" | tr ',' '\n' | grep -vE '^(rw|nofail|_netdev)$' | paste -sd
 # complaint and fstests relies on that; libfuse2 refuses by default and a
 # single test leaving debris under the mountpoint would brick every
 # subsequent mount in the guest.
+# allow_other + default_permissions: fstests exercises multi-user access
+# constantly; without these fuse denies every non-mounter uid and the
+# kernel never applies normal mode-bit checks. Parity, not masking.
+STD="nonempty,allow_other,default_permissions"
 if [ -n "$opts" ]; then
-	exec /usr/bin/fuse2fs -o "nonempty,$opts" "$dev" "$mnt"
+	exec /usr/bin/fuse2fs -o "$STD,$opts" "$dev" "$mnt"
 fi
-exec /usr/bin/fuse2fs -o nonempty "$dev" "$mnt"
+exec /usr/bin/fuse2fs -o "$STD" "$dev" "$mnt"
