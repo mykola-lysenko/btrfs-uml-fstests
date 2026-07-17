@@ -71,8 +71,8 @@ ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
   case "$FSTYP" in
     ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
-    fuse) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1
-          mkfs.ext4 -Fq /dev/ubdc >/dev/null 2>&1 ;;
+    fuse) mkfs.ext4 -Fq -O ^has_journal /dev/ubdb >/dev/null 2>&1
+          mkfs.ext4 -Fq -O ^has_journal /dev/ubdc >/dev/null 2>&1 ;;
     *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
   esac
   # 1300, was 900: at 16 concurrent lanes the two longest healthy tests

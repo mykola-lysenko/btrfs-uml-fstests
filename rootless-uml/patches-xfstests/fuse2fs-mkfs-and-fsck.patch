@@ -1,12 +1,12 @@
 --- /home/prozak/uml-smoke/xfstests-built/common/rc.prefuse	2026-07-17 11:56:41.015572583 -0700
-+++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 12:00:01.268769144 -0700
++++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 14:02:05.807756858 -0700
 @@ -850,7 +850,9 @@
  	# do nothing for 9p
  	;;
      fuse)
 -	# do nothing for fuse
 +	if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
-+		mkfs.ext4 -Fq $TEST_DEV >/dev/null 2>&1
++		mkfs.ext4 -Fq -O ^has_journal $TEST_DEV >/dev/null 2>&1
 +	fi
  	;;
      virtiofs)
@@ -21,7 +21,7 @@
 +		# can genuinely re-mkfs; other fuse subtypes keep the
 +		# wipe-files fallback below.
 +		if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
-+			mkfs.ext4 -Fq $SCRATCH_DEV >/dev/null 2>&1
++			mkfs.ext4 -Fq -O ^has_journal $SCRATCH_DEV >/dev/null 2>&1
 +			return $?
 +		fi
 +		_scratch_cleanup_files

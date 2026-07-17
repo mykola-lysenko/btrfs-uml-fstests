@@ -19,8 +19,10 @@ opts=$(echo "$opts" | tr ',' '\n' | grep -vE '^(rw|nofail|_netdev)$' | paste -sd
 # allow_other + default_permissions: fstests exercises multi-user access
 # constantly; without these fuse denies every non-mounter uid and the
 # kernel never applies normal mode-bit checks. Parity, not masking.
-STD="nonempty,allow_other,default_permissions"
-if [ -n "$opts" ]; then
-	exec /usr/bin/fuse2fs -o "$STD,$opts" "$dev" "$mnt"
-fi
-exec /usr/bin/fuse2fs -o "$STD" "$dev" "$mnt"
+# nonempty (kernel-mount parity for non-empty mountpoints) exists only in
+# libfuse2; libfuse3-based fuse2fs (>=1.47.3) dropped the check AND the
+# option, so try without it first and fall back for old binaries.
+STD="allow_other,default_permissions"
+[ -n "$opts" ] && STD="$STD,$opts"
+/usr/bin/fuse2fs -o "$STD" "$dev" "$mnt" && exit 0
+exec /usr/bin/fuse2fs -o "nonempty,$STD" "$dev" "$mnt"

@@ -60,8 +60,8 @@ $BB mount -t tmpfs tmpfs /mnt
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
 case "$FSTYP" in
   ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
-  fuse) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1
-        mkfs.ext4 -Fq /dev/ubdc >/dev/null 2>&1 ;;
+  fuse) mkfs.ext4 -Fq -O ^has_journal /dev/ubdb >/dev/null 2>&1
+        mkfs.ext4 -Fq -O ^has_journal /dev/ubdc >/dev/null 2>&1 ;;
   *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
 esac
 # 1300 (was 900): T3 lesson — at 16 lanes the longest healthy tests cross
