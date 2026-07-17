@@ -1,5 +1,17 @@
 # fuse2fs baseline sweep — triage (2026-07-17)
 
+**CANONICAL BASELINE (sweep-8, fuse2fs 1.47.4, nojournal, journaling-
+aware harness): 206 pass / 549 notrun / 36 fail -> 34 confirmed + 2
+load-flaky (generic/074, 339).** Confirmed list checked in at
+results/baseline-fuse-confirmed.txt. Evolution: 66 confirmed on 1.47.0
+(sweep-6) -> 92 on 1.47.4+nojournal before the _has_metadata_journaling
+guard (sweep-7) -> 34 final. fsx zero-range trio closed (fuse2fs 1.47.0
+EINVAL-vs-EOPNOTSUPP bug, fixed upstream, rig upgraded). Remaining 34 =
+open_by_handle ESTALE (5), helper-bypass (409/411/589), ro-mount family
+(294/306/452 — re-triage: signature may have changed post-nojournal),
+fallocate EPERM (683-685), and ~18 singles. The section below is the
+ORIGINAL sweep-6 triage, kept for history.
+
 First complete fuse corpus run (sweep-6 after five aborted attempts —
 see rig-bug ledger below). 792 generic tests, FSTYP=fuse +
 FUSE_SUBTYP=.fuse2fs (fuse2fs 1.47/libfuse2 over ext4-formatted ubd),
