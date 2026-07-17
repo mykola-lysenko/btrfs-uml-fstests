@@ -1,5 +1,5 @@
 --- /home/prozak/uml-smoke/xfstests-built/common/rc.prefuse	2026-07-17 11:56:41.015572583 -0700
-+++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 14:02:05.807756858 -0700
++++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 14:40:46.335575867 -0700
 @@ -850,7 +850,9 @@
  	# do nothing for 9p
  	;;
@@ -103,3 +103,19 @@
  	;;
      virtiofs)
  	# no way to check consistency for virtiofs
+@@ -4308,6 +4359,15 @@
+ 		echo "$FSTYP does not support metadata journaling"
+ 		return 1
+ 		;;
++	fuse)
++		# fuse2fs cannot use the ext4 journal at all (and our rig
++		# formats its devices -O ^has_journal accordingly) — crash
++		# consistency tests cannot be satisfied.
++		if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++			echo "fuse2fs does not support metadata journaling"
++			return 1
++		fi
++		;;
+ 	ext4)
+ 		# ext4 could be mkfs'd without a journal...
+ 		_require_dumpe2fs
