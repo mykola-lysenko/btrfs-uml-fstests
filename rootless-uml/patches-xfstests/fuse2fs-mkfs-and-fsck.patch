@@ -1,0 +1,105 @@
+--- /home/prozak/uml-smoke/xfstests-built/common/rc.prefuse	2026-07-17 11:56:41.015572583 -0700
++++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 12:00:01.268769144 -0700
+@@ -850,7 +850,9 @@
+ 	# do nothing for 9p
+ 	;;
+     fuse)
+-	# do nothing for fuse
++	if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++		mkfs.ext4 -Fq $TEST_DEV >/dev/null 2>&1
++	fi
+ 	;;
+     virtiofs)
+ 	# do nothing for virtiofs
+@@ -981,7 +983,18 @@
+ 	local mkfs_status
+ 
+ 	case $FSTYP in
+-	nfs*|afs|cifs|ceph|overlay|glusterfs|pvfs2|9p|fuse|virtiofs)
++	fuse)
++		# fuse2fs sits on a real block device holding ext4 that we
++		# can genuinely re-mkfs; other fuse subtypes keep the
++		# wipe-files fallback below.
++		if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++			mkfs.ext4 -Fq $SCRATCH_DEV >/dev/null 2>&1
++			return $?
++		fi
++		_scratch_cleanup_files
++		return $?
++		;;
++	nfs*|afs|cifs|ceph|overlay|glusterfs|pvfs2|9p|virtiofs)
+ 		# unable to re-create this fstyp, just remove all files in
+ 		# $SCRATCH_MNT to avoid EEXIST caused by the leftover files
+ 		# created in previous runs
+@@ -1748,7 +1761,8 @@
+     #
+     _df_device $1 | $AWK_PROG '{ print $2 }' | \
+         sed -e 's/nfs4/nfs/' -e 's/fuse.glusterfs/glusterfs/' \
+-            -e 's/fuse.ceph-fuse/ceph-fuse/'
++            -e 's/fuse.ceph-fuse/ceph-fuse/' \
++            -e 's/^fuse\..*/fuse/'
+ }
+ 
+ # return the FS mount options of a mounted device
+@@ -3545,6 +3559,39 @@
+ # Filesystems which don't support this will need to define their
+ # own check routine.
+ #
++# fsck a fuse2fs-backed device with e2fsck directly: the mounted type is
++# fuse.fuse2fs but the on-disk format is ext4, so neither fsck -t fuse nor
++# the generic mounted-type match in _check_generic_filesystem apply.
++_check_fuse2fs_filesystem()
++{
++    local device=$1
++    local type=`_fs_type $device`
++    local ok=1
++    local mountpoint=""
++
++    case "$type" in
++    fuse*)
++        mountpoint=`_umount_or_remount_ro $device`
++        ;;
++    esac
++
++    e2fsck -fn $device >$tmp.fsck 2>&1
++    if [ $? -ne 0 ]; then
++        _log_err "_check_fuse2fs_filesystem: filesystem on $device is inconsistent"
++        echo "*** e2fsck -fn output ***"	>>$seqres.full
++        cat $tmp.fsck				>>$seqres.full
++        echo "*** end e2fsck output"		>>$seqres.full
++        ok=0
++    fi
++    rm -f $tmp.fsck
++
++    if [ -n "$mountpoint" ]; then
++        _mount_or_remount_rw "$MOUNT_OPTIONS" $device $mountpoint
++    fi
++    [ $ok -ne 0 ] && return 0
++    return 1
++}
++
+ _check_generic_filesystem()
+ {
+     local device=$1
+@@ -3679,7 +3726,9 @@
+ 	# no way to check consistency for 9p
+ 	;;
+     fuse)
+-	# no way to check consistency for fuse
++	if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++		_check_fuse2fs_filesystem $TEST_DEV
++	fi
+ 	;;
+     virtiofs)
+ 	# no way to check consistency for virtiofs
+@@ -3741,7 +3790,9 @@
+ 	# no way to check consistency for 9p
+ 	;;
+     fuse)
+-	# no way to check consistency for fuse
++	if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++		_check_fuse2fs_filesystem $device
++	fi
+ 	;;
+     virtiofs)
+ 	# no way to check consistency for virtiofs

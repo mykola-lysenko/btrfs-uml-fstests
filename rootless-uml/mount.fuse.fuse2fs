@@ -1,0 +1,18 @@
+#!/bin/sh
+# mount.fuse.fuse2fs — util-linux mount helper: `mount -t fuse.fuse2fs DEV DIR`
+# execs the fuse2fs daemon. Installed at /sbin/mount.fuse.fuse2fs in the guest
+# rootfs; mount(8) dispatches here for fstype "fuse.fuse2fs".
+dev=$1; mnt=$2; shift 2
+opts=""
+while [ $# -gt 0 ]; do
+	case $1 in
+	-o) opts=$2; shift 2 ;;
+	*) shift ;;
+	esac
+done
+# strip options mount(8) adds that fuse2fs/libfuse doesn't accept
+opts=$(echo "$opts" | tr ',' '\n' | grep -vE '^(rw|nofail|_netdev)$' | paste -sd, -)
+if [ -n "$opts" ]; then
+	exec /usr/bin/fuse2fs -o "$opts" "$dev" "$mnt"
+fi
+exec /usr/bin/fuse2fs "$dev" "$mnt"

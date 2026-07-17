@@ -59,6 +59,9 @@ else
   [ -b /dev/ubdh ] && echo 'LOGWRITES_DEV=/dev/ubdh' >> local.config
   echo 'SCRATCH_DEV=/dev/ubdc' >> local.config
 fi
+# fuse mode = fuse2fs over ext4-formatted ubd devices (see
+# patches-xfstests/fuse2fs-mkfs-and-fsck.patch for the harness side)
+[ "$FSTYP" = fuse ] && echo 'FUSE_SUBTYP=.fuse2fs' >> local.config
 # optional per-shard config overrides (MOUNT_OPTIONS, MKFS_OPTIONS, ...)
 [ -f "$SDIR/extra.config" ] && cat "$SDIR/extra.config" >> local.config
 mkdir -p /mnt/test /mnt/scratch; chmod 777 /mnt/test /mnt/scratch
@@ -66,6 +69,8 @@ ARGS="$($BB cat "$SDIR/RUN_ARGS" 2>/dev/null)"
 if [ -z "$ARGS" ]; then echo "SHARD $SHARD: empty RUN_ARGS"; else
   case "$FSTYP" in
     ext4) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1 ;;
+    fuse) mkfs.ext4 -Fq /dev/ubdb >/dev/null 2>&1
+          mkfs.ext4 -Fq /dev/ubdc >/dev/null 2>&1 ;;
     *)    mkfs.$FSTYP -f -q /dev/ubdb >/dev/null 2>&1 ;;
   esac
   # 1300, was 900: at 16 concurrent lanes the two longest healthy tests
