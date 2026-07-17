@@ -104,11 +104,11 @@ while :; do
     batch="$batch $($BB cat "$QR/claimed/$m")"
   done
   [ -z "$markers" ] && break
-  lines_before=$($BB wc -l < "$SDIR/results/run.log" 2>/dev/null || echo 0)
+  lines_before=$($BB grep -c '^generic\|^btrfs\|^xfs\|^ext4' "$SDIR/results/run.log" 2>/dev/null || echo 0)
   ./check $batch >> "$SDIR/results/run.log" 2>&1
   rc=$?
-  lines_after=$($BB wc -l < "$SDIR/results/run.log" 2>/dev/null || echo 0)
-  echo "$($BB date +%s) rc=$rc dlines=$((lines_after-lines_before)) batch:$batch" >> "$SDIR/results/batches.log"
+  lines_after=$($BB grep -c '^generic\|^btrfs\|^xfs\|^ext4' "$SDIR/results/run.log" 2>/dev/null || echo 0)
+  echo "$($BB date +%s) rc=$rc dverdicts=$((lines_after-lines_before)) batch:$batch" >> "$SDIR/results/batches.log"
   if [ "$lines_after" = "$lines_before" ]; then
     # silent batch: never destroy the claims — put them back
     silent=$((silent+1))

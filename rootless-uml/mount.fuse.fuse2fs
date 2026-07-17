@@ -12,7 +12,11 @@ while [ $# -gt 0 ]; do
 done
 # strip options mount(8) adds that fuse2fs/libfuse doesn't accept
 opts=$(echo "$opts" | tr ',' '\n' | grep -vE '^(rw|nofail|_netdev)$' | paste -sd, -)
+# nonempty: kernel filesystems mount over non-empty directories without
+# complaint and fstests relies on that; libfuse2 refuses by default and a
+# single test leaving debris under the mountpoint would brick every
+# subsequent mount in the guest.
 if [ -n "$opts" ]; then
-	exec /usr/bin/fuse2fs -o "$opts" "$dev" "$mnt"
+	exec /usr/bin/fuse2fs -o "nonempty,$opts" "$dev" "$mnt"
 fi
-exec /usr/bin/fuse2fs "$dev" "$mnt"
+exec /usr/bin/fuse2fs -o nonempty "$dev" "$mnt"
