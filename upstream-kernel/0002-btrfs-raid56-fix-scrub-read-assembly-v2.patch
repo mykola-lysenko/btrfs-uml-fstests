@@ -62,7 +62,7 @@ message that the absence of P/Q error reporting is by design; move the
 AI-usage disclosure to an Assisted-by tag per
 Documentation/process/coding-assistants.rst.
 
-v1: https://lore.kernel.org/linux-btrfs/[MSGID-TODO]/
+v1: https://lore.kernel.org/linux-btrfs/20260716174511.8738-1-nickolay.lysenko@gmail.com/
 
 Note: UML (User-Mode Linux) results above come from
 https://github.com/mykola-lysenko/btrfs-uml-fstests/ -- for reference
