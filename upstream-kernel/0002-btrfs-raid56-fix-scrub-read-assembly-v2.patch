@@ -88,7 +88,7 @@ only.
 -		paddrs = sector_paddrs_in_rbio(rbio, stripe, sectornr, 1);
 -		if (paddrs == NULL)
 -			continue;
-+		ASSERT(sector_paddrs_in_rbio(rbio, stripe, sectornr, 1) == NULL);
++		ASSERT(!sector_paddrs_in_rbio(rbio, stripe, sectornr, 1));
 
  		paddrs = rbio_stripe_paddrs(rbio, stripe, sectornr);
  		/*
