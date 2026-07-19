@@ -6,12 +6,19 @@ gate would have caught. Decisions below agreed in discussion; none
 implemented yet except where noted.
 
 ## Regression protection (priority order)
-1. **Tri-fs smoke gate = the rig's CI.** Extend dev-check.sh smoke to
+1. **Tri-fs smoke gate = the rig's CI.** DONE 2026-07-18 (dev-check.sh
+   smoke stage; per-fs lists from gen-smoke-list.sh; strict-notrun;
+   validated by sabotage tests — which caught a latent dev-check bug:
+   the old '^FAILURES:' grep never matched run-supervised output, so
+   failures never failed the pipeline). Extend dev-check.sh smoke to
    run per-fs: smoke x {btrfs, xfs, fuse}, ~2 min total. Rule: any
    change under rootless-uml/, the rootfs, or xfstests-built must pass
    the gate before any full sweep. Local pre-flight (optionally a git
    pre-push hook) — the rig is hardware-bound, no hosted CI.
-2. **deploy.sh with manifest.** Kill the repo-copy-vs-deployed-copy
+2. **deploy.sh with manifest.** DONE 2026-07-18 (verifies patches
+   applied in xfstests-built — caught fuse2fs patch with absolute-path
+   headers that -p1 rebuilds would have dropped; heals missing files;
+   refuses manifest on invariant violation). Kill the repo-copy-vs-deployed-copy
    divergence (bit us: qemu-init pool support, queue-init fuse branch).
    One script syncs the blessed set, applies patches-xfstests/, verifies
    rootfs invariants (/bin,/sbin,/lib are symlinks — the dpkg -x tar
