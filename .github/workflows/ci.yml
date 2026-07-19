@@ -1,0 +1,62 @@
+# Hosted CI = the static tier only. The rig's real CI (tri-fs smoke gate,
+# dev-check.sh smoke) is hardware-bound and runs pre-push on the host.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: bash syntax (bash -n)
+        run: |
+          set -e
+          for f in rootless-uml/*.sh rootless-uml/qemu-init scripts/*.sh; do
+            bash -n "$f" || { echo "SYNTAX FAIL: $f"; exit 1; }
+          done
+
+      - name: shellcheck (error severity)
+        # SC1081/SC1069 excluded: false positives on the DONE[$n] array in
+        # the runners (shellcheck mistakes it for the 'done' keyword).
+        run: |
+          shellcheck --severity=error --exclude=SC1081,SC1069 \
+            rootless-uml/*.sh rootless-uml/qemu-init scripts/*.sh
+
+      - name: patch headers are -p1 relative
+        # The fuse2fs harness patch once carried absolute /home paths from
+        # being diffed against the deployed tree; a -p1 rebuild would have
+        # silently dropped it. Keep every patch header a/ b/ relative.
+        run: |
+          if grep -nE '^(---|\+\+\+) +/' rootless-uml/patches-xfstests/*.patch rootless-uml/patches/*.patch; then
+            echo "absolute path in patch header — must be a/ b/ relative for -p1"
+            exit 1
+          fi
+
+      - name: deploy.sh blessed set exists in repo
+        # Every file deploy.sh would sync must exist here, or deploy fails
+        # on the rig at sync time. Catch it at PR time instead.
+        run: |
+          set -e
+          cd rootless-uml
+          missing=0
+          for f in $(BLESSED_PRINT=1 bash deploy.sh); do
+            [ -f "$f" ] || { echo "MISSING from repo: rootless-uml/$f"; missing=1; }
+          done
+          exit $missing
+
+      - name: smoke lists sane
+        # Non-empty, no duplicates, only known test-path shapes.
+        run: |
+          set -e
+          for l in rootless-uml/smoke.txt rootless-uml/smoke-xfs.txt rootless-uml/smoke-fuse.txt; do
+            tests=$(grep -vE '^#|^\s*$' "$l")
+            [ -n "$tests" ] || { echo "EMPTY: $l"; exit 1; }
+            dup=$(echo "$tests" | sort | uniq -d)
+            [ -z "$dup" ] || { echo "DUPLICATES in $l: $dup"; exit 1; }
+            bad=$(echo "$tests" | grep -vE '^(generic|btrfs|xfs|ext4)/[0-9]{3}$' || true)
+            [ -z "$bad" ] || { echo "MALFORMED entries in $l: $bad"; exit 1; }
+          done

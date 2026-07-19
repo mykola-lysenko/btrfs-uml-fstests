@@ -25,10 +25,6 @@ log(){ echo "[deploy] $*"; }
 fail(){ echo "[deploy] FAIL: $*" >&2; exit 1; }
 rc=0
 
-[ -d "$ROOTFS" ] || fail "rootfs not found: $ROOTFS"
-[ -d "$XT" ] || fail "xfstests-built not found: $XT"
-mkdir -p "$R"
-
 # Guest-side scripts, deployed to the rootfs root (UML PID1s and labs).
 GUEST_SCRIPTS="shard-init.sh queue-init.sh qemu-init checkenv-init.sh
   fsxprobe-init.sh prof-init.sh validate033-init.sh smoke-init.sh
@@ -38,6 +34,17 @@ GUEST_SCRIPTS="shard-init.sh queue-init.sh qemu-init checkenv-init.sh
 LISTS="smoke.txt smoke-xfs.txt smoke-fuse.txt quick-all.txt quick-fast.txt
   quick-slow.txt auto-all.txt confirmed-fast.txt confirmed-slow.txt
   slow-tier.txt stable-core.txt exclude-known.txt bigmem-seed.txt"
+
+# BLESSED_PRINT=1: emit the blessed set and exit — lets CI verify every
+# referenced file exists in the repo without needing a rig.
+if [ "${BLESSED_PRINT:-0}" = 1 ]; then
+  for f in $GUEST_SCRIPTS mount.fuse.fuse2fs $LISTS; do echo "$f"; done
+  exit 0
+fi
+
+[ -d "$ROOTFS" ] || fail "rootfs not found: $ROOTFS"
+[ -d "$XT" ] || fail "xfstests-built not found: $XT"
+mkdir -p "$R"
 
 MANIFEST_BODY="$(mktemp)"; trap 'rm -f "$MANIFEST_BODY"' EXIT
 
