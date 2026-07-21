@@ -1,5 +1,5 @@
---- /home/prozak/uml-smoke/xfstests-built/common/rc.prefuse	2026-07-17 11:56:41.015572583 -0700
-+++ /home/prozak/uml-smoke/xfstests-built/common/rc	2026-07-17 14:40:46.335575867 -0700
+--- a/common/rc
++++ b/common/rc
 @@ -850,7 +850,9 @@
  	# do nothing for 9p
  	;;
