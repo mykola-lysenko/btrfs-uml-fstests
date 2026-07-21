@@ -75,17 +75,9 @@ Now the experiment (mirrors what btrfs/297 automates):
 available in this bare shell — the mapping one-liners in the test file
 itself are at ~/uml-smoke/xfstests-built/tests/btrfs/297 on the host.)
 
-## Sending v2 (after Step 1-3 satisfy you)
-1. Get the v1 Message-ID: in Gmail open the sent v1 mail -> "Show
-   original" -> copy the Message-ID header (with angle brackets).
-2. Put it into the `v1:` lore link in
-   upstream-kernel/0002-btrfs-raid56-fix-scrub-read-assembly-v2.patch
-   (replace [MSGID-TODO] with the id, no brackets, in the URL).
-3. Send as a reply to the thread:
-    git send-email \
-      --to=linux-btrfs@vger.kernel.org \
-      --cc=quwenruo.btrfs@gmx.com --cc=wqu@suse.com \
-      --cc=clm@fb.com --cc=josef@toxicpanda.com --cc=dsterba@suse.com \
-      --cc=linux-kernel@vger.kernel.org --cc=stable@vger.kernel.org \
-      --in-reply-to='<MESSAGE-ID-WITH-BRACKETS>' \
-      upstream-kernel/0002-btrfs-raid56-fix-scrub-read-assembly-v2.patch
+## Sending v2 — DONE, merged upstream
+v2 was mailed 2026-07-18 (fresh thread, v1 lineage via lore link in the
+patch footer) and has been merged upstream; the patch file was removed
+from this repo after the merge. Thread: "[PATCH v2] btrfs: raid56: fix
+scrub read assembly submitting no reads" on linux-btrfs; v1 at
+<https://lore.kernel.org/linux-btrfs/20260716174511.8738-1-nickolay.lysenko@gmail.com/>.

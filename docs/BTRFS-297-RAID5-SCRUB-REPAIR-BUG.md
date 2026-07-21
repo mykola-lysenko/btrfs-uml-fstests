@@ -1,9 +1,11 @@
 # btrfs raid5 scrub fails to repair corrupted parity (intermittent) — REAL BUG
 
-**Status:** SOLVED 2026-07-15 same day — root cause found, one-line fix
-written, validated 8/8 UML + 10/10 KVM. Patch:
-`upstream-kernel/0002-btrfs-raid56-fix-inverted-bio-list-check-in-scrub-re.patch`
-(`Fixes: 5387bd958180`, `CC: stable # 7.1+`).
+**Status:** MERGED UPSTREAM 2026-07 — root cause found 2026-07-15,
+one-line fix validated 8/8 UML + 10/10 KVM, v2 accepted upstream
+(`Fixes: 5387bd958180`, `CC: stable # 7.1+`). Patch files removed from
+this repo after merge; thread on lore: "[PATCH v2] btrfs: raid56: fix
+scrub read assembly submitting no reads", v1 at
+<https://lore.kernel.org/linux-btrfs/20260716174511.8738-1-nickolay.lysenko@gmail.com/>.
 
 ## ROOT CAUSE (found via printk instrumentation, 7/8 repro rate under UML)
 
