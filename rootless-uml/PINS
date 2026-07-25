@@ -9,27 +9,43 @@
 # lists -> commit PINS + baselines together.
 PIN_DATE=2026-07-24
 
-# Canonical tri-fs kernel: runs the smoke gate and all per-fs sweeps
-# (btrfs + CONFIG_XFS_FS + CONFIG_FUSE_FS built in).
-KERNEL_TRIFS_REPO=kdave/btrfs-devel
-KERNEL_TRIFS_REF=for-next
-KERNEL_TRIFS_SHA=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3
-KERNEL_TRIFS_NAME=for-next-0710
+# Per-fs sweep kernels — each fs is gated and swept on its own upstream
+# (plan item 7). CAVEAT until the first re-confirmation sweeps: the xfs and
+# fuse committed baselines were established on the btrfs-for-next tri-fs
+# kernel; treat NEW failures on the new pins as un-triaged, not regressions.
+KERNEL_BTRFS_REPO=kdave/btrfs-devel
+KERNEL_BTRFS_REF=for-next
+KERNEL_BTRFS_SHA=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3
+KERNEL_BTRFS_NAME=for-next-0710
+KERNEL_BTRFS_FLAVOR=trifs   # pre-item-7 build; next advance builds FLAVOR=btrfs
 
-# btrfs upstream-tracking tip (btrfs-only config; A/B and freshness checks).
+KERNEL_XFS_REPO=https://git.kernel.org/pub/scm/fs/xfs/xfs-linux.git
+KERNEL_XFS_REF=for-next
+KERNEL_XFS_SHA=56aa9ef3c413cb13a373226f91a19358cd9f1266
+KERNEL_XFS_NAME=xfs-for-next-0724
+KERNEL_XFS_FLAVOR=xfs
+
+KERNEL_FUSE_REPO=torvalds/linux
+KERNEL_FUSE_REF=master
+KERNEL_FUSE_SHA=0ce37745d4bfbc493f718169c3974898ffec8ee7
+KERNEL_FUSE_NAME=mainline-0724
+KERNEL_FUSE_FLAVOR=fuse
+
+# btrfs upstream-tracking tip (A/B and freshness checks, not sweeps).
 KERNEL_BTRFSTIP_REPO=kdave/btrfs-devel
 KERNEL_BTRFSTIP_REF=misc-next
 KERNEL_BTRFSTIP_SHA=e5455947117b95c37aa4b7cf5338f0f551611c37
 KERNEL_BTRFSTIP_NAME=misc-next-0724
+KERNEL_BTRFSTIP_FLAVOR=btrfs
 
 # xfstests source snapshot (built via build-xfstests-hostside.sh).
 XFSTESTS_REPO=kdave/xfstests
 XFSTESTS_REF=master
 XFSTESTS_SHA=acb6d4cb84205a8e3f19ca470cfcf7bf6d93a509
 
-# Userspace. (Initial SHAs above for kernels/xfstests were resolved
-# retroactively from recorded fetch timestamps — pre-PINS builds came from
-# branch tarballs; from the first advance on, downloads happen BY SHA.)
+# Userspace. (Initial kernel/xfstests SHAs were resolved retroactively from
+# recorded fetch timestamps — pre-PINS builds came from branch tarballs;
+# since the first advance, downloads happen BY SHA.)
 E2FSPROGS_VER=1.47.4        # fuse2fs; nojournal scratch config
 BTRFS_PROGS_VER=v7.0        # kdave static btrfs.box release
 ROOTFS_SNAPSHOT=2026-07-17  # Ubuntu noble pool fetch date (fullpkgs/)

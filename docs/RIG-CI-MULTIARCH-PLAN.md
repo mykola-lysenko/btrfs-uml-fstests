@@ -52,21 +52,21 @@ implemented yet except where noted.
    queued == total and verdicts ~= tests-run (catches marker stranding
    and silent queue inhalation classes). Sick-lane guard and startup
    interlock already implemented.
-7. **Per-fs kernel pins (agreed 2026-07-24).** Each fs sweeps on its own
-   upstream: KERNEL_BTRFS = kdave/btrfs-devel for-next (exists),
-   KERNEL_XFS = xfs for-next, KERNEL_FUSE = torvalds/linux master.
-   Today xfs/fuse test against the btrfs for-next tree, i.e. vanilla-rc
-   xfs/fuse code — an xfs for-next regression is invisible and findings
-   aren't upstream-actionable. Per-shard boots make per-fs kernels free
-   at runtime; work is: (a) resolve a codeload-reachable source for xfs
-   for-next (no guaranteed GitHub mirror of xfs-linux.git; fallback =
-   mainline master, weaker but better than btrfs-for-next), (b) per-fs
-   config profiles in build-uml-kernel.sh (current list is btrfs-only;
-   the tri-fs config of for-next-0710 was a one-off), (c) dev-check +
-   pins-advance select KERNEL per fs for gate and sweeps, (d) each new
-   pin gets its own baseline re-confirmation sweep before its baseline
-   is trusted. ~an evening. DO THIS BEFORE the hosted UML smoke lane so
-   the PINS cache key doesn't churn.
+7. **Per-fs kernel pins (agreed 2026-07-24).** DONE 2026-07-24 (branch
+   ci-perfs-pins): KERNEL_BTRFS = kdave/btrfs-devel for-next,
+   KERNEL_XFS = xfs-linux.git for-next (kernel.org direct — cgit
+   *snapshots* time out but shallow git fetch by SHA works, ~280M;
+   build-uml-kernel.sh grew a git-URL source mode), KERNEL_FUSE =
+   torvalds/linux master. build-uml-kernel.sh FLAVOR profiles
+   (btrfs|xfs|fuse|trifs; xfs profile mirrors for-next-0710 incl.
+   XFS_DEBUG + online scrub/repair; TMPFS_XATTR/POSIX_ACL folded into
+   the common base per the generic/270 triage). dev-check resolves each
+   fs's kernel from PINS (explicit KERNEL= still overrides everything);
+   pins-advance handles URL pins via ls-remote and builds with the
+   pin's flavor. Smoke gate green per-fs on the new pins (3x20/20).
+   PENDING: baseline re-confirmation full sweeps for xfs and fuse on
+   their new pins — until then treat NEW failures there as un-triaged,
+   not regressions (caveat noted in PINS).
 
 Sequencing: 1+2 first (one evening, kills the dominant regression
 source), 3 nearly free, 5 is an hour of bookkeeping, 4 last.
