@@ -19,6 +19,8 @@ results/*.log
 results/*.txt
 results/shard-*.log
 results/runner_output.txt
+# ...but committed baselines are data, not runtime output
+!results/baseline-*.txt
 
 # Python cache
 __pycache__/
