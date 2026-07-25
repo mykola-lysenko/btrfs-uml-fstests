@@ -1,0 +1,37 @@
+common/rc: resolve _fs_sysfs_dname via /sys/dev/block, not the node name
+
+The fs registers its sysfs directory under the kernel's name for the
+device (e.g. /sys/fs/xfs/dm-0). _short_dev only produces that name when
+/dev/mapper entries are udev-managed symlinks to ../dm-N; on a system
+where libdevmapper creates real nodes (DM_DISABLE_UDEV=1, common in
+minimal/containerized test rigs), it returns the map name and every
+_get/_set_fs_sysfs_attr caller silently misses, failing ~90 dm-backed
+tests. Resolve the device's maj:min through /sys/dev/block instead,
+which is correct with or without udev; fall back to _short_dev if the
+sysfs link is unavailable.
+
+--- a/common/rc
++++ b/common/rc
+@@ -5436,7 +5436,21 @@
+ 	btrfs)
+ 		_btrfs_get_fsid $dev ;;
+ 	*)
+-		_short_dev $dev ;;
++		# The sysfs dir uses the kernel's device name (e.g. dm-0),
++		# which matches the node's basename only when /dev entries
++		# are udev-managed symlinks. Resolve via /sys/dev/block so
++		# dm nodes created without udev work too.
++		local majmin=$(stat -L -c '%t:%T' "$dev")
++		local kname=""
++		if [ -n "$majmin" ]; then
++			kname=$(basename "$(readlink -f \
++				"/sys/dev/block/$((0x${majmin%:*})):$((0x${majmin#*:}))")")
++		fi
++		if [ -n "$kname" ] && [ -e "/sys/dev/block/$((0x${majmin%:*})):$((0x${majmin#*:}))" ]; then
++			echo "$kname"
++		else
++			_short_dev $dev
++		fi ;;
+ 	esac
+ }
+ 

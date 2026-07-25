@@ -65,9 +65,14 @@ for l in $LISTS; do deploy_one "$l" "$R/$l" 644; done
 # xfstests patches: verify each is applied in the deployed tree.
 for p in "$SCRIPTDIR"/patches-xfstests/*.patch; do
   name=$(basename "$p")
-  if patch -p1 -R --dry-run --batch -d "$XT" < "$p" >/dev/null 2>&1; then
+  # --force, NOT --batch: with --batch, an unapplied patch makes the -R
+  # dry-run print "Unreversed patch detected! Ignoring -R." and succeed
+  # FORWARD — every cleanly-applying patch then counts as "(applied)" and
+  # is silently skipped. --force keeps -R literal so reversal really
+  # tests reversal.
+  if patch -p1 -R --dry-run --force -d "$XT" < "$p" >/dev/null 2>&1; then
     sha256sum "$p" | sed "s|$p|patches-xfstests/$name (applied)|" >> "$MANIFEST_BODY"
-  elif patch -p1 --dry-run --batch -d "$XT" < "$p" >/dev/null 2>&1; then
+  elif patch -p1 --dry-run --force -d "$XT" < "$p" >/dev/null 2>&1; then
     if [ "${APPLY:-0}" = 1 ]; then
       patch -p1 --batch -d "$XT" < "$p" >/dev/null && log "applied: $name" \
         || { log "patch application FAILED: $name"; rc=1; }
