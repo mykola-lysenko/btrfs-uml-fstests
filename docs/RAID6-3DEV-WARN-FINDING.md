@@ -1,7 +1,18 @@
 # btrfs 3-device RAID6 trips a new raid6-library WARN on 7.2.0-rc1
 
-**Status:** both-platform confirmed (UML + x86/KVM), fix written and validated in
-QEMU, patch drafted (`upstream-kernel/0001-btrfs-handle-3-device-RAID6-*.patch`).
+**Status:** SUPERSEDED UPSTREAM 2026-07-20 — never sent. Qu Wenruo's series
+"btrfs: disguise single-data-RAID56 as RAID1/RAID1C3" (v1 on-list 2026-05-22,
+<https://lwn.net/Articles/1074081/>) is merged in btrfs misc-next:
+`set_real_chunk_type()` remaps `nr_data_stripes == 1` RAID56 chunk maps to
+RAID1/RAID1C3 on both chunk creation and mount, so 3-device RAID6 never
+reaches `raid56.c` and the WARN cannot fire. Verified empirically on the
+misc-next-0720 UML kernel (library WARN present, no btrfs-side guard):
+3-dev raid6 mkfs + write + scrub, dmesg clean; `btrfs fi df` still reports
+RAID6 (disguise is internal, on-disk type preserved). Mainline 7.2 does NOT
+yet have the series and still WARNs — whether a minimal stable fix is wanted
+there is Qu/David's call. Our drafted patch (removed from the repo, was
+`upstream-kernel/0001-btrfs-handle-3-device-RAID6-*.patch`) took the
+memcpy-in-rbio_gen_syndrome approach documented below; kept as analysis record.
 **Found:** 2026-07-15, by the T3 memory-calibration run (serendipitously — first
 run of the full bigmem set on the 7.2.0-rc1 kernel).
 
