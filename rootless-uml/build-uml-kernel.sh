@@ -21,7 +21,13 @@ BASE="${BASE:-$HOME/uml-smoke}"
 REPO="${REPO:-torvalds/linux}"
 REF="${REF:-tags/v${KVER:-6.12}}"
 NAME="${NAME:-$(echo "$REF" | sed 's#.*/##')}"
-SRC_URL="https://codeload.github.com/${REPO}/tar.gz/refs/${REF}"
+# A bare commit SHA as REF (the PINS advance path) downloads that exact
+# commit — reproducible, unlike a moving branch tarball.
+if echo "$REF" | grep -qE '^[0-9a-f]{7,40}$'; then
+  SRC_URL="https://codeload.github.com/${REPO}/tar.gz/${REF}"
+else
+  SRC_URL="https://codeload.github.com/${REPO}/tar.gz/refs/${REF}"
+fi
 DIR="linux-${NAME}"
 mkdir -p "$BASE"; cd "$BASE"
 log(){ echo "[$(date '+%H:%M:%S')] $*"; }
