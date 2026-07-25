@@ -1,0 +1,35 @@
+# PINS — the rig's pinned software state, one shell-sourceable line per fact.
+# This file is the single answer to "what exactly is the rig running?" and
+# the cache key for any hosted lane. Advance via pins-advance.sh, weekly on
+# a quiet day, NEVER mid-investigation. Kernel binaries stay on disk as
+# named artifacts (~/uml-smoke/linux-<NAME>/linux), one per pin generation.
+#
+# Ritual on every advance: deploy -> smoke gate -> full sweeps (serial) ->
+# triage delta vs committed baselines -> fold baselines -> regenerate smoke
+# lists -> commit PINS + baselines together.
+PIN_DATE=2026-07-24
+
+# Canonical tri-fs kernel: runs the smoke gate and all per-fs sweeps
+# (btrfs + CONFIG_XFS_FS + CONFIG_FUSE_FS built in).
+KERNEL_TRIFS_REPO=kdave/btrfs-devel
+KERNEL_TRIFS_REF=for-next
+KERNEL_TRIFS_SHA=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3
+KERNEL_TRIFS_NAME=for-next-0710
+
+# btrfs upstream-tracking tip (btrfs-only config; A/B and freshness checks).
+KERNEL_BTRFSTIP_REPO=kdave/btrfs-devel
+KERNEL_BTRFSTIP_REF=misc-next
+KERNEL_BTRFSTIP_SHA=f418d68d71fd4a0a9cef92377bc8c4c3334b5b53
+KERNEL_BTRFSTIP_NAME=misc-next-0720
+
+# xfstests source snapshot (built via build-xfstests-hostside.sh).
+XFSTESTS_REPO=kdave/xfstests
+XFSTESTS_REF=master
+XFSTESTS_SHA=acb6d4cb84205a8e3f19ca470cfcf7bf6d93a509
+
+# Userspace. (Initial SHAs above for kernels/xfstests were resolved
+# retroactively from recorded fetch timestamps — pre-PINS builds came from
+# branch tarballs; from the first advance on, downloads happen BY SHA.)
+E2FSPROGS_VER=1.47.4        # fuse2fs; nojournal scratch config
+BTRFS_PROGS_VER=v7.0        # kdave static btrfs.box release
+ROOTFS_SNAPSHOT=2026-07-17  # Ubuntu noble pool fetch date (fullpkgs/)
