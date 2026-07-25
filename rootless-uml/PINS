@@ -19,8 +19,8 @@ KERNEL_TRIFS_NAME=for-next-0710
 # btrfs upstream-tracking tip (btrfs-only config; A/B and freshness checks).
 KERNEL_BTRFSTIP_REPO=kdave/btrfs-devel
 KERNEL_BTRFSTIP_REF=misc-next
-KERNEL_BTRFSTIP_SHA=f418d68d71fd4a0a9cef92377bc8c4c3334b5b53
-KERNEL_BTRFSTIP_NAME=misc-next-0720
+KERNEL_BTRFSTIP_SHA=e5455947117b95c37aa4b7cf5338f0f551611c37
+KERNEL_BTRFSTIP_NAME=misc-next-0724
 
 # xfstests source snapshot (built via build-xfstests-hostside.sh).
 XFSTESTS_REPO=kdave/xfstests
