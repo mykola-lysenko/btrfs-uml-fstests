@@ -25,7 +25,23 @@
 set -uo pipefail
 SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="${BASE:-$HOME/uml-smoke}"
-KERNEL="${KERNEL:?set KERNEL=/path/to/uml/linux}"
+# KERNEL= is an explicit override used for every fs. Without it, each fs
+# runs on its own pinned kernel from PINS (plan item 7) — btrfs sweeps
+# btrfs for-next, xfs sweeps xfs for-next, fuse sweeps mainline.
+KERNEL="${KERNEL:-}"
+[ -f "$SCRIPTDIR/PINS" ] && . "$SCRIPTDIR/PINS"
+kernel_for(){ # $1 fs -> kernel binary path ('' if unresolvable)
+  if [ -n "$KERNEL" ]; then echo "$KERNEL"; return; fi
+  local name=""
+  case "$1" in
+    btrfs) name="${KERNEL_BTRFS_NAME:-}";;
+    xfs)   name="${KERNEL_XFS_NAME:-${KERNEL_BTRFS_NAME:-}}";;
+    fuse)  name="${KERNEL_FUSE_NAME:-${KERNEL_BTRFS_NAME:-}}";;
+  esac
+  [ -n "$name" ] && echo "$BASE/linux-$name/linux" || echo ""
+}
+[ -n "$KERNEL" ] || [ -n "${KERNEL_BTRFS_NAME:-}" ] || \
+  { echo "set KERNEL=/path/to/uml/linux (no PINS kernel names found)"; exit 1; }
 TREE=""; BASEREF="origin/master"; STAGE="all"
 while [ $# -gt 0 ]; do case "$1" in
   --tree) TREE="$2"; shift 2;;
@@ -77,8 +93,10 @@ run_list(){ # $1 list-file  $2 label  [$3 slim shards] [$4 big shards]
   local excl="$EXCLUDE"
   [ "$fs" != btrfs ] && { excl="$R/exclude-known-$fs.txt"; touch "$excl"; }
   local bl="$R/devcheck-blacklist.txt"; cp "$excl" "$bl"
-  log "stage '$label': $(grep -cvE '^#|^\s*$' "$list") tests [$fs]"
-  BASE="$BASE" KERNEL="$KERNEL" LIST="$list" BLACKLIST="$bl" FSTYP="$fs" \
+  local kern; kern=$(kernel_for "$fs")
+  [ -x "$kern" ] || { log "stage '$label': kernel not found/executable: $kern"; return 1; }
+  log "stage '$label': $(grep -cvE '^#|^\s*$' "$list") tests [$fs] kernel=$(basename "$(dirname "$kern")")"
+  BASE="$BASE" KERNEL="$kern" LIST="$list" BLACKLIST="$bl" FSTYP="$fs" \
     SHARDS=$slim BIG_SHARDS=$big STALL=600 POLL=10 \
     bash "$SCRIPTDIR/run-supervised.sh" > "$R/devcheck-$label.out" 2>&1
   local line; line=$(grep '^TOTAL:' "$R/devcheck-$label.out" | tail -1)
@@ -129,13 +147,13 @@ smoke|all)
   # CONFIG_*_FS=y is provably absent from the kernel's .config is skipped
   # loudly (a btrfs-only dev tree is legitimate); if no .config is found
   # we run anyway and let STRICT_NOTRUN catch a config-less kernel.
-  KCONFIG="$(dirname "$KERNEL")/.config"
   for fs in ${GATE_FS:-btrfs xfs fuse}; do
     case "$fs" in btrfs) slist="$R/smoke.txt"; copt=CONFIG_BTRFS_FS;;
                   xfs)   slist="$R/smoke-xfs.txt"; copt=CONFIG_XFS_FS;;
                   fuse)  slist="$R/smoke-fuse.txt"; copt=CONFIG_FUSE_FS;;
                   *) log "unknown GATE_FS entry: $fs"; exit 1;; esac
     [ -f "$slist" ] || { log "SMOKE($fs): $slist missing — run deploy.sh"; exit 1; }
+    KCONFIG="$(dirname "$(kernel_for "$fs")")/.config"
     if [ -f "$KCONFIG" ] && ! grep -q "^$copt=y" "$KCONFIG"; then
       log "SMOKE($fs) SKIPPED: kernel lacks $copt=y ($KCONFIG)"
       continue
