@@ -64,9 +64,13 @@ implemented yet except where noted.
    fs's kernel from PINS (explicit KERNEL= still overrides everything);
    pins-advance handles URL pins via ls-remote and builds with the
    pin's flavor. Smoke gate green per-fs on the new pins (3x20/20).
-   PENDING: baseline re-confirmation full sweeps for xfs and fuse on
-   their new pins — until then treat NEW failures there as un-triaged,
-   not regressions (caveat noted in PINS).
+   Baselines re-confirmed on the new pins 2026-07-25: xfs sweep #2
+   (957/335/105, wall 3320s) — generic/270 FIXED (the TMPFS_XATTR
+   config fix), generic/753+754 folded (dm-sysfs cluster), xfs/504
+   folded (unicode cluster, v1 omission), xfs/136 folded UN-TRIAGED
+   (xfs_db output drift, xfsprogs-suspect); fuse sweep #9 (207/549/36,
+   wall 924s) — generic/410 folded (mount-propagation harness
+   limitation). Both baseline-diffs now new=0.
 
 Sequencing: 1+2 first (one evening, kills the dominant regression
 source), 3 nearly free, 5 is an hour of bookkeeping, 4 last.

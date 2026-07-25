@@ -10,9 +10,8 @@
 PIN_DATE=2026-07-24
 
 # Per-fs sweep kernels — each fs is gated and swept on its own upstream
-# (plan item 7). CAVEAT until the first re-confirmation sweeps: the xfs and
-# fuse committed baselines were established on the btrfs-for-next tri-fs
-# kernel; treat NEW failures on the new pins as un-triaged, not regressions.
+# (plan item 7). Baselines re-confirmed on these pins 2026-07-25
+# (xfs sweep #2, fuse sweep #9): committed baselines fully apply.
 KERNEL_BTRFS_REPO=kdave/btrfs-devel
 KERNEL_BTRFS_REF=for-next
 KERNEL_BTRFS_SHA=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3

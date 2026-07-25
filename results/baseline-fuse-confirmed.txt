@@ -1,6 +1,8 @@
 # baseline-fuse-confirmed.txt — committed known-failure baseline for fuse2fs.
 # Source: canonical fuse baseline 2026-07-17, fuse2fs 1.47.4 nojournal
 # (206 pass / 549 notrun / 34 fail sweep) — see docs/FUSE2FS-BASELINE-TRIAGE.md.
+# Re-confirmed 2026-07-25 on the per-fs pin (mainline-0724, sweep #9):
+# generic/410 folded in (mount-propagation harness limitation under fuse2fs).
 generic/020
 generic/035
 generic/053
@@ -14,6 +16,7 @@ generic/338
 generic/347
 generic/375
 generic/409
+generic/410
 generic/411
 generic/424
 generic/426

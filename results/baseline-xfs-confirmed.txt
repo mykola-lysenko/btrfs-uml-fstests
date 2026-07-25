@@ -1,5 +1,10 @@
 # baseline-xfs-confirmed.txt — committed known-failure baseline for xfs.
 # Source: xfs sweep #1 on for-next-0710 + XFS_DEBUG (2026-07-16),
+# Re-confirmed 2026-07-25 on the per-fs pin (xfs-for-next-0724, sweep #2):
+# generic/270 FIXED out (TMPFS_XATTR); generic/753+754 folded in (dm-sysfs
+# cluster signature); xfs/504 folded in (unicode cluster, v1 omission);
+# xfs/136 folded in UN-TRIAGED (xfs_db output drift, xfsprogs-suspect —
+# check on a progs bump + QEMU crosscheck before calling it kernel).
 # FAILURES(confirmed-solo) + the 8 straggler dm-cluster tests classified in
 # docs/XFS-BASELINE-TRIAGE.md. PROVISIONAL: ~89 of these are one rig bug
 # (dm-sysfs / udev-less rootfs cluster) — re-baseline after that fix lands;
@@ -26,7 +31,6 @@ generic/265
 generic/266
 generic/267
 generic/268
-generic/270
 generic/271
 generic/272
 generic/276
@@ -85,6 +89,8 @@ generic/695
 generic/741
 generic/743
 generic/745
+generic/753
+generic/754
 generic/764
 generic/771
 generic/779
@@ -98,10 +104,12 @@ generic/792
 xfs/006
 xfs/013
 xfs/083
+xfs/136
 xfs/237
 xfs/240
 xfs/264
 xfs/438
+xfs/504
 xfs/542
 xfs/556
 xfs/605
