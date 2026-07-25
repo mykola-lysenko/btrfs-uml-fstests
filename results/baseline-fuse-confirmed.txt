@@ -1,0 +1,37 @@
+# baseline-fuse-confirmed.txt — committed known-failure baseline for fuse2fs.
+# Source: canonical fuse baseline 2026-07-17, fuse2fs 1.47.4 nojournal
+# (206 pass / 549 notrun / 34 fail sweep) — see docs/FUSE2FS-BASELINE-TRIAGE.md.
+generic/020
+generic/035
+generic/053
+generic/079
+generic/099
+generic/184
+generic/294
+generic/306
+generic/319
+generic/338
+generic/347
+generic/375
+generic/409
+generic/411
+generic/424
+generic/426
+generic/434
+generic/441
+generic/444
+generic/452
+generic/467
+generic/477
+generic/484
+generic/500
+generic/553
+generic/589
+generic/633
+generic/683
+generic/684
+generic/685
+generic/732
+generic/743
+generic/756
+generic/777

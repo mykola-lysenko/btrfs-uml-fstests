@@ -1,0 +1,7 @@
+# baseline-btrfs-confirmed.txt — committed known-failure baseline for btrfs.
+# EMPTY since 2026-07-24: the 12 triaged residuals from the July definitive
+# sweep (docs/RESIDUAL-FAILURES-TRIAGE.md) all PASS as of the quick-stage run
+# on for-next-0710 — the rootfs/tooling fixes from the xfs/fuse bring-up
+# (terminfo, loop devices, lock helpers, mount, progs) resolved them.
+# Contract: any btrfs sweep failure is now a new-failure regression alarm.
+# History: git log this file; original list in RESIDUAL-FAILURES-TRIAGE.md.
