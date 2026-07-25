@@ -1,0 +1,17 @@
+xfs/605: use _fs_sysfs_dname instead of open-coding the sysfs path
+
+The errortag path was built from _short_dev, which mismatches the
+kernel's sysfs name when /dev/mapper nodes are not udev symlinks.
+_fs_sysfs_dname resolves via /sys/dev/block and works either way.
+
+--- a/tests/xfs/605
++++ b/tests/xfs/605
+@@ -54,7 +54,7 @@
+ _scratch_mount
+ 
+ device=$(readlink -f $SCRATCH_DEV)
+-device=$(_short_dev $device)
++device=$(_fs_sysfs_dname $device)
+ 
+ echo "Pin log items in the AIL"
+ echo 1 > /sys/fs/xfs/${device}/errortag/log_item_pin

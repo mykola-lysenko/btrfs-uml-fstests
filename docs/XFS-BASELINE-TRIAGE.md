@@ -1,5 +1,19 @@
 # xfs baseline sweep #1 — triage (2026-07-16)
 
+**RESOLVED 2026-07-25:** the dm-sysfs hypothesis below was CONFIRMED
+(guest experiment: /dev/mapper/flakey-test.999 = real node 254:0, kernel
+registers dm-0) and fixed via fix candidate (b):
+`patches-xfstests/common-rc-sysfs-dname-no-udev.patch` resolves
+`_fs_sysfs_dname` through /sys/dev/block (upstream candidate), plus
+`xfs-605-sysfs-dname.patch` for xfs/605's open-coded path. Baseline
+retest on xfs-for-next-0724: 96 of 105 entries flipped to PASS —
+crash-consistency coverage is now real. The suppressed signal the NOTE
+below warned about did surface: **generic/753 + generic/754 leave the
+scratch fs INCONSISTENT** once their error injection actually runs
+(solo-confirmed; QEMU crosscheck pending — real-bug candidates).
+Found alongside: deploy.sh's patch-applied check was hollow
+('patch -R --batch' dry-runs forward on unapplied patches; now --force).
+
 First full xfs run on the rig: 1592 tests (generic+xfs minus generic/027),
 queue mode, 14+2 lanes, for-next-0710 + XFS_DEBUG. Wall 7855s.
 **TOTAL: pass=959 notrun=328 failed=222 (~33 timeout)**
