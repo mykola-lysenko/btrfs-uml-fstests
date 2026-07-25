@@ -24,9 +24,14 @@ implemented yet except where noted.
    rootfs invariants (/bin,/sbin,/lib are symlinks — the dpkg -x tar
    clobber class), prints a manifest hash the smoke gate records.
    Long-term: generate the rootfs fully from the repo.
-3. **Baselines as committed data.** Per-fs confirmed-failure lists +
-   counts in results/ (started: baseline-fuse-confirmed.txt). Every
-   sweep diffs against baseline: new failures = regression alarm,
+3. **Baselines as committed data.** DONE 2026-07-24 (branch
+   ci-baselines): results/baseline-{btrfs,xfs,fuse}-confirmed.txt +
+   rootless-uml/baseline-diff.sh; dev-check quick/full gate on NEW
+   failures only (smoke/targeted stay strict). First run immediately
+   paid off: all 12 btrfs residuals now pass (rootfs/tooling fixes from
+   the xfs/fuse bring-up) — btrfs baseline emptied; xfs baseline is
+   provisional until the dm-sysfs cluster fix, then re-baseline.
+   Every sweep diffs against baseline: new failures = regression alarm,
    disappeared = progress to fold in.
 4. **Serial on hardware, parallel on calendar.** Full sweeps are
    timing-sensitive and share one host (the interlock exists for a

@@ -91,10 +91,26 @@ run_list(){ # $1 list-file  $2 label  [$3 slim shards] [$4 big shards]
   # marker: run-supervised prints FAILURES(raw)/(confirmed-solo), and the
   # old '^FAILURES:' grep matched neither — failures sailed through.
   local nf; nf=$(sed -n 's/.*failed=\([0-9]*\).*/\1/p' <<<"$line")
+  # quick/full run real test groups where the triaged environment failures
+  # in results/baseline-<fs>-confirmed.txt are expected: there the committed
+  # baseline decides what gates (new failure = regression, known = pass,
+  # baseline test passing = logged progress). Smoke/targeted lists are
+  # curated confirmed-pass sets — any failure gates, no baseline applies.
+  local blfile="$SCRIPTDIR/../results/baseline-$fs-confirmed.txt" brc=""
+  if { [ "$label" = quick ] || [ "$label" = full ]; } && [ -f "$blfile" ]; then
+    FSTYP=$fs BASE=$BASE bash "$SCRIPTDIR/baseline-diff.sh" \
+      "$R/devcheck-$label.out" "$blfile" > "$R/devcheck-$label.baseline" 2>&1
+    brc=$?
+    while IFS= read -r bl; do log "stage '$label': $bl"; done < "$R/devcheck-$label.baseline"
+  fi
   if [ -n "$nf" ] && [ "$nf" -gt 0 ]; then
-    log "stage '$label' FAILURES:$(grep -E '^FAILURES\((raw|confirmed-solo)\):' \
-      "$R/devcheck-$label.out" | tail -1 | cut -d: -f2)"
-    return 1
+    if [ "$brc" = 0 ]; then
+      log "stage '$label': $nf failures, none new (known-baseline or load-flaky) — not gating"
+    else
+      log "stage '$label' FAILURES:$(grep -E '^FAILURES\((raw|confirmed-solo)\):' \
+        "$R/devcheck-$label.out" | tail -1 | cut -d: -f2)"
+      return 1
+    fi
   fi
   if [ "${STRICT_NOTRUN:-0}" = 1 ]; then
     local nr; nr=$(sed -n 's/.*notrun=\([0-9]*\).*/\1/p' <<<"$line")
