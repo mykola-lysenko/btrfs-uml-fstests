@@ -37,12 +37,17 @@ implemented yet except where noted.
    timing-sensitive and share one host (the interlock exists for a
    reason): nightly rotation script runs tri-fs smoke + one (or all
    three, serially) full sweeps + baseline diff + dated report.
-5. **PINS manifest + weekly advance ritual.** One file: kernel SHAs per
-   upstream (btrfs for-next, xfs for-next, mainline for fuse), xfstests
-   SHA, e2fsprogs/fuse2fs version, rootfs snapshot date. Advance weekly
-   on a quiet day: bump, rebuild, gate, sweep, triage delta, commit new
-   baselines. Never advance mid-investigation. Keep per-pin kernel
-   binaries as named artifacts (formalizes linux.pre-xfs-style backups).
+5. **PINS manifest + weekly advance ritual.** DONE 2026-07-24 (branch
+   ci-pins): rootless-uml/PINS (shell-sourceable: kernel SHAs for the
+   tri-fs sweep kernel + btrfs-tip A/B kernel, xfstests SHA, e2fsprogs/
+   btrfs-progs versions, rootfs snapshot date) + pins-advance.sh
+   (check = report moved branches; advance = resolve tip, build BY SHA
+   via build-uml-kernel.sh, rewrite PINS, print ritual checklist —
+   sweeps/triage/fold stay human). Grows pins per upstream (xfs
+   for-next, mainline-for-fuse) when those kernels exist. Advance weekly
+   on a quiet day; never mid-investigation. Per-pin kernel binaries stay
+   as named artifacts (linux-<NAME>/). PINS is also the intended cache
+   key for the hosted UML smoke lane.
 6. **Rig invariant asserts.** In run-queued aggregate: done + claimed +
    queued == total and verdicts ~= tests-run (catches marker stranding
    and silent queue inhalation classes). Sick-lane guard and startup
