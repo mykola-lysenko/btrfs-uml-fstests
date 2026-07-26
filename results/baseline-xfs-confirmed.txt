@@ -1,24 +1,19 @@
 # baseline-xfs-confirmed.txt — committed known-failure baseline for xfs.
-# Rebuilt 2026-07-25 after the dm-sysfs cluster fix
-# (patches-xfstests/common-rc-sysfs-dname-no-udev.patch +
-# xfs-605-sysfs-dname.patch): full-baseline retest on xfs-for-next-0724
-# flipped 95+1 of 105 entries to PASS — xfs crash-consistency coverage is
-# now claimable. What remains, by class:
-#   generic/753, generic/754 — CONFIRMED both-platform 2026-07-25: fs left
-#     inconsistent after EIO injection on UML AND QEMU/KVM (3/3), on both
-#     xfs-for-next-0724 and vanilla-7.1 kernels (not a for-next
-#     regression). See docs/XFS-753-754-EIO-INCONSISTENCY.md; next step is
-#     test-intent review + fstests-list question, not yet an xfs report.
-#   generic/473 — fiemap extent-granularity diff; kernel-behavior candidate,
-#     QEMU crosscheck pending (see XFS-BASELINE-TRIAGE.md).
-#   xfs/136 — UN-TRIAGED xfs_db output drift (xfsprogs-suspect).
+# Rebuilt 2026-07-25 (twice): dm-sysfs harness fix collapsed 105 -> 8, then
+# the xfsprogs 6.6.0 -> 7.1.1 pin (PINS XFSPROGS_VER; the stale xfs_repair
+# manufactured the generic/753+754 "corruption" — see
+# docs/XFS-753-754-STALE-REPAIR-RESOLVED.md) collapsed 8 -> 6.
+# Remaining, by class:
 #   generic/454, xfs/504 — unicode-tooling cluster (rootfs misc-filter).
+#   generic/473 — fiemap extent-granularity diff; kernel-behavior candidate,
+#     QEMU crosscheck still pending (see XFS-BASELINE-TRIAGE.md).
 #   generic/791 — UML has no fanotify syscall; inherent.
 #   xfs/013 — ENOSPC filling scratch even at 8G solo; sizing/geometry.
+#   xfs/136 — legacy golden output hardcodes inum=67 from ancient mkfs
+#     geometry (modern mkfs: 131); fails with progs 6.6.0 AND 7.1.1 —
+#     env-class, arguably an upstream test bug.
 generic/454
 generic/473
-generic/753
-generic/754
 generic/791
 xfs/013
 xfs/136

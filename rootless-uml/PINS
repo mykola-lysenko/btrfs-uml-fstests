@@ -47,4 +47,7 @@ XFSTESTS_SHA=acb6d4cb84205a8e3f19ca470cfcf7bf6d93a509
 # since the first advance, downloads happen BY SHA.)
 E2FSPROGS_VER=1.47.4        # fuse2fs; nojournal scratch config
 BTRFS_PROGS_VER=v7.0        # kdave static btrfs.box release
+XFSPROGS_VER=7.1.1          # built by build-xfsprogs.sh; Ubuntu-pool 6.6.0
+                            # xfs_repair false-flagged post-crash INCOMPLETE
+                            # attr entries (the generic/753+754 story)
 ROOTFS_SNAPSHOT=2026-07-17  # Ubuntu noble pool fetch date (fullpkgs/)
