@@ -31,6 +31,26 @@ if ! ls usr/lib/x86_64-linux-gnu/libproc2.so.0* >/dev/null 2>&1 \
   log "added libproc2 (from host)"
 fi
 
+# C.UTF-8 locale data: without it setlocale(LC_ALL,"") returns NULL in the
+# guest, and xfs_scrub's Unicode confusable checker (unicrash) silently
+# disables itself — that was the generic/454 + xfs/504 "unicode cluster".
+# Ubuntu glibc has no built-in C.UTF-8; libc-bin ships the compiled locale.
+if [ ! -e usr/lib/locale/C.utf8/LC_CTYPE ]; then
+  d=$(ls "$BASE"/fullpkgs/libc-bin_*.deb 2>/dev/null | head -1)
+  if [ -z "$d" ]; then
+    (cd "$BASE/fullpkgs" && apt-get download libc-bin >/dev/null 2>&1)
+    d=$(ls "$BASE"/fullpkgs/libc-bin_*.deb 2>/dev/null | head -1)
+  fi
+  if [ -n "$d" ]; then
+    t=$(mktemp -d); dpkg-deb -x "$d" "$t"
+    mkdir -p usr/lib/locale
+    cp -a "$t"/usr/lib/locale/C.utf8 usr/lib/locale/ && log "added C.utf8 locale (libc-bin)"
+    rm -rf "$t"
+  else
+    log "WARNING: no libc-bin deb — C.utf8 missing, scrub unicode checks will silently disable"
+  fi
+fi
+
 # setuid bits: dpkg-deb -x preserves the setuid BIT but ownership becomes the
 # assembling uid (1000) — which in the guest is fsgqa. A setuid-fsgqa mount
 # DROPS root to uid 1000, so mount(2) gets EPERM: the long-standing

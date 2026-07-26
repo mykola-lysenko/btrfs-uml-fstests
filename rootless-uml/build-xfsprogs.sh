@@ -15,10 +15,13 @@ set -euo pipefail
 BASE="${BASE:-$HOME/uml-smoke}"; R="$BASE/rootfs-xfs"
 WORK="${WORK:-$BASE/xfsprogs-build}"; SYS="$WORK/sysroot"
 mkdir -p "$WORK" && cd "$WORK"
-for p in libinih-dev liburcu-dev libedit-dev uuid-dev libblkid-dev gettext gettext-base; do
+for p in libinih-dev liburcu-dev libedit-dev uuid-dev libblkid-dev gettext gettext-base libicu-dev libicu74; do
   ls ${p}_*.deb >/dev/null 2>&1 || apt-get download "$p" >/dev/null 2>&1
 done
 for d in *.deb; do dpkg-deb -x "$d" "$SYS"; done
+# force dynamic ICU: the static libicu*.a need libstdc++, which the gcc-linked
+# scrub does not pull in
+rm -f "$SYS"/usr/lib/x86_64-linux-gnu/libicu*.a
 VER=$(curl -s https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/ \
       | grep -oE 'xfsprogs-[0-9.]+\.tar\.xz' | sort -V | tail -1)
 [ -d "${VER%.tar.xz}" ] || { wget -q "https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/$VER"; tar xf "$VER"; }
@@ -27,13 +30,14 @@ export PATH="$SYS/usr/bin:$PATH" LD_LIBRARY_PATH="$SYS/usr/lib/x86_64-linux-gnu"
 INC="-I$SYS/usr/include -I$SYS/usr/include/x86_64-linux-gnu"
 PKG_CONFIG_PATH="$SYS/usr/lib/x86_64-linux-gnu/pkgconfig" PKG_CONFIG_SYSROOT_DIR="$SYS" \
 CFLAGS="$INC -O2" CXXFLAGS="$INC -O2" LDFLAGS="-L$SYS/usr/lib/x86_64-linux-gnu" \
-./configure --disable-docs >/dev/null
+./configure --disable-docs --enable-libicu >/dev/null
 make headers >/dev/null 2>&1
-for d in libfrog libxcmd libhandle libxfs libxlog io mkfs repair db logprint growfs spaceman quota fsr; do
+for d in libfrog libxcmd libhandle libxfs libxlog io mkfs repair db logprint growfs spaceman quota fsr scrub; do
   make -j"$(nproc)" -C "$d" >/dev/null
 done
 BINS="io/xfs_io mkfs/mkfs.xfs repair/xfs_repair db/xfs_db logprint/xfs_logprint
-      growfs/xfs_growfs spaceman/xfs_spaceman quota/xfs_quota fsr/xfs_fsr"
+      growfs/xfs_growfs spaceman/xfs_spaceman quota/xfs_quota fsr/xfs_fsr
+      scrub/xfs_scrub"
 # copy runtime libs the binaries need but the rootfs lacks
 for b in $BINS; do
   for f in $(ldd "$b" | awk '/=>/{print $3}'); do
@@ -46,4 +50,4 @@ for b in $BINS; do
   install -m 755 "$b" "$R/usr/sbin/$n"; rm -f "$R/usr/bin/$n"
 done
 # xfs_freeze is a shell wrapper around xfs_io in upstream; keep distro copy.
-echo "installed: $("$R/usr/sbin/xfs_io" -V), $("$R/usr/sbin/xfs_repair" -V), $("$R/usr/sbin/mkfs.xfs" -V)"
+echo "installed: $("$R/usr/sbin/xfs_io" -V), $("$R/usr/sbin/xfs_repair" -V), $("$R/usr/sbin/mkfs.xfs" -V), $("$R/usr/sbin/xfs_scrub" -VV 2>/dev/null | sed -n '2p' || true)"
