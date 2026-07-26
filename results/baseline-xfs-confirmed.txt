@@ -4,10 +4,11 @@
 # xfs-605-sysfs-dname.patch): full-baseline retest on xfs-for-next-0724
 # flipped 95+1 of 105 entries to PASS — xfs crash-consistency coverage is
 # now claimable. What remains, by class:
-#   generic/753, generic/754 — REAL-BUG CANDIDATES: with the harness fixed
-#     the error injection actually runs and _check_xfs_filesystem finds the
-#     scratch fs INCONSISTENT (solo-confirmed). QEMU crosscheck before any
-#     upstream claim; remove from baseline once resolved either way.
+#   generic/753, generic/754 — CONFIRMED both-platform 2026-07-25: fs left
+#     inconsistent after EIO injection on UML AND QEMU/KVM (3/3), on both
+#     xfs-for-next-0724 and vanilla-7.1 kernels (not a for-next
+#     regression). See docs/XFS-753-754-EIO-INCONSISTENCY.md; next step is
+#     test-intent review + fstests-list question, not yet an xfs report.
 #   generic/473 — fiemap extent-granularity diff; kernel-behavior candidate,
 #     QEMU crosscheck pending (see XFS-BASELINE-TRIAGE.md).
 #   xfs/136 — UN-TRIAGED xfs_db output drift (xfsprogs-suspect).
