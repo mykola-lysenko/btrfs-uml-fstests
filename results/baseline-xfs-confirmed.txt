@@ -1,19 +1,16 @@
 # baseline-xfs-confirmed.txt — committed known-failure baseline for xfs.
-# Rebuilt 2026-07-25 (three passes): dm-sysfs harness fix collapsed 105 -> 8;
-# xfsprogs 6.6.0 -> 7.1.1 pin collapsed 8 -> 6 (stale xfs_repair story,
-# docs/XFS-753-754-STALE-REPAIR-RESOLVED.md); generic/473 removed 6 -> 5
-# (upstream-disowned: 'broken' group, out of auto/quick per Dave Chinner —
-# "This fails on XFS ... no apparent resolution in sight"; now permanently
-# excluded via exclude-known-xfs.txt, not swept at all).
-# Remaining, by class:
-#   generic/454, xfs/504 — unicode-tooling cluster (rootfs misc-filter).
+# 2026-07-26: unicode cluster resolved (generic/454, xfs/504) — the rootfs
+# had no locale data, so setlocale(LC_ALL,"") failed in-guest and
+# xfs_scrub's unicrash checker silently disabled itself; C.utf8 now ships
+# in the rootfs (assemble-rootfs.sh) and xfs_scrub 7.1.1 +Unicode is part
+# of the built toolset. Baseline 5 -> 3. History of earlier collapses
+# (105 -> 8 -> 6 -> 5): git log this file.
+# Remaining, by class — all understood, none kernel bugs:
 #   generic/791 — UML has no fanotify syscall; inherent.
 #   xfs/013 — ENOSPC filling scratch even at 8G solo; sizing/geometry.
 #   xfs/136 — legacy golden output hardcodes inum=67 from ancient mkfs
 #     geometry (modern mkfs: 131); fails with progs 6.6.0 AND 7.1.1 —
 #     env-class, arguably an upstream test bug.
-generic/454
 generic/791
 xfs/013
 xfs/136
-xfs/504

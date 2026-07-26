@@ -61,9 +61,18 @@ must all re-run before we claim xfs crash-consistency coverage.
 - **generic/270** — SOLVED rig config: CONFIG_TMPFS_XATTR unset, so
   setcap on /tmp-copied fsstress fails. Enable (+TMPFS_POSIX_ACL) in
   next kernel rebuild.
-- **generic/454** — unexpected "No complaints about ..." informational
-  lines in output: xattr/unicode tooling difference, likely missing
-  misc-filter dependency in rootfs. Rig-level, investigate.
+- **generic/454** — RESOLVED 2026-07-26 (with xfs/504, the whole unicode
+  cluster): TWO stacked rootfs gaps. (1) xfs_scrub was still Ubuntu 6.6.0
+  after the 7.1.1 toolset upgrade (scrub needs libicu at build time — now
+  built with --enable-libicu, dynamic ICU). (2) The decisive one: the
+  rootfs had NO locale data, so in-guest setlocale(LC_ALL,"") returned
+  NULL, LC_MESSAGES stayed "C", and scrub's is_utf8_locale() gate
+  silently disabled all unicrash Unicode checking — no error, no warning,
+  it just falls back to simple_check_name. Found via in-guest strace
+  (getdents64 proved the name walk ran) + an in-guest setlocale probe.
+  Fix: C.utf8 from libc-bin ships in the rootfs (assemble-rootfs.sh).
+  Beware the trap that delayed this: testing the rootfs glibc from the
+  HOST via its ld.so finds the host's /usr/lib/locale and lies.
 - **xfs/013** — ENOSPC filling scratch even at 8G solo. Sizing/geometry
   question, not obviously a bug.
 - **xfs/006** — [failed] (exit status, no .out.bad): error-handling test
