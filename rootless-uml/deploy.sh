@@ -33,7 +33,8 @@ GUEST_SCRIPTS="shard-init.sh queue-init.sh qemu-init checkenv-init.sh
 # residual/baseline files) is intentionally NOT in this set.
 LISTS="smoke.txt smoke-xfs.txt smoke-fuse.txt quick-all.txt quick-fast.txt
   quick-slow.txt auto-all.txt confirmed-fast.txt confirmed-slow.txt
-  slow-tier.txt stable-core.txt exclude-known.txt bigmem-seed.txt"
+  slow-tier.txt stable-core.txt exclude-known.txt exclude-known-xfs.txt
+  bigmem-seed.txt"
 
 # BLESSED_PRINT=1: emit the blessed set and exit — lets CI verify every
 # referenced file exists in the repo without needing a rig.

@@ -1,0 +1,6 @@
+# exclude-known-xfs.txt — permanent xfs sweep excludes (deployed to $R by deploy.sh).
+# upstream-disowned: in the 'broken' group, removed from auto/quick by Dave
+# Chinner — "FIEMAP is a debugging interface ... This fails on XFS, and
+# there's no apparent resolution to that in sight." Not a kernel-behavior
+# candidate; do not investigate, do not baseline.
+generic/473
