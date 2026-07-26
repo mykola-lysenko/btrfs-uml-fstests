@@ -49,10 +49,15 @@ must all re-run before we claim xfs crash-consistency coverage.
 ## Independent confirmed failures (5 + 1)
 - **xfs/083** — "xfs_repair did not fix everything" after corruption.
   REAL-BUG CANDIDATE (repair gap). QEMU crosscheck first.
-- **generic/473** — fiemap reports [128..135] where golden expects
-  [128..255]: extent granularity difference. Kernel-behavior candidate;
-  QEMU crosscheck (remember the third-strike lesson before calling it
-  an artifact).
+- **generic/473** — RESOLVED 2026-07-25 without a crosscheck: the test is
+  upstream-DISOWNED — it sits in the 'broken' group and was removed from
+  auto/quick by Dave Chinner ("FIEMAP is a debugging interface ... This
+  fails on XFS, and there's no apparent resolution to that in sight").
+  Our failure is the documented one. It only ran here because xfs-all.txt
+  sweeps every test, not the auto group. Now permanently excluded
+  (exclude-known-xfs.txt); dropped from the baseline. Rig lesson: check a
+  failing test's groups FIRST — 'broken' or missing-from-auto is an
+  instant verdict.
 - **generic/270** — SOLVED rig config: CONFIG_TMPFS_XATTR unset, so
   setcap on /tmp-copied fsstress fails. Enable (+TMPFS_POSIX_ACL) in
   next kernel rebuild.
