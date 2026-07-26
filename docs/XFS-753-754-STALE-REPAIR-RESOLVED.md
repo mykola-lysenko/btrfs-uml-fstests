@@ -1,7 +1,23 @@
-# generic/753 + generic/754 leave xfs inconsistent after EIO injection — CONFIRMED both platforms
+# generic/753 + generic/754 "inconsistency" — RESOLVED: stale xfs_repair, not a kernel bug
 
-**Status:** confirmed real (rig standards: two independent platforms,
-deterministic), NOT yet root-caused, NOT yet reported upstream.
+**Status:** RESOLVED 2026-07-25, same day. NOT a kernel bug — the
+"corruption" was manufactured by xfs_repair 6.6.0 (Ubuntu pool, ~18
+months older than the kernels under test). Decisive experiment: the SAME
+post-generic/753 scratch image judged by both repair versions —
+xfs_repair 6.6.0: exit 1, "would clear attr fork / bad nblocks";
+xfs_repair 7.1.1: exit 0, CLEAN (the `XFS_ATTR_INCOMPLETE` entries are
+legitimate post-crash residue, noted as informational). generic/754's
+test header even documents the repair-side fix ("xfs_repair: small
+remote symlinks are ok") as not-yet-released at snapshot time; xfs/136's
+xfs_db output drift is the same stale-progs root cause. Kernel log
+recovery does its job on both 7.1 and xfs-for-next.
+Fix: xfsprogs pinned + built from source (build-xfsprogs.sh, PINS
+XFSPROGS_VER=7.1.1); baselines re-tested and folded. Nothing to report
+upstream. Methodology lesson: "both platforms agree" only rules out the
+EXECUTION environment — the judging toolchain was the same stale binary
+on both sides. Cross-check the verdict tool too.
+
+Original (now-retracted) analysis kept below for the record.
 **Found:** 2026-07-25, immediately after the dm-sysfs harness fix — these
 tests were invisible before it (their `_require` sysfs probes failed →
 notrun in sweep #1; the sysfs-signature failure in sweep #2 masked the
