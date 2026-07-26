@@ -1,6 +1,9 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export TERM=linux
+# no udev in the guest: stop libdevmapper waiting on udev cookies, create
+# real /dev/mapper nodes itself (same as shard-init; needed for dm tests)
+export DM_DISABLE_UDEV=1
 BB=/usr/bin/busybox
 $BB mount -t proc proc /proc 2>/dev/null
 $BB mount -t sysfs sysfs /sys 2>/dev/null
@@ -26,14 +29,19 @@ export FSTESTS_PER_TEST_TIMEOUT=900
 $MOPTS
 CFG
 # multi-device tests (raid/scrub): pool over every extra virtio disk present
-if [ -b /dev/vdd ]; then
+# (btrfs only — xfs/ext4 want a single SCRATCH_DEV, extra disks stay unused)
+if [ -b /dev/vdd ] && [ "$QFSTYP" = btrfs ]; then
   POOL="/dev/vdc /dev/vdd"
   for d in /dev/vde /dev/vdf /dev/vdg; do [ -b "$d" ] && POOL="$POOL $d"; done
   $BB sed -i '/SCRATCH_DEV=/d' local.config
   echo "export SCRATCH_DEV_POOL=\"$POOL\"" >> local.config
 fi
 $BB mkdir -p /mnt/test /mnt/scratch
-if [ "$QFSTYP" = btrfs ]; then mkfs.btrfs -f /dev/vdb >/dev/null 2>&1; else mkfs.$QFSTYP -Fq /dev/vdb >/dev/null 2>&1; fi
+case "$QFSTYP" in
+  btrfs) mkfs.btrfs -f /dev/vdb >/dev/null 2>&1 ;;
+  xfs)   mkfs.xfs -fq /dev/vdb >/dev/null 2>&1 ;;
+  *)     mkfs.$QFSTYP -Fq /dev/vdb >/dev/null 2>&1 ;;
+esac
 TESTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qtests=//p' | $BB tr ',' ' ')"
 [ -z "$TESTS" ] && TESTS="generic/574"
 LOOP="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qloop=//p')"
