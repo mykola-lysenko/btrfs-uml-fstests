@@ -105,6 +105,22 @@ run_list(){ # $1 list-file  $2 label  [$3 slim shards] [$4 big shards]
     return 1
   fi
   log "stage '$label': $line"
+  # Zero-work green guard: a stage that executed fewer tests than listed is
+  # a FAILURE even with failed=0 — guests that never boot, lost lists, and
+  # scheduler bugs all present as a vacuous pass=0 "success" otherwise
+  # (bit us three times: scratchpad list wipe, and the hosted lane's first
+  # "green" run where UML executed nothing at all).
+  local listed ran
+  listed=$(grep -cvE '^#|^\s*$' "$list")
+  ran=$(( $(sed -n 's/.*pass=\([0-9]*\).*/\1/p' <<<"$line") \
+       + $(sed -n 's/.*notrun=\([0-9]*\).*/\1/p' <<<"$line") \
+       + $(sed -n 's/.*failed=\([0-9]*\).*/\1/p' <<<"$line") ))
+  # grep -c prints the 0 itself on no-match (and exits 1) — no || echo
+  local blk; blk=$(grep -cvE '^#|^\s*$' "$bl" 2>/dev/null | head -1); blk=${blk:-0}
+  if [ "$ran" -lt $((listed - blk)) ]; then
+    log "stage '$label': only $ran of $listed listed tests produced a verdict (blacklisted<=$blk) — guests died or list lost (see $R/devcheck-$label.out and shard boot.out)"
+    return 1
+  fi
   # Parse failed= from the TOTAL line rather than grepping a FAILURES
   # marker: run-supervised prints FAILURES(raw)/(confirmed-solo), and the
   # old '^FAILURES:' grep matched neither — failures sailed through.
@@ -122,8 +138,21 @@ run_list(){ # $1 list-file  $2 label  [$3 slim shards] [$4 big shards]
     while IFS= read -r bl; do log "stage '$label': $bl"; done < "$R/devcheck-$label.baseline"
   fi
   if [ -n "$nf" ] && [ "$nf" -gt 0 ]; then
+    local solo=""
+    if grep -qE '^FAILURES\(confirmed-solo\):' "$R/devcheck-$label.out"; then
+      solo=$(grep -E '^FAILURES\(confirmed-solo\):' "$R/devcheck-$label.out" \
+             | tail -1 | cut -d: -f2 | tr -d '[:space:]')
+      soloran=1
+    else
+      soloran=0
+    fi
     if [ "$brc" = 0 ]; then
       log "stage '$label': $nf failures, none new (known-baseline or load-flaky) — not gating"
+    elif [ "$soloran" = 1 ] && [ -z "$solo" ]; then
+      # The solo-retry lane reran every failure serially and all passed:
+      # pure load-flakes. Smoke lists are curated confirmed-pass tests, so
+      # trust the runner's own classification instead of failing the gate.
+      log "stage '$label': $nf raw failure(s) all passed solo — load-flake, not gating"
     else
       log "stage '$label' FAILURES:$(grep -E '^FAILURES\((raw|confirmed-solo)\):' \
         "$R/devcheck-$label.out" | tail -1 | cut -d: -f2)"
