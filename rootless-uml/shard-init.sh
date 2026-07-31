@@ -39,6 +39,15 @@ SDIR="/host/shards/$SHARD"
 mkdir -p "$SDIR/results"
 echo "==== SHARD $SHARD ($(uname -r)) ===="
 
+# debugfs: fault-injection and error-injection tests need it (btrfs/150,
+# generic/271 were notrun without); also the kmemleak knob lives here.
+$BB mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null
+# Leak checking is opt-in BY KERNEL: on a CONFIG_DEBUG_KMEMLEAK kernel the
+# knob exists and xfstests then scans after every test, writing
+# results/<test>.kmemleak (see _detect_kmemleak / _check_kmemleak in
+# common/rc). On the normal pinned kernels this is a no-op.
+[ -w /sys/kernel/debug/kmemleak ] && export USE_KMEMLEAK=yes
+
 # Restore the shared prebuilt tree to this shard's tmpfs (34 MB, fast).
 cp -a /host/xfstests-built /tmp/xfstests
 cd /tmp/xfstests

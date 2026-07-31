@@ -251,6 +251,10 @@ echo "TOTAL: pass=$pass notrun=$nr failed=$fail (incl ~$to timeout) wall=${WALL}
 echo "BLACKLIST: $(grep -cE '^[begx]' "$BLACKLIST_FILE") = hangs:$(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -cE '^[begx]') + crashes:$(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -cE '^[begx]')"
 echo "HANGS: $(sort -u "$BASE/results/hang.txt" 2>/dev/null|grep -hE '^[begx]'|tr '\n' ' ')"
 echo "CRASHES: $(sort -u "$BASE/results/crash.txt" 2>/dev/null|grep -hE '^[begx]'|tr '\n' ' ')"
+# kmemleak reports (leak-hunting kernels only): informational, never gates —
+# leaks need solo-repeat + KVM crosscheck triage before they mean anything.
+lk=$(find "$BASE"/shards/*/results -name '*.kmemleak' 2>/dev/null | sed 's|.*/results/||;s|\.kmemleak$||' | sort -u | tr '\n' ' ')
+[ -n "$lk" ] && echo "LEAKS(kmemleak reports): $lk"
 DEFERRED_SET=$(grep -hE '^[begx]' "$DEFERRED_FILE" 2>/dev/null | sort -u)
 [ -n "$DEFERRED_SET" ] && echo "DEFERRED(memory-victims):$(echo $DEFERRED_SET | tr '\n' ' ')"
 if [ -n "$failed" ] || [ -n "$DEFERRED_SET" ]; then

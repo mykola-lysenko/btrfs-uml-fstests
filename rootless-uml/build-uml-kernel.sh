@@ -45,7 +45,11 @@ if [ ! -d "$DIR" ]; then
     git -C "$DIR" checkout -q FETCH_HEAD
     git -C "$DIR" rev-parse FETCH_HEAD > "$DIR/.source-sha"
   else
-  [ -f "${DIR}.tar.gz" ] || { log "Downloading ${REPO} ${REF}..."; wget -q "$SRC_URL" -O "${DIR}.tar.gz"; }
+  # -s not -f: a failed wget leaves a zero-byte file that would poison
+  # every retry; delete it on failure so the next run re-downloads.
+  [ -s "${DIR}.tar.gz" ] || { log "Downloading ${REPO} ${REF}..."; \
+    wget -q "$SRC_URL" -O "${DIR}.tar.gz" \
+      || { rm -f "${DIR}.tar.gz"; log "DOWNLOAD FAILED: $SRC_URL"; exit 1; }; }
   log "Extracting ($(du -h "${DIR}.tar.gz" | cut -f1))..."
   # GitHub tarballs unpack to <repo>-<ref-slug>/ ; extract to a temp dir then
   # normalize to $DIR (avoids `tar t | head`, which trips SIGPIPE under pipefail).
@@ -108,6 +112,17 @@ case "$FLAVOR" in
   trifs) cfg_btrfs; cfg_xfs; cfg_fuse ;;
   *) log "unknown FLAVOR=$FLAVOR (btrfs|xfs|fuse|trifs)"; exit 1 ;;
 esac
+# KMEMLEAK=1: leak-hunting variant. kmemleak tracks every allocation, so
+# this stays OFF the pinned gate/sweep kernels — build a separate named
+# artifact (e.g. NAME=<pin>-kmemleak). xfstests drives the scans per-test
+# once shard-init sees a writable /sys/kernel/debug/kmemleak.
+if [ "${KMEMLEAK:-0}" = 1 ]; then
+  ./scripts/config \
+    --enable CONFIG_DEBUG_KMEMLEAK \
+    --set-val CONFIG_DEBUG_KMEMLEAK_MEM_POOL_SIZE 65536 \
+    --disable CONFIG_DEBUG_KMEMLEAK_DEFAULT_OFF \
+    --disable CONFIG_DEBUG_KMEMLEAK_AUTO_SCAN >/dev/null 2>&1
+fi
 make ARCH=um olddefconfig >/dev/null 2>&1
 
 log "Building UML kernel with $(nproc) cores..."
