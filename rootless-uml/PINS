@@ -7,16 +7,16 @@
 # Ritual on every advance: deploy -> smoke gate -> full sweeps (serial) ->
 # triage delta vs committed baselines -> fold baselines -> regenerate smoke
 # lists -> commit PINS + baselines together.
-PIN_DATE=2026-07-24
+PIN_DATE=2026-07-31
 
 # Per-fs sweep kernels — each fs is gated and swept on its own upstream
 # (plan item 7). Baselines re-confirmed on these pins 2026-07-25
 # (xfs sweep #2, fuse sweep #9): committed baselines fully apply.
 KERNEL_BTRFS_REPO=kdave/btrfs-devel
 KERNEL_BTRFS_REF=for-next
-KERNEL_BTRFS_SHA=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3
-KERNEL_BTRFS_NAME=for-next-0710
-KERNEL_BTRFS_FLAVOR=trifs   # pre-item-7 build; next advance builds FLAVOR=btrfs
+KERNEL_BTRFS_SHA=374fd5d128d84fd7bf0388cd49225acb8f6a9a4b
+KERNEL_BTRFS_NAME=for-next-0731
+KERNEL_BTRFS_FLAVOR=btrfs
 
 KERNEL_XFS_REPO=https://git.kernel.org/pub/scm/fs/xfs/xfs-linux.git
 KERNEL_XFS_REF=for-next
