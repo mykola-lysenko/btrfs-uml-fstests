@@ -47,7 +47,14 @@ implemented yet except where noted.
    for-next, mainline-for-fuse) when those kernels exist. Advance weekly
    on a quiet day; never mid-investigation. Per-pin kernel binaries stay
    as named artifacts (linux-<NAME>/). PINS is also the intended cache
-   key for the hosted UML smoke lane.
+   key for the hosted UML smoke lane — DONE 2026-07-31 (branch
+   hosted-uml-smoke): .github/workflows/uml-smoke.yml runs the real
+   tri-fs gate on ubuntu-latest, all state cached keyed on PINS
+   (rootfs / xfstests / three kernels); cache-hit runs are minutes, a
+   PINS advance rebuilds (~20 min). Porting it surfaced eight latent
+   rig defects (pipefail landmines, vacuous-green gate gap, HOST_DIR
+   hardcodes, hand-added rootfs state, uncaptured fuse2fs build) — all
+   fixed in the same series. Timing-sensitive tiers stay rig-only.
 6. **Rig invariant asserts.** In run-queued aggregate: done + claimed +
    queued == total and verdicts ~= tests-run (catches marker stranding
    and silent queue inhalation classes). Sick-lane guard and startup

@@ -1,5 +1,7 @@
-# Hosted CI = the static tier only. The rig's real CI (tri-fs smoke gate,
-# dev-check.sh smoke) is hardware-bound and runs pre-push on the host.
+# Hosted CI, static tier: syntax, shellcheck, patch and list invariants.
+# The tri-fs smoke gate also runs hosted now — see uml-smoke.yml (UML is
+# plain userspace; state is cached keyed on PINS). Timing-sensitive work
+# (full sweeps, probes, baselines) stays rig-only.
 name: ci
 on:
   pull_request:
