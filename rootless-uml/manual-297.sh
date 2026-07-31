@@ -10,7 +10,11 @@ $BB mount -t proc proc /proc; $BB mount -t sysfs sysfs /sys
 $BB mount -t devtmpfs devtmpfs /dev 2>/dev/null
 $BB mount -t tmpfs -o size=90% tmpfs /tmp
 $BB mount -t tmpfs tmpfs /mnt; mkdir -p /mnt/test /mnt/scratch
-$BB mount -t hostfs -o /home/prozak/uml-smoke none /host 2>/dev/null
+# hostfs base = parent of the rootflags path — portable across hosts
+# (rig: /home/prozak/uml-smoke; hosted runners: /home/runner/uml-smoke)
+HOST_DIR="$($BB dirname "$($BB sed -n 's/.*rootflags=\([^ ]*\).*/\1/p' /proc/cmdline)")"
+case "$HOST_DIR" in ""|.|/) HOST_DIR=/home/prozak/uml-smoke;; esac
+$BB mount -t hostfs -o "$HOST_DIR" none /host 2>/dev/null
 $BB ip link set lo up 2>/dev/null
 
 cp -a /host/xfstests-built /tmp/xfstests

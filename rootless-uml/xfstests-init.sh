@@ -16,7 +16,6 @@
 #
 # HOST_DIR must match the hostfs rootflags path (where results/ and the prebuilt
 # xfstests-built/ tree live). Edit if your workdir differs.
-HOST_DIR=/home/prozak/uml-smoke
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export HOME=/root TMPDIR=/tmp
@@ -34,6 +33,10 @@ $BB mount -t tmpfs tmpfs /run 2>/dev/null
 mkdir -p /dev/pts /dev/shm
 $BB mount -t devpts devpts /dev/pts 2>/dev/null; $BB mount -t tmpfs tmpfs /dev/shm 2>/dev/null
 hostname uml-xfstests
+# hostfs base = parent of the rootflags path — portable across hosts
+# (rig: /home/prozak/uml-smoke; hosted runners: /home/runner/uml-smoke)
+HOST_DIR="$($BB dirname "$($BB sed -n 's/.*rootflags=\([^ ]*\).*/\1/p' /proc/cmdline)")"
+case "$HOST_DIR" in ""|.|/) HOST_DIR=/home/prozak/uml-smoke;; esac
 $BB mount -t hostfs -o "$HOST_DIR" none /host 2>/dev/null || echo "HOSTFS_FAIL"
 echo "==== UML XFSTESTS RUNNER ($(uname -r)) ===="
 [ -d /host/results ] || mkdir -p /host/results
