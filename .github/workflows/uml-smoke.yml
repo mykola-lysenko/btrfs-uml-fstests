@@ -1,0 +1,129 @@
+# Hosted UML smoke lane — the tri-fs smoke gate (dev-check.sh smoke) on a
+# GitHub runner. UML is plain userspace, so the whole rig pipeline runs
+# hosted; what stays rig-only is timing-sensitive work (full sweeps, probes).
+# All heavy state is cached, keyed on PINS — a cache-hit run is minutes; a
+# full-miss run (PINS advance) rebuilds rootfs + xfstests + three kernels.
+#
+# Cache-miss rootfs rebuilds fetch CURRENT noble-pool debs, so a hosted
+# rootfs can drift newer than the rig's (ROOTFS_SNAPSHOT pins the rig, not
+# the pool). The smoke lists are curated confirmed-pass tests, so this is
+# acceptable for a gate; full sweeps and baselines stay rig-side.
+name: uml-smoke
+on:
+  pull_request:
+    paths:
+      - 'rootless-uml/**'
+      - '.github/workflows/uml-smoke.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'rootless-uml/**'
+      - '.github/workflows/uml-smoke.yml'
+
+concurrency:
+  group: uml-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  uml-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: rootless-uml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: read PINS
+        id: pins
+        run: |
+          . ./PINS
+          {
+            echo "kb_repo=$KERNEL_BTRFS_REPO";  echo "kb_sha=$KERNEL_BTRFS_SHA"
+            echo "kb_name=$KERNEL_BTRFS_NAME"; echo "kb_flavor=$KERNEL_BTRFS_FLAVOR"
+            echo "kx_repo=$KERNEL_XFS_REPO";   echo "kx_sha=$KERNEL_XFS_SHA"
+            echo "kx_name=$KERNEL_XFS_NAME";   echo "kx_flavor=$KERNEL_XFS_FLAVOR"
+            echo "kf_repo=$KERNEL_FUSE_REPO";  echo "kf_sha=$KERNEL_FUSE_SHA"
+            echo "kf_name=$KERNEL_FUSE_NAME";  echo "kf_flavor=$KERNEL_FUSE_FLAVOR"
+            echo "xfstests_repo=$XFSTESTS_REPO"; echo "xfstests_sha=$XFSTESTS_SHA"
+            echo "rootfs_snap=$ROOTFS_SNAPSHOT"; echo "xfsprogs=$XFSPROGS_VER"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: runner prerequisites
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q flex bison bc libelf-dev libssl-dev
+          # build-xfstests-hostside.sh uses an unprivileged userns; noble
+          # runners restrict those via apparmor by default
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+
+      - name: cache rootfs
+        id: cache-rootfs
+        uses: actions/cache@v4
+        with:
+          path: ~/uml-smoke/rootfs-xfs
+          key: rootfs-${{ steps.pins.outputs.rootfs_snap }}-xfsprogs${{ steps.pins.outputs.xfsprogs }}-${{ hashFiles('rootless-uml/fetch-rootfs-pkgs.sh', 'rootless-uml/assemble-rootfs.sh', 'rootless-uml/build-xfsprogs.sh', 'rootless-uml/build-fuse2fs.sh') }}
+
+      - name: cache xfstests
+        id: cache-xfstests
+        uses: actions/cache@v4
+        with:
+          path: ~/uml-smoke/xfstests-built
+          key: xfstests-${{ steps.pins.outputs.xfstests_sha }}-${{ hashFiles('rootless-uml/patches-xfstests/**', 'rootless-uml/build-xfstests-hostside.sh') }}
+
+      - name: cache kernels
+        id: cache-kernels
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/uml-smoke/linux-*/linux
+            ~/uml-smoke/linux-*/.config
+            ~/uml-smoke/linux-*/SOURCE.txt
+          key: kernels-${{ steps.pins.outputs.kb_sha }}-${{ steps.pins.outputs.kx_sha }}-${{ steps.pins.outputs.kf_sha }}-${{ hashFiles('rootless-uml/build-uml-kernel.sh', 'rootless-uml/patches/**') }}
+
+      - name: build rootfs (cache miss)
+        if: steps.cache-rootfs.outputs.cache-hit != 'true'
+        run: |
+          ./fetch-rootfs-pkgs.sh
+          ./assemble-rootfs.sh
+          ./build-xfsprogs.sh
+          ./build-fuse2fs.sh
+
+      - name: build xfstests (cache miss)
+        if: steps.cache-xfstests.outputs.cache-hit != 'true'
+        run: |
+          cd ~/uml-smoke
+          wget -q "https://codeload.github.com/${{ steps.pins.outputs.xfstests_repo }}/tar.gz/${{ steps.pins.outputs.xfstests_sha }}" -O xfstests-src.tar.gz
+          rm -rf _xt && mkdir _xt && tar xf xfstests-src.tar.gz -C _xt
+          rm -rf xfstests-master && mv _xt/* xfstests-master && rmdir _xt
+          cd "$GITHUB_WORKSPACE/rootless-uml"
+          ./build-xfstests-hostside.sh
+
+      - name: build kernels (cache miss)
+        if: steps.cache-kernels.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          REPO='${{ steps.pins.outputs.kb_repo }}' REF='${{ steps.pins.outputs.kb_sha }}' \
+            NAME='${{ steps.pins.outputs.kb_name }}' FLAVOR='${{ steps.pins.outputs.kb_flavor }}' ./build-uml-kernel.sh
+          REPO='${{ steps.pins.outputs.kx_repo }}' REF='${{ steps.pins.outputs.kx_sha }}' \
+            NAME='${{ steps.pins.outputs.kx_name }}' FLAVOR='${{ steps.pins.outputs.kx_flavor }}' ./build-uml-kernel.sh
+          REPO='${{ steps.pins.outputs.kf_repo }}' REF='${{ steps.pins.outputs.kf_sha }}' \
+            NAME='${{ steps.pins.outputs.kf_name }}' FLAVOR='${{ steps.pins.outputs.kf_flavor }}' ./build-uml-kernel.sh
+
+      - name: deploy
+        run: APPLY=1 ./deploy.sh
+
+      - name: tri-fs smoke gate
+        run: ./dev-check.sh smoke
+
+      - name: upload gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uml-smoke-logs
+          path: |
+            ~/uml-smoke/results/devcheck-*.out
+            ~/uml-smoke/shards/*/boot.out*
+            ~/uml-smoke/shards/*/results/run.log*
+          if-no-files-found: ignore
+          retention-days: 7
