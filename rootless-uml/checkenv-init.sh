@@ -4,7 +4,11 @@ BB=/usr/bin/busybox
 $BB mount -t proc proc /proc; $BB mount -t sysfs sysfs /sys
 $BB mount -t devtmpfs devtmpfs /dev 2>/dev/null
 $BB mount -t tmpfs tmpfs /tmp
-$BB mount -t hostfs -o /home/prozak/uml-smoke none /host 2>/dev/null
+# hostfs base = parent of the rootflags path — portable across hosts
+# (rig: /home/prozak/uml-smoke; hosted runners: /home/runner/uml-smoke)
+HOST_DIR="$($BB dirname "$($BB sed -n 's/.*rootflags=\([^ ]*\).*/\1/p' /proc/cmdline)")"
+case "$HOST_DIR" in ""|.|/) HOST_DIR=/home/prozak/uml-smoke;; esac
+$BB mount -t hostfs -o "$HOST_DIR" none /host 2>/dev/null
 R=/host/shards/checkenv-report
 {
 echo "== dmsetup =="; dmsetup version 2>&1 | head -3

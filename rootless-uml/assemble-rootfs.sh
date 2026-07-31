@@ -36,10 +36,12 @@ fi
 # disables itself — that was the generic/454 + xfs/504 "unicode cluster".
 # Ubuntu glibc has no built-in C.UTF-8; libc-bin ships the compiled locale.
 if [ ! -e usr/lib/locale/C.utf8/LC_CTYPE ]; then
-  d=$(ls "$BASE"/fullpkgs/libc-bin_*.deb 2>/dev/null | head -1)
+  # libc-bin is Essential, so the dependency closure does not include it —
+  # fetch it explicitly. Glob lookup, not ls: pipefail + no match = exit 2.
+  d=""; for f in "$BASE"/fullpkgs/libc-bin_*.deb; do [ -f "$f" ] && d="$f" && break; done
   if [ -z "$d" ]; then
-    (cd "$BASE/fullpkgs" && apt-get download libc-bin >/dev/null 2>&1)
-    d=$(ls "$BASE"/fullpkgs/libc-bin_*.deb 2>/dev/null | head -1)
+    (cd "$BASE/fullpkgs" && apt-get download libc-bin >/dev/null 2>&1) || true
+    for f in "$BASE"/fullpkgs/libc-bin_*.deb; do [ -f "$f" ] && d="$f" && break; done
   fi
   if [ -n "$d" ]; then
     t=$(mktemp -d); dpkg-deb -x "$d" "$t"
@@ -106,6 +108,7 @@ log "minimal /etc (xfstests needs fsgqa users or many tests _notrun)..."
 mkdir -p etc home/fsgqa home/fsgqa2 mnt/test mnt/scratch host results
 cat > etc/passwd <<'P'
 root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
 nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
 fsgqa:x:1000:1000:fsgqa:/home/fsgqa:/bin/bash
 123456-fsgqa:x:1001:1001:fsgqa:/home/fsgqa:/bin/bash
@@ -113,6 +116,7 @@ fsgqa2:x:1002:1002:fsgqa2:/home/fsgqa2:/bin/bash
 P
 cat > etc/group <<'G'
 root:x:0:
+daemon:x:1:
 nogroup:x:65534:
 fsgqa:x:1000:
 fsgqa2:x:1002:
@@ -123,7 +127,12 @@ printf 'passwd: files\ngroup: files\nhosts: files\n' > etc/nsswitch.conf
 log "unresolved shared libs (should be empty):"
 find . \( -type f -o -type l \) -name '*.so*' 2>/dev/null | sed 's|.*/||' | sort -u > /tmp/_have
 { find usr/bin usr/sbin -type f 2>/dev/null; find . \( -type f -o -type l \) -name '*.so*'; } \
-  | while read -r f; do readelf -d "$f" 2>/dev/null | awk '/NEEDED/{gsub(/[][]/,"",$5);print $5}'; done \
+  | while read -r f; do
+      # '|| true': under pipefail a non-ELF (script, dangling symlink) makes
+      # readelf fail; if that file is LAST in the stream the loop's status
+      # kills the whole script. Bit the hosted lane's first fresh assemble.
+      readelf -d "$f" 2>/dev/null | awk '/NEEDED/{gsub(/[][]/,"",$5);print $5}' || true
+    done \
   | sort -u > /tmp/_need
 comm -23 /tmp/_need /tmp/_have | sed 's/^/  MISSING: /'
 log "rootfs assembled at $R ($(du -sh "$R" | cut -f1))"

@@ -7,7 +7,6 @@
 # Claim markers live in /host/queue/claimed/<item>.<shard> and move to
 # /host/queue/done/ after the batch completes, so the supervisor can requeue
 # exactly the claimed-but-unfinished tests of a dead lane.
-HOST_DIR=/home/prozak/uml-smoke
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export HOME=/root TMPDIR=/tmp
@@ -28,6 +27,10 @@ $BB hostname "uml-q$SHARD"
 # loopback up: src/locktest (generic/131,571,786,787) is a TCP client/server on lo
 $BB ip link set lo up 2>/dev/null || $BB ifconfig lo 127.0.0.1 up 2>/dev/null
 export TERM=linux
+# hostfs base = parent of the rootflags path — portable across hosts
+# (rig: /home/prozak/uml-smoke; hosted runners: /home/runner/uml-smoke)
+HOST_DIR="$($BB dirname "$($BB sed -n 's/.*rootflags=\([^ ]*\).*/\1/p' /proc/cmdline)")"
+case "$HOST_DIR" in ""|.|/) HOST_DIR=/home/prozak/uml-smoke;; esac
 $BB mount -t hostfs -o "$HOST_DIR" none /host 2>/dev/null || echo "HOSTFS_FAIL"
 SDIR="/host/shards/$SHARD"; QR=/host/queue
 mkdir -p "$SDIR/results"
