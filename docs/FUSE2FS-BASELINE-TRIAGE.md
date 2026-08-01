@@ -106,11 +106,25 @@ on second fsync on fd[1]"), and syncfs doesn't return EIO (484). On
 kernel filesystems errseq_t gives every fd one error report; the fuse
 writeback path doesn't propagate this per-fd. Kernel-fuse territory
 (fs/fuse writeback + FUSE_SYNCFS), not fuse2fs. KVM crosscheck
-2026-08-01: 484 reproduces with the same signature ("One of the
-following syncfs calls should fail with EIO") on mainline 7.2.0-rc1 —
-not a UML artifact; 441 was inconclusive in the qemu lane (check aborts
-on a duplicate /proc/mounts entry for the fuse TEST_DEV — qemu-lane
-harness wrinkle, follow up before reporting 441 specifically).
+2026-08-01: BOTH reproduce with identical signatures on mainline
+7.2.0-rc1 — not UML artifacts. (441's first crosscheck aborted; that
+turned out to be a judging-layer race, below, not the test.)
+
+### Judging-layer race found by the crosscheck (fixed)
+The 441/777 KVM aborts traced to _check_fuse2fs_filesystem fsck'ing too
+early: umount(2) returns BEFORE the fuse2fs daemon has flushed and
+exited, so on a fast host e2fsck -fn read a mid-flush image and reported
+false corruption (426 got a bogus "_check_fuse2fs_filesystem: filesystem
+on /dev/vdb is inconsistent"); check then ran its repair path
+(_repair_test_fs: "/dev/vdb is in use"), called _test_mount on the
+already-remounted device, the helper's bind branch stacked a self-bind,
+and the duplicate mount entry aborted the NEXT test. Two fixes: the
+harness patch now waits (fuser, 10s bound) for the device to be released
+before fsck, and the helper treats mount-of-same-device-on-same-
+mountpoint as a no-op success. UML never hit it (daemon wins the race
+there) — the same class as the stale-judging-binary trap: the judge must
+not race the thing it judges. False-inconsistent verdicts on fast hosts
+were possible for ANY fuse2fs _check call before this fix.
 
 ### E. statx attribute flags — fuse protocol gap (1)
 generic/424.

@@ -26,6 +26,11 @@ esac
 # the same-superblock semantics the tests expect (generic/409-411/589/732).
 first=$(awk -v d="$dev" '$1==d && $3 ~ /^fuse/ {print $2; exit}' /proc/mounts)
 if [ -n "$first" ]; then
+	# same device on the SAME mountpoint again: nothing to do. A second
+	# daemon would EBUSY, and a self-bind stacks a duplicate mount entry
+	# that trips the harness' _check_if_dev_already_mounted on the next
+	# test (the KVM 441/777 abort chain).
+	[ "$first" = "$mnt" ] && exit 0
 	mount -i --bind "$first" "$mnt" || exit 1
 	# a fresh mount(2) of a device is NOT a propagation peer of existing
 	# mounts of that device; a bind joins the source's peer group when the
