@@ -14,7 +14,8 @@ make x86_64_defconfig >/dev/null 2>&1
   --enable BLK_DEV --enable DEVTMPFS --enable DEVTMPFS_MOUNT \
   --enable FS_VERITY --enable FS_VERITY_BUILTIN_SIGNATURES --enable BLK_DEV_LOOP \
   --enable BLK_DEV_DM --enable DM_FLAKEY --enable DM_LOG_WRITES --enable DM_SNAPSHOT \
-  --enable DM_THIN_PROVISIONING --enable DM_DELAY --enable DM_ZERO --enable MD
+  --enable DM_THIN_PROVISIONING --enable DM_DELAY --enable DM_ZERO --enable MD \
+  --enable FUSE_FS
 # EXTRA_KCONFIG: space-separated CONFIG names to force on (e.g. the xfs
 # debug set when cross-checking an xfs pin).
 for o in ${EXTRA_KCONFIG:-}; do ./scripts/config --enable "$o"; done

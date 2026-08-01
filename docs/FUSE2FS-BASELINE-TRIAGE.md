@@ -88,11 +88,15 @@ Source-level findings in fuse2fs (1.47.4, cross-checked against master):
   immutable files silently no-ops "successfully" (079) — fixed in
   master's boilerplate rework, worth calling out for 1.47.x.
 REPORT CANDIDATES for e2fsprogs (fuse2fs upstreaming is active — djwong's
-2025 rework). Before sending: KVM crosscheck blocked on qemu-init lacking
-a fuse branch (host repro blocked: unprivileged fuse mounts can't set
-immutable — kernel-side cap check); wire qfstyp=fuse + FUSE_SUBTYP into
-qemu-init first, or reproduce on any root box with fuse2fs on a loop
-image (no UML needed — these are pure userspace daemon bugs).
+2025 rework). KVM CROSSCHECK DONE 2026-08-01: qemu-init grew a fuse
+branch (qfstyp=fuse -> FUSE_SUBTYP + ext4-nojournal mkfs; CONFIG_FUSE_FS
+added to the x86 crosscheck kernel, build-x86.sh updated) and all 15
+survivors were rerun under KVM (x86 mainline 7.2.0-rc1, virtio disks,
+real page cache): generic/079 and 553 fail with IDENTICAL signatures
+(same three "did not fail" lines; same missing copy_range EPERM) —
+environment-independent, ready to send. Host-side repro remains blocked
+for unprivileged mounts only (kernel denies SETFLAGS immutable without
+privilege), irrelevant for the report.
 
 ### D. Writeback-error (errseq) propagation — fuse kernel semantics (2)
 generic/441, 484.
@@ -101,8 +105,12 @@ fd's fsync after a failed writeback doesn't see the error (441 "Success
 on second fsync on fd[1]"), and syncfs doesn't return EIO (484). On
 kernel filesystems errseq_t gives every fd one error report; the fuse
 writeback path doesn't propagate this per-fd. Kernel-fuse territory
-(fs/fuse writeback + FUSE_SYNCFS), not fuse2fs; possible linux-fsdevel
-discussion item, needs a KVM crosscheck before any report.
+(fs/fuse writeback + FUSE_SYNCFS), not fuse2fs. KVM crosscheck
+2026-08-01: 484 reproduces with the same signature ("One of the
+following syncfs calls should fail with EIO") on mainline 7.2.0-rc1 —
+not a UML artifact; 441 was inconclusive in the qemu lane (check aborts
+on a duplicate /proc/mounts entry for the fuse TEST_DEV — qemu-lane
+harness wrinkle, follow up before reporting 441 specifically).
 
 ### E. statx attribute flags — fuse protocol gap (1)
 generic/424.

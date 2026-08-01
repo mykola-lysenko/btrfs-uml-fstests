@@ -29,6 +29,9 @@ export SCRATCH_MNT=/mnt/scratch
 export FSTESTS_PER_TEST_TIMEOUT=900
 $MOPTS
 CFG
+# fuse mode = fuse2fs over ext4-formatted virtio disks, same contract as
+# shard-init (harness side: patches-xfstests/fuse2fs-mkfs-and-fsck.patch)
+[ "$QFSTYP" = fuse ] && echo 'FUSE_SUBTYP=.fuse2fs' >> local.config
 # multi-device tests (raid/scrub): pool over every extra virtio disk present
 # (btrfs only — xfs/ext4 want a single SCRATCH_DEV, extra disks stay unused)
 if [ -b /dev/vdd ] && [ "$QFSTYP" = btrfs ]; then
@@ -41,6 +44,8 @@ $BB mkdir -p /mnt/test /mnt/scratch
 case "$QFSTYP" in
   btrfs) mkfs.btrfs -f /dev/vdb >/dev/null 2>&1 ;;
   xfs)   mkfs.xfs -fq /dev/vdb >/dev/null 2>&1 ;;
+  fuse)  mkfs.ext4 -Fq -O ^has_journal /dev/vdb >/dev/null 2>&1
+         mkfs.ext4 -Fq -O ^has_journal /dev/vdc >/dev/null 2>&1 ;;
   *)     mkfs.$QFSTYP -Fq /dev/vdb >/dev/null 2>&1 ;;
 esac
 TESTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qtests=//p' | $BB tr ',' ' ')"
