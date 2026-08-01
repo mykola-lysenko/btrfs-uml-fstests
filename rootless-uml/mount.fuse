@@ -1,0 +1,13 @@
+#!/bin/sh
+# mount.fuse — dispatcher installed over the stock fuse3 helper symlink.
+#
+# Stock mount.fuse3 treats the mount SOURCE as a program to exec via
+# /bin/sh, so every fstests path that mounts with a literal `-t fuse` and a
+# block device — _get_mount -t $FSTYP (generic/409-411/589), dm targets
+# (generic/338/347/441/484/500/743) — died with
+# "/bin/sh: 1: /dev/...: Permission denied". On this rig a block-device
+# source means fuse2fs; anything else keeps stock fuse3 behavior.
+if [ -b "$1" ]; then
+	exec /usr/sbin/mount.fuse.fuse2fs "$@"
+fi
+exec /sbin/mount.fuse3 "$@"

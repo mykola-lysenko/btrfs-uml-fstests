@@ -1,0 +1,19 @@
+Companion to fuse2fs-mkfs-and-fsck.patch: _mkfs_dev is the mkfs entry
+point for extra devices (dm targets: thin volumes, error targets). With
+"do nothing for fuse" the dm-thin tests mount a device that never got a
+filesystem — generic/347's post-test e2fsck then finds no superblock at
+all. Same fuse2fs-can-really-mkfs rationale as the scratch/test hunks.
+
+--- a/common/rc
++++ b/common/rc
+@@ -906,7 +906,9 @@ _try_mkfs_dev()
+ 	# do nothing for 9p
+ 	;;
+     fuse)
+-	# do nothing for fuse
++	if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++		mkfs.ext4 -Fq -O ^has_journal $* >/dev/null 2>&1
++	fi
+ 	;;
+     virtiofs)
+ 	# do nothing for virtiofs

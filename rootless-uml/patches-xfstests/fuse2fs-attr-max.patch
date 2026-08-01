@@ -1,0 +1,48 @@
+Upstream candidate: generic/020 sizes its xattr limits for FSTYP=fuse as if
+the server had no backing-format constraints (max_attrs=1000, 64K values),
+but with FUSE_SUBTYP=.fuse2fs the backing store is ext4: in-block xattr
+space caps out around 101 attrs at 4K blocks ("attr_set: No space left on
+device" at attribute_111) and a single value can't exceed ~1 block. Use the
+ext4-style sizing when fuse2fs is the fuse server (the upstream
+fuse-fstests direction hits the same wall).
+
+--- a/tests/generic/020
++++ b/tests/generic/020
+@@ -55,7 +55,17 @@ _attr_get_max()
+ {
+ 	# set maximum total attr space based on fs type
+ 	case "$FSTYP" in
+-	xfs|udf|pvfs2|9p|ceph|fuse|nfs|ceph-fuse)
++	fuse)
++		if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++			# ext4 on-disk format: ~1 block of xattrs; see the
++			# ext4 case below for the formula derivation
++			BLOCK_SIZE=`_get_block_size $TEST_DIR`
++			let max_attrs=$((($BLOCK_SIZE - 32) / (16 + 8 + 12 + 4)))
++		else
++			max_attrs=1000
++		fi
++		;;
++	xfs|udf|pvfs2|9p|ceph|nfs|ceph-fuse)
+ 		max_attrs=1000
+ 		;;
+ 	ext2|ext3|ext4)
+@@ -150,7 +160,17 @@ _attr_get_maxval_size()
+ 	pvfs2)
+ 		max_attrval_size=8192
+ 		;;
+-	xfs|udf|9p|fuse)
++	fuse)
++		if [ "$FUSE_SUBTYP" = ".fuse2fs" ]; then
++			# ext4 on-disk format: value fits one xattr block,
++			# same sizing as the default branch below
++			BLOCK_SIZE=`_get_block_size $TEST_DIR`
++			let max_attrval_size=$BLOCK_SIZE-256
++		else
++			max_attrval_size=65536
++		fi
++		;;
++	xfs|udf|9p)
+ 		max_attrval_size=65536
+ 		;;
+ 	bcachefs)
