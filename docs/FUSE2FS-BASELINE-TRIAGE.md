@@ -1,75 +1,127 @@
-# fuse2fs baseline sweep — triage (2026-07-17)
+# fuse2fs baseline — deep triage (2026-08-01)
 
-**CANONICAL BASELINE (sweep-8, fuse2fs 1.47.4, nojournal, journaling-
-aware harness): 206 pass / 549 notrun / 36 fail -> 34 confirmed + 2
-load-flaky (generic/074, 339).** Confirmed list checked in at
-results/baseline-fuse-confirmed.txt. Evolution: 66 confirmed on 1.47.0
-(sweep-6) -> 92 on 1.47.4+nojournal before the _has_metadata_journaling
-guard (sweep-7) -> 34 final. fsx zero-range trio closed (fuse2fs 1.47.0
-EINVAL-vs-EOPNOTSUPP bug, fixed upstream, rig upgraded). Remaining 34 =
-open_by_handle ESTALE (5), helper-bypass (409/411/589), ro-mount family
-(294/306/452 — re-triage: signature may have changed post-nojournal),
-fallocate EPERM (683-685), and ~18 singles. The section below is the
-ORIGINAL sweep-6 triage, kept for history.
+**RESULT: baseline 35 -> 15.** Every entry classified; 20 recovered by rig
+fixes in one session (fuse pin mainline-0724, fuse2fs 1.47.4). All 15
+survivors are fuse/fuse2fs-semantics classes, none rig-fixable, several
+upstream-worthy. Method: rerun the committed baseline on the current pin
+(all 35 reproduced, 0 flaky), read every .out.bad, cluster by signature,
+probe in-guest labs before touching anything (xfs playbook).
 
-First complete fuse corpus run (sweep-6 after five aborted attempts —
-see rig-bug ledger below). 792 generic tests, FSTYP=fuse +
-FUSE_SUBTYP=.fuse2fs (fuse2fs 1.47/libfuse2 over ext4-formatted ubd),
-14+2 lanes, wall 918s.
+## Rig fixes applied (each verified by a full-list rerun)
 
-**TOTAL: pass=217 notrun=509 failed=66 → confirmed-solo 65, flaky 1
-(generic/676). allow_other+default_permissions retry: 13 recovered
-(rig config), 1 notrun → 51 real survivors.**
+1. **fuse2fs `-o kernel` mode** (mount.fuse.fuse2fs). Upstream's
+   "behave like kernel ext4" switch: allow_other,default_permissions,
+   suid,dev + ACL enforcement + permission checks deferred to the kernel.
+   Our hand-rolled `allow_other,default_permissions` was a strict subset:
+   no suid (generic/633), no dev (184, 434, part of 306), daemon-side
+   perm checks blind to supplementary groups (683/684/685 fallocate
+   EPERM).
+2. **mount.fuse dispatcher** (new, shadows the stock mount.fuse ->
+   mount.fuse3 symlink). Stock mount.fuse execs the mount SOURCE via
+   /bin/sh — every `-t fuse` mount with a block device died with
+   "/bin/sh: /dev/...: Permission denied": _get_mount -t $FSTYP
+   (409/410/411/589) and all dm targets (338/347/441/484/500/743).
+   Block-device source -> mount.fuse.fuse2fs, else stock behavior.
+3. **Helper remount + same-superblock parity.** `-o remount` now does a
+   real VFS remount (mount -i) instead of spawning a second fuse2fs that
+   EBUSYs on the device (294/306/452 "Device or resource busy"); a mount
+   of an already-mounted device becomes a bind from the first mountpoint
+   + make-private (kernel filesystems share one superblock across
+   mountpoints; propagation reset keeps 409/411 mount-table parity), which
+   fixed 732 and the multi-mountpoint family.
+4. **remember=-1** in the helper STD options: libfuse-highlevel forgets
+   nodeids as soon as the kernel drops dentries, so open_by_handle decode
+   ESTALEd even same-session; kernel filesystems never do that
+   (probe-verified fix; recovered the plain-decode legs of 426-family).
+5. **e2fsck + mke2fs 1.47.4** built and installed by build-fuse2fs.sh —
+   judge and formatter were Ubuntu-stock 1.47.0, four minors behind the
+   daemon under test (the xfs generic/753+754 stale-judging-binary trap).
+6. **xfstests harness patches** (patches-xfstests/): _mkfs_dev fuse2fs
+   branch (dm-target devices never got a filesystem — generic/347's
+   "Bad magic number in super-block"); _check_fuse2fs_filesystem
+   mountpoint fix (findmnt -t $FSTYP never matches type fuse.ext4, so the
+   post-fsck remount silently didn't happen and generic/053's second ACL
+   listing saw a bare mountpoint); generic/020 xattr sizing for
+   ext4-backed fuse (max_attrs ~101/block and ~1-block values, not the
+   generic 1000/64K).
 
-## Survivor clusters (51)
-1. **fsx zero-range data divergence — generic/363, 521, 522.**
-   REAL-BUG CANDIDATES: fsx op-log dumps around zero_range through
-   fuse2fs = data-integrity class. Next: extract fsx ops, minimal
-   reproducer, compare against loop-mounted ext4; if confirmed this is
-   an e2fsprogs (fuse2fs) report.
-2. **"Mounting read-only." — generic/294, 306, 452.** fuse2fs cannot
-   replay a dirty ext4 journal ("Writing to the journal is not
-   supported") and falls back to ro. Genuine fuse2fs limitation;
-   crash-consistency tests can't pass by design. Report-or-notrun
-   discussion for upstream.
-3. **open_by_handle ESTALE — generic/426, 467, 477, 756, 777.** fuse
-   file-handle semantics; likely needs an fstests _require guard
-   (upstream patch candidate) unless fuse2fs can support persistent
-   handles.
-4. **mount-helper bypass — generic/409, 410, 411, 589.**
-   '/bin/sh: /dev/ubdc: Permission denied' = mount.fuse3 executing the
-   device again: these tests mount with paths/opts that skip our
-   mount.fuse.fuse2fs helper (bind/propagation/by-label variants).
-   RIG issue; fix helper dispatch, then re-run.
-5. **fallocate EPERM — generic/683, 684** (+ possibly in cluster 1's
-   root cause): zero-range/punch modes not wired through fuse2fs.
-6. **Unclassified 7 — generic/035, 321, 335, 341, 348, 533, 790**
-   (mostly dm-flakey/log-writes family): diff head empty, read
-   individually. Likely overlaps cluster 2's journal story.
-7. Singles: generic/091 (mmap writes disabled through fuse), 319 (ACL
-   mask propagation), 535 (statx after rename), 633 (setid binaries),
-   637 (xattr?), plus remainder of the 51 not listed above.
+## Remaining 15 — all confirmed-solo, classified
 
-## Rig lessons ledger (cost: five aborted sweeps in one afternoon)
-1. queue-init lacked the fuse branch (only shard-init had it) → sweep-1
-   792 tests inhaled in 30s by instant-abort ./check.
-2. `| head -5` on the launch pipeline SIGPIPE-killed the supervisor.
-3. Shared hostfs /mnt + libfuse2 non-empty refusal → synchronized
-   all-lane collapse at ~t+300s (sweep-2). Fix: per-guest tmpfs /mnt.
-4. Self-poisoning via post-unmount debris → -o nonempty (parity with
-   kernel mounts; libfuse3 deleted the check).
-5. Zombie guests from a not-yet-dead prior run contaminated sweep-5 →
-   run-queued startup interlock (with $-anchored self-count).
-6. Sick-lane guard: silent/verdict-less ./check batches requeue; two
-   strikes exits the lane loudly. batches.log per-batch forensics.
+### A. File-handle decode after eviction/unlink — inherent-fuse (6)
+generic/035, 426, 467, 477, 756, 777.
+The FUSE protocol has no lookup-by-nodeid (no FUSE_EXPORT_SUPPORT in
+libfuse-highlevel servers): open_by_handle_at can only decode a handle
+whose inode is still in the kernel icache. remember=-1 fixed the
+never-unlinked legs; what still fails is decode after the original name
+is unlinked (426/467/756/777 `-u` legs; hardlink keeps the inode alive on
+disk but not in the fuse icache) and across mount cycles (477, 777).
+035 is the same family from the other side: fuse2fs frees the on-disk
+inode at rename-over while a kernel fd still holds it open, so fstat
+returns ESTALE where kernel filesystems keep the inode until last close.
+Upstream angle: fstests could gate these on a "persistent file handles"
+require for fuse; fuse2fs could defer inode reclaim to release (035).
 
-## Next steps
-1. Fix helper-bypass (cluster 4), re-run those 4.
-2. fsx forensics on 363/521/522 → minimal repro → compare vs native
-   ext4 loop mount; report to e2fsprogs if it holds.
-3. Read the 7 unclassified diffs; fold into clusters.
-4. Draft the fstests _require guards (clusters 3/5) as upstream
-   patches — pairs well with the dm-sysfs _fs_sysfs_dname portability
-   patch from the xfs triage.
-5. Journal-ro limitation: raise on linux-ext4/fuse lists whether
-   fuse2fs should refuse-rw or the tests should _notrun.
+### B. POSIX ACL <-> mode synchronization — fuse2fs upstream gap (4)
+generic/099, 319, 375, 444.
+ACLs are stored and enforced, but the mode-bit side of POSIX ACL
+semantics is missing: setting an access ACL does not rewrite the group
+permission bits (099 — probe: chacl set + readback fine, ls mode
+unchanged, `+` marker present), and file creation under a default-ACL +
+setgid directory derives group bits from umask instead of the ACL mask
+(375/444 child `drwxr-sr-x` vs expected `drwxrwsr-x`; 319 default-ACL
+propagation view). Kernel-side FUSE_POSIX_ACL only covers enforcement
+and relies on the server for mode updates (fuse_set_acl does not do
+posix_acl_update_mode). Upstream fuse2fs is actively reworking this area
+post-1.47.4 (default-ACL propagation commits 2c79003876, 7fb6db6085,
+sgid inheritance 33880eea11) — re-triage at the next e2fsprogs advance.
+
+### C. Inode-flag enforcement on open fds — fuse2fs upstream BUGS (2)
+generic/079, 553.
+Source-level findings in fuse2fs (1.47.4, cross-checked against master):
+- op_ftruncate has NO immutable/append-only check at all (079
+  "ftruncate(append-only) did not fail") — still true in master.
+- op_write has NO iflags re-check, and fuse2fs lacks copy_file_range, so
+  the kernel falls back to read/write — writes to a file made immutable
+  after open succeed (553) — still true in master.
+- op_truncate (1.47.4 only) computes the EPERM but returns the wrong
+  variable (`return err` where the check sets `ret`), so path truncate on
+  immutable files silently no-ops "successfully" (079) — fixed in
+  master's boilerplate rework, worth calling out for 1.47.x.
+REPORT CANDIDATES for e2fsprogs (fuse2fs upstreaming is active — djwong's
+2025 rework). Before sending: KVM crosscheck blocked on qemu-init lacking
+a fuse branch (host repro blocked: unprivileged fuse mounts can't set
+immutable — kernel-side cap check); wire qfstyp=fuse + FUSE_SUBTYP into
+qemu-init first, or reproduce on any root box with fuse2fs on a loop
+image (no UML needed — these are pure userspace daemon bugs).
+
+### D. Writeback-error (errseq) propagation — fuse kernel semantics (2)
+generic/441, 484.
+dm-error mounts now work; what fails is error-reporting parity: a second
+fd's fsync after a failed writeback doesn't see the error (441 "Success
+on second fsync on fd[1]"), and syncfs doesn't return EIO (484). On
+kernel filesystems errseq_t gives every fd one error report; the fuse
+writeback path doesn't propagate this per-fd. Kernel-fuse territory
+(fs/fuse writeback + FUSE_SYNCFS), not fuse2fs; possible linux-fsdevel
+discussion item, needs a KVM crosscheck before any report.
+
+### E. statx attribute flags — fuse protocol gap (1)
+generic/424.
+STATX_ATTR_{IMMUTABLE,APPEND,NODUMP,COMPRESSED} are not surfaced through
+fuse getattr (flags live in the ext4 inode; the protocol doesn't carry
+them). Inherent until the fuse statx extension grows attribute support;
+fstests could _require statx attr support instead of assuming it.
+
+## Judgement-toolchain note
+e2fsck/mke2fs/fuse2fs now all pinned at E2FSPROGS_VER=1.47.4 (was: daemon
+1.47.4, judge+formatter 1.47.0). No verdict changed after the upgrade
+(the 347 "inconsistent" was a genuinely absent filesystem), but the skew
+class is closed.
+
+## History
+- 2026-08-01 deep triage: 35 -> 15 (this document).
+- 2026-07-25 sweep #9 on per-fs pin: 35 confirmed (generic/410 folded).
+- 2026-07-17 canonical baseline (sweep-8): 206 pass / 549 notrun / 34+2
+  load-flaky. Original sweep-6 triage and the five-aborted-sweeps rig
+  ledger: see git history of this file (clusters were: fsx zero-range —
+  fixed via fuse2fs 1.47.4 upgrade; ro-mount family, helper bypass,
+  fallocate EPERM — all rig-fixed today; open_by_handle — cluster A).

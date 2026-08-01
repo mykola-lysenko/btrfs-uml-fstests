@@ -1,40 +1,30 @@
 # baseline-fuse-confirmed.txt — committed known-failure baseline for fuse2fs.
-# Source: canonical fuse baseline 2026-07-17, fuse2fs 1.47.4 nojournal
-# (206 pass / 549 notrun / 34 fail sweep) — see docs/FUSE2FS-BASELINE-TRIAGE.md.
-# Re-confirmed 2026-07-25 on the per-fs pin (mainline-0724, sweep #9):
-# generic/410 folded in (mount-propagation harness limitation under fuse2fs).
-generic/020
+# Deep-triaged 2026-08-01 (fuse pin mainline-0724, fuse2fs 1.47.4): 35 -> 15.
+# Every entry classified; clusters and evidence in
+# docs/FUSE2FS-BASELINE-TRIAGE.md. Rig fixes that removed the other 20:
+# fuse2fs -o kernel + remember=-1 helper, mount.fuse block-device
+# dispatcher, remount/bind parity, e2fsprogs 1.47.4 judge, _mkfs_dev +
+# _check remount + generic/020 sizing harness patches.
+#
+# Cluster A: handle decode after unlink/eviction — inherent-fuse protocol
 generic/035
-generic/053
-generic/079
-generic/099
-generic/184
-generic/294
-generic/306
-generic/319
-generic/338
-generic/347
-generic/375
-generic/409
-generic/410
-generic/411
-generic/424
 generic/426
-generic/434
-generic/441
-generic/444
-generic/452
 generic/467
 generic/477
-generic/484
-generic/500
-generic/553
-generic/589
-generic/633
-generic/683
-generic/684
-generic/685
-generic/732
-generic/743
 generic/756
 generic/777
+# Cluster B: POSIX ACL <-> mode sync missing — fuse2fs upstream gap
+# (actively reworked post-1.47.4; re-triage at next e2fsprogs advance)
+generic/099
+generic/319
+generic/375
+generic/444
+# Cluster C: iflags enforcement on open fds — fuse2fs upstream bugs
+# (op_ftruncate/op_write missing checks; report candidates, see doc)
+generic/079
+generic/553
+# Cluster D: writeback-error errseq propagation — fuse kernel semantics
+generic/441
+generic/484
+# Cluster E: statx attribute flags not in fuse protocol
+generic/424

@@ -39,7 +39,7 @@ LISTS="smoke.txt smoke-xfs.txt smoke-fuse.txt quick-all.txt quick-fast.txt
 # BLESSED_PRINT=1: emit the blessed set and exit — lets CI verify every
 # referenced file exists in the repo without needing a rig.
 if [ "${BLESSED_PRINT:-0}" = 1 ]; then
-  for f in $GUEST_SCRIPTS mount.fuse.fuse2fs $LISTS; do echo "$f"; done
+  for f in $GUEST_SCRIPTS mount.fuse.fuse2fs mount.fuse $LISTS; do echo "$f"; done
   exit 0
 fi
 
@@ -61,6 +61,9 @@ deploy_one(){ # $1 src (repo-relative)  $2 dest  $3 mode
 
 for s in $GUEST_SCRIPTS; do deploy_one "$s" "$ROOTFS/$s" 755; done
 deploy_one mount.fuse.fuse2fs "$ROOTFS/usr/sbin/mount.fuse.fuse2fs" 755
+# dispatcher shadows the stock mount.fuse -> mount.fuse3 symlink (which
+# execs a block-device source via /bin/sh — the "-t fuse" death class)
+deploy_one mount.fuse "$ROOTFS/usr/sbin/mount.fuse" 755
 for l in $LISTS; do deploy_one "$l" "$R/$l" 644; done
 
 # xfstests patches: verify each is applied in the deployed tree.
@@ -93,6 +96,8 @@ for d in bin sbin lib lib64; do
   [ -L "$ROOTFS/$d" ] || { log "INVARIANT VIOLATION: $ROOTFS/$d is not a symlink"; rc=1; }
 done
 [ -x "$ROOTFS/usr/sbin/mount.fuse.fuse2fs" ] || { log "INVARIANT VIOLATION: mount.fuse.fuse2fs not executable"; rc=1; }
+[ -f "$ROOTFS/usr/sbin/mount.fuse" ] && [ ! -L "$ROOTFS/usr/sbin/mount.fuse" ] \
+  || { log "INVARIANT VIOLATION: mount.fuse is still the stock symlink (dispatcher not deployed)"; rc=1; }
 [ -x "$ROOTFS/shard-init.sh" ] || { log "INVARIANT VIOLATION: shard-init.sh not deployed"; rc=1; }
 
 # Report unmanaged drift (present on rig, unknown to repo) — informational.

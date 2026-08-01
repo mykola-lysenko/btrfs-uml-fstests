@@ -41,7 +41,7 @@
  }
  
  # return the FS mount options of a mounted device
-@@ -3545,6 +3559,39 @@
+@@ -3545,6 +3559,45 @@
  # Filesystems which don't support this will need to define their
  # own check routine.
  #
@@ -57,7 +57,13 @@
 +
 +    case "$type" in
 +    fuse*)
-+        mountpoint=`_umount_or_remount_ro $device`
++        # mounted type is fuse.<subtype>: _is_dev_mounted's -t $FSTYP
++        # filter misses it and _umount_or_remount_ro would echo an empty
++        # mountpoint, silently skipping the remount below. Resolve the
++        # mountpoint unfiltered; unmount unconditionally (the fuse2fs
++        # daemon holds the device open, e2fsck needs exclusive access).
++        mountpoint=$(findmnt -rncv -S $device -o TARGET | head -1)
++        _unmount $device
 +        ;;
 +    esac
 +

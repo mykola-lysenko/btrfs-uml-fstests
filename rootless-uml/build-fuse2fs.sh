@@ -44,8 +44,21 @@ make -j"$(nproc)" libs > build-libs.out 2>&1 \
 make -j"$(nproc)" -C misc fuse2fs > build-fuse2fs.out 2>&1 \
   || { log "make fuse2fs FAILED:"; tail -25 build-fuse2fs.out; exit 1; }
 [ -x misc/fuse2fs ] || { log "BUILD FAILED: misc/fuse2fs missing"; exit 1; }
+# e2fsck + mke2fs at the SAME pin: the noble rootfs ships 1.47.0 for both,
+# so the judge (e2fsck -fn in _check_fuse2fs_filesystem) and the formatter
+# ran four minor versions behind the daemon under test — the exact
+# stale-judging-binary trap the xfs generic/753+754 triage documented.
+make -j"$(nproc)" -C e2fsck e2fsck > build-e2fsck.out 2>&1 \
+  || { log "make e2fsck FAILED:"; tail -25 build-e2fsck.out; exit 1; }
+make -j"$(nproc)" -C misc mke2fs > build-mke2fs.out 2>&1 \
+  || { log "make mke2fs FAILED:"; tail -25 build-mke2fs.out; exit 1; }
+[ -x e2fsck/e2fsck ] || { log "BUILD FAILED: e2fsck/e2fsck missing"; exit 1; }
+[ -x misc/mke2fs ] || { log "BUILD FAILED: misc/mke2fs missing"; exit 1; }
 
 install -m 755 misc/fuse2fs "$R/usr/bin/fuse2fs"
+install -m 755 e2fsck/e2fsck "$R/usr/sbin/e2fsck"
+# mkfs.ext4 in the rootfs is a symlink to mke2fs; replacing mke2fs covers it
+install -m 755 misc/mke2fs "$R/usr/sbin/mke2fs"
 # Ship the libfuse3 runtime the built binary actually needs. Two traps
 # solved here: the guard must key on the binary's NEEDED soname (a
 # hardcoded .so.N broke when fuse bumped sonames), and the runtime deb
@@ -56,3 +69,5 @@ if [ -n "$need" ] && [ ! -e "$R/usr/lib/x86_64-linux-gnu/$need" ]; then
   log "added libfuse3 runtime ($need)"
 fi
 log "installed: $("$R/usr/bin/fuse2fs" -V 2>&1 | head -1 || true)"
+log "installed: $("$R/usr/sbin/e2fsck" -V 2>&1 | head -1 || true)"
+log "installed: $("$R/usr/sbin/mke2fs" -V 2>&1 | head -1 || true)"
