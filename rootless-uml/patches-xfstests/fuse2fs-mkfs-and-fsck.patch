@@ -41,7 +41,7 @@
  }
  
  # return the FS mount options of a mounted device
-@@ -3545,6 +3559,45 @@
+@@ -3545,6 +3559,55 @@
  # Filesystems which don't support this will need to define their
  # own check routine.
  #
@@ -64,6 +64,16 @@
 +        # daemon holds the device open, e2fsck needs exclusive access).
 +        mountpoint=$(findmnt -rncv -S $device -o TARGET | head -1)
 +        _unmount $device
++        # umount(2) returns before the fuse2fs daemon has flushed and
++        # exited; fsck'ing immediately reads a mid-flush image and can
++        # report false corruption (fast KVM hosts hit this — check then
++        # "repairs", double-mounts, and the NEXT test aborts on the
++        # duplicate mount entry). Wait for the device to be released.
++        local tries=100
++        while [ $tries -gt 0 ] && fuser -s $device 2>/dev/null; do
++            sleep 0.1
++            tries=$((tries-1))
++        done
 +        ;;
 +    esac
 +
