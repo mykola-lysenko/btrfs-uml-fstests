@@ -7,7 +7,7 @@ set -u
 BASE=$HOME/uml-smoke
 KERNEL="${KERNEL:?}"; TAG="${TAG:?}"
 ITER="${ITER:-5}"; LOAD="${LOAD:-6}"
-SUSPECTS="generic/044 generic/045 generic/046 generic/747"
+SUSPECTS="${SUSPECTS:-generic/044 generic/045 generic/046 generic/747}"
 OUT=$BASE/results/flake-$TAG
 mkdir -p $OUT
 log(){ echo "[$(date '+%H:%M:%S')] $*" | tee -a $OUT/log; }

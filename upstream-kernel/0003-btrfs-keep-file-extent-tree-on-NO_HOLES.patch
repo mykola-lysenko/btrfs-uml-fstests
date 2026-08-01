@@ -1,0 +1,181 @@
+From: Mykola Lysenko <nickolay.lysenko@gmail.com>
+Subject: [PATCH] btrfs: track file extents on NO_HOLES filesystems to avoid null files after crash
+
+The per-inode file extent tree exists so that
+btrfs_inode_safe_disk_i_size_write() only advances disk_i_size over
+ranges whose extents (or hole records) have actually been persisted,
+preventing a crash from exposing a file whose committed i_size outruns
+its committed data ("null files": non-zero size, no extents).
+
+btrfs_init_file_extent_tree() skips allocating the tree when the
+filesystem has NO_HOLES, on the grounds that an extentless tail is
+representable there, so the resulting metadata is valid.  Valid,
+however, is not the same as expected: with the tree absent,
+btrfs_inode_safe_disk_i_size_write() falls back to setting
+disk_i_size = i_size unconditionally, so the sequence
+
+	pwrite (buffered) -> truncate(same size) -> transaction commit
+	-> crash before delalloc writeback
+
+persists size=N nbytes=0 with zero EXTENT_DATA items.  After log
+replay the file reads back as N bytes of zeroes.  fsck is clean (the
+tail is a legal implicit hole), so nothing flags the data loss.
+
+This is precisely the class generic/044-046 guard against, and they
+fail deterministically on any NO_HOLES filesystem (the mkfs default
+since btrfs-progs 5.15) when the commit window lands between the
+truncate and writeback: mkfs defaults + mount -o commit=1 fails
+generic/044 15/15 on x86-64 KVM.  A single-variable A/B (mkfs
+-O ^no-holes, same kernel, same load) goes 0/8.
+
+Allocate the file extent tree on NO_HOLES filesystems too.  Every
+marking path already handles NO_HOLES correctly: hole filling marks
+implicit-hole ranges in the tree even when it elides the hole item
+(btrfs_cont_expand()), ordered extent completion, truncation and log
+replay mark their ranges unconditionally.  Only the allocation was
+skipped, which turns btrfs_inode_safe_disk_i_size_write() into a no-op
+protection.  The cost is one extent_io_tree per in-memory regular
+inode, the same as every non-NO_HOLES filesystem already pays.
+
+Three paths deliberately create implicit holes on NO_HOLES and must
+record them in the tree, since an implicit hole is committed state the
+moment its transaction commits: fill_holes() (hole punching and extent
+replacement below i_size), clone_finish_inode_update() (a clone
+extending i_size over a cloned-in hole, e.g. reflink-copying a sparse
+file), and log replay below.  Without these, the disk_i_size clamp
+persists a size below the data (observed live, no crash needed: cp of
+a fully-sparse file came back size 0 after remount; fstests
+generic/303, generic/547, generic/574 and btrfs/332 catch variants).
+
+Log replay needs one adjustment: on NO_HOLES filesystems the log
+carries no hole items, so replaying only the logged extents would leave
+implicit-hole gaps unmarked and a later disk_i_size update would clamp
+the file below its replayed size.  During replay the on-disk state is
+fully committed — a gap below a replayed extent is a true hole — so
+mark the range cumulatively from offset zero.
+
+Also drop the assertion in btrfs_find_contiguous_extent_bit() and the
+comment in btrfs_inode_safe_disk_i_size_write() that encoded the
+tree-less NO_HOLES arrangement.
+
+Reproducible with fstests generic/044, generic/045, generic/046 on
+default mkfs; verified on both x86-64/KVM and UML, and at current
+for-next (374fd5d128d8).
+
+Signed-off-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
+---
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -3996,8 +3996,6 @@ static int btrfs_init_file_extent_tree(struct btrfs_inode *inode)
+
+ 	if (WARN_ON_ONCE(inode->file_extent_tree))
+ 		return 0;
+-	if (btrfs_fs_incompat(fs_info, NO_HOLES))
+-		return 0;
+ 	if (!S_ISREG(inode->vfs_inode.i_mode))
+ 		return 0;
+ 	if (btrfs_is_free_space_inode(inode))
+--- a/fs/btrfs/reflink.c
++++ b/fs/btrfs/reflink.c
+@@ -40,6 +40,27 @@
+ 	if (endoff > destoff + olen)
+ 		endoff = destoff + olen;
+ 	if (endoff > vfs_inode->i_size) {
++		/*
++		 * On NO_HOLES filesystems the clone may have created an
++		 * implicit hole (no items) in the extended range — e.g. when
++		 * the source range is itself a hole.  That hole becomes
++		 * committed state with this transaction, so record it in the
++		 * file extent tree or the disk_i_size clamp below would
++		 * persist a size under @endoff.
++		 */
++		if (btrfs_fs_incompat(inode->root->fs_info, NO_HOLES)) {
++			int ret2;
++
++			ret2 = btrfs_inode_set_file_extent_range(inode,
++					vfs_inode->i_size,
++					round_up(endoff, inode->root->fs_info->sectorsize) -
++					vfs_inode->i_size);
++			if (ret2) {
++				btrfs_abort_transaction(trans, ret2);
++				btrfs_end_transaction(trans);
++				return ret2;
++			}
++		}
+ 		i_size_write(vfs_inode, endoff);
+ 		btrfs_inode_safe_disk_i_size_write(inode, 0);
+ 	}
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -2051,8 +2051,19 @@
+ 	u64 num_bytes = 0;
+ 	int ret;
+ 
+-	if (btrfs_fs_incompat(fs_info, NO_HOLES))
++	if (btrfs_fs_incompat(fs_info, NO_HOLES)) {
++		/*
++		 * No hole item to insert, but the implicit hole this range
++		 * becomes is committed state: record it in the file extent
++		 * tree so btrfs_inode_safe_disk_i_size_write() can advance
++		 * disk_i_size over it.
++		 */
++		ret = btrfs_inode_set_file_extent_range(inode, offset,
++							end - offset);
++		if (ret)
++			return ret;
+ 		goto out;
++	}
+ 
+ 	key.objectid = btrfs_ino(inode);
+ 	key.type = BTRFS_EXTENT_DATA_KEY;
+--- a/fs/btrfs/tree-log.c
++++ b/fs/btrfs/tree-log.c
+@@ -991,7 +991,17 @@
+ 		goto out;
+ 
+ update_inode:
+-	ret = btrfs_inode_set_file_extent_range(inode, start, extent_end - start);
++	/*
++	 * On NO_HOLES filesystems the log carries no hole items, so gaps
++	 * below this extent would stay unmarked and a later
++	 * btrfs_inode_safe_disk_i_size_write() would clamp i_size under the
++	 * replayed size.  Everything below a replayed extent is committed
++	 * on-disk state (data or implicit hole), so mark from offset zero.
++	 */
++	if (btrfs_fs_incompat(root->fs_info, NO_HOLES))
++		ret = btrfs_inode_set_file_extent_range(inode, 0, extent_end);
++	else
++		ret = btrfs_inode_set_file_extent_range(inode, start, extent_end - start);
+ 	if (ret) {
+ 		btrfs_abort_log_replay(wc, ret,
+ 	       "failed to set file extent range [%llu, %llu) inode %llu root %llu",
+--- a/fs/btrfs/extent-io-tree.c
++++ b/fs/btrfs/extent-io-tree.c
+@@ -1068,8 +1068,6 @@ bool btrfs_find_contiguous_extent_bit(struct extent_io_tree *tree, u64 start,
+ 	struct extent_state *state;
+ 	bool ret = false;
+
+-	ASSERT(!btrfs_fs_incompat(btrfs_extent_io_tree_to_fs_info(tree), NO_HOLES));
+-
+ 	spin_lock(&tree->lock);
+ 	state = find_first_extent_bit_state(tree, start, bits);
+ 	if (state) {
+--- a/fs/btrfs/file-item.c
++++ b/fs/btrfs/file-item.c
+@@ -31,13 +31,9 @@
+  * @inode:      inode we want to update the disk_i_size for
+  * @new_i_size: i_size we want to set to, 0 if we use i_size
+  *
+- * With NO_HOLES set this simply sets the disk_is_size to whatever i_size_read()
+- * returns as it is perfectly fine with a file that has holes without hole file
+- * extent items.
+- *
+- * However without NO_HOLES we need to only return the area that is contiguous
+- * from the 0 offset of the file.  Otherwise we could end up adjust i_size up
+- * to an extent that has a gap in between.
++ * Only advance disk_i_size over the area that is contiguous from offset 0
++ * of the file according to the file extent tree.  Otherwise we could end up
++ * adjusting i_size up over data that was never persisted.
+  *
+  * Finally new_i_size should only be set in the case of truncate where we're not
+  * ready to use i_size_read() as the limiter yet.
