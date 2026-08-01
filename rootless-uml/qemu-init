@@ -16,7 +16,8 @@ echo "=== QEMU cross-check ($(uname -r)) ==="
 cp -a /opt/xfstests /tmp/xfstests 2>/dev/null
 cd /tmp/xfstests
 MOPTS="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qmopts=//p' | $BB tr ',' ' ')"
-[ -n "$MOPTS" ] && MOPTS="export MOUNT_OPTIONS=\"$MOPTS\""
+# xfstests MOUNT_OPTIONS conventionally includes the -o flag itself
+[ -n "$MOPTS" ] && MOPTS="export MOUNT_OPTIONS=\"-o $MOPTS\""
 QFSTYP="$($BB tr ' ' '\n' < /proc/cmdline | $BB sed -n 's/^qfstyp=//p')"
 [ -z "$QFSTYP" ] && QFSTYP=btrfs
 cat > local.config <<CFG
@@ -53,6 +54,12 @@ while [ "$i" -le "$LOOP" ]; do
   rc=$?
   fails=$($BB grep -oE 'Failures: .*' /tmp/iter.log)
   echo "QITER $i rc=$rc ${fails:-all-passed}"
+  # always show the check summary — rc!=0 with no Failures line means
+  # something died before/besides test verdicts and was invisible here
+  $BB grep -E "^Ran:|^Not run:|^Passed|^Failed|_check|error" /tmp/iter.log | $BB head -6
+  # zero-work guard, qemu flavor: nonzero rc with no failure verdicts =
+  # check died before running anything; show it
+  [ "$rc" -ne 0 ] && [ -z "$fails" ] && $BB tail -25 /tmp/iter.log
   if [ -n "$fails" ]; then
     for f in /tmp/xfstests/results/*/*.out.bad; do
       [ -f "$f" ] || continue
