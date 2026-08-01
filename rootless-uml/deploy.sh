@@ -28,7 +28,7 @@ rc=0
 # Guest-side scripts, deployed to the rootfs root (UML PID1s and labs).
 GUEST_SCRIPTS="shard-init.sh queue-init.sh qemu-init checkenv-init.sh
   fsxprobe-init.sh prof-init.sh validate033-init.sh smoke-init.sh
-  xfstests-init.sh manual-297.sh manual-parity.sh"
+  xfstests-init.sh manual-297.sh manual-parity.sh verity-probe.sh"
 # Scheduler input lists, deployed to $R. Measured data (times DBs,
 # residual/baseline files) is intentionally NOT in this set.
 LISTS="smoke.txt smoke-xfs.txt smoke-fuse.txt quick-all.txt quick-fast.txt

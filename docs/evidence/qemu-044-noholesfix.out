@@ -1,0 +1,1619 @@
+c[?7l[2J[0mSeaBIOS (version 1.16.3-debian-1.16.3-2)
+Booting from ROM...
+c[?7l[2J[    0.000000] Linux version 7.2.0-rc5 (prozak@powertower) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Fri Jul 31 20:18:40 PDT 2026
+[    0.000000] Command line: root=/dev/vda rw console=ttyS0 init=/qemu-init panic=-1 qfstyp=btrfs qtests=generic/044,generic/045,generic/046 qloop=3 qmopts=commit=1
+[    0.000000] x86 CPU feature dependency check failure: CPU0 has '18*32+31' enabled but '18*32+26' disabled. Kernel might be fine, but no guarantees.
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff]  device reserved
+[    0.000000] BIOS-e820: [gap 0x00000000000a0000-0x00000000000effff]
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff]  device reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffd6fff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x00000000bffd7000-0x00000000bfffffff]  device reserved
+[    0.000000] BIOS-e820: [gap 0x00000000c0000000-0x00000000feffbfff]
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff]  device reserved
+[    0.000000] BIOS-e820: [gap 0x00000000ff000000-0x00000000fffbffff]
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff]  device reserved
+[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000013fffffff]  System RAM
+[    0.000000] BIOS-e820: [gap 0x0000000140000000-0x000000fcffffffff]
+[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff]  device reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] DMI: SMBIOS 3.0.0 present.
+[    0.000000] DMI: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] Hypervisor detected: KVM
+[    0.000000] last_pfn = 0xbffd7 max_arch_pfn = 0x400000000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000000] kvm-clock: using sched offset of 383529501 cycles
+[    0.000001] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[    0.000002] tsc: Detected 3400.028 MHz processor
+[    0.000451] last_pfn = 0x140000 max_arch_pfn = 0x400000000
+[    0.000557] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built from 8 variable MTRRs
+[    0.000562] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.000703] last_pfn = 0xbffd7 max_arch_pfn = 0x400000000
+[    0.001901] found SMP MP-table at [mem 0x000f5470-0x000f547f]
+[    0.001909] Using GB pages for direct mapping
+[    0.002026] ACPI: Early table checksum verification disabled
+[    0.002028] ACPI: RSDP 0x00000000000F5260 000014 (v00 BOCHS )
+[    0.002039] ACPI: RSDT 0x00000000BFFE1D75 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002042] ACPI: FACP 0x00000000BFFE1C11 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002049] ACPI: DSDT 0x00000000BFFE0040 001BD1 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002051] ACPI: FACS 0x00000000BFFE0000 000040
+[    0.002052] ACPI: APIC 0x00000000BFFE1C85 000090 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002053] ACPI: HPET 0x00000000BFFE1D15 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002054] ACPI: WAET 0x00000000BFFE1D4D 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.002055] ACPI: Reserving FACP table memory at [mem 0xbffe1c11-0xbffe1c84]
+[    0.002055] ACPI: Reserving DSDT table memory at [mem 0xbffe0040-0xbffe1c10]
+[    0.002056] ACPI: Reserving FACS table memory at [mem 0xbffe0000-0xbffe003f]
+[    0.002056] ACPI: Reserving APIC table memory at [mem 0xbffe1c85-0xbffe1d14]
+[    0.002057] ACPI: Reserving HPET table memory at [mem 0xbffe1d15-0xbffe1d4c]
+[    0.002057] ACPI: Reserving WAET table memory at [mem 0xbffe1d4d-0xbffe1d74]
+[    0.002490] No NUMA configuration found
+[    0.002491] Faking a node at [mem 0x0000000000000000-0x000000013fffffff]
+[    0.002493] NODE_DATA(0) allocated [mem 0x13fffa680-0x13fffdfff]
+[    0.003183] ACPI: PM-Timer IO Port: 0x608
+[    0.003197] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.003245] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.003247] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.003247] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.003248] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.003249] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.003249] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.003251] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.003251] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.003253] TSC deadline timer available
+[    0.003254] CPU topo: Max. logical packages:   1
+[    0.003254] CPU topo: Max. logical nodes:      1
+[    0.003255] CPU topo: Num. nodes per package:  1
+[    0.003256] CPU topo: Max. logical dies:       1
+[    0.003256] CPU topo: Max. dies per package:   1
+[    0.003258] CPU topo: Max. threads per core:   1
+[    0.003258] CPU topo: Num. cores per package:     4
+[    0.003259] CPU topo: Num. threads per package:   4
+[    0.003259] CPU topo: Allowing 4 present CPUs plus 0 hotplug CPUs
+[    0.003274] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+[    0.003303] kvm-guest: KVM setup pv remote TLB flush
+[    0.003312] kvm-guest: setup PV sched yield
+[    0.003355] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+[    0.003356] PM: hibernation: Registered nosave memory: [mem 0x0009f000-0x000fffff]
+[    0.003357] PM: hibernation: Registered nosave memory: [mem 0xbffd7000-0xffffffff]
+[    0.003358] [gap 0xc0000000-0xfeffbfff] available for PCI devices
+[    0.003358] Booting paravirtualized kernel on KVM
+[    0.003359] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.007271] Zone ranges:
+[    0.007272]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.007273]   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+[    0.007274]   Normal   [mem 0x0000000100000000-0x000000013fffffff]
+[    0.007275] Movable zone start for each node
+[    0.007275] Early memory node ranges
+[    0.007275]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.007276]   node   0: [mem 0x0000000000100000-0x00000000bffd6fff]
+[    0.007277]   node   0: [mem 0x0000000100000000-0x000000013fffffff]
+[    0.007277] Initmem setup node 0 [mem 0x0000000000001000-0x000000013fffffff]
+[    0.007304] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.007876] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.140907] On node 0, zone Normal: 41 pages in unavailable ranges
+[    0.140914] setup_percpu: NR_CPUS:64 nr_cpumask_bits:4 nr_cpu_ids:4 nr_node_ids:1
+[    0.145052] percpu: Embedded 52 pages/cpu s175704 r8192 d29096 u524288
+[    0.145111] Kernel command line: root=/dev/vda rw console=ttyS0 init=/qemu-init panic=-1 qfstyp=btrfs qtests=generic/044,generic/045,generic/046 qloop=3 qmopts=commit=1
+[    0.145144] Unknown kernel command line parameters "qfstyp=btrfs qtests=generic/044,generic/045,generic/046 qloop=3 qmopts=commit=1", will be passed to user space.
+[    0.145157] random: crng init done
+[    0.145157] printk: log buffer data + meta data: 262144 + 917504 = 1179648 bytes
+[    0.153408] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    0.157711] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.157799] software IO TLB: area num 4.
+[    0.296413] Fallback order for Node 0: 0 
+[    0.296419] Built 1 zonelists, mobility grouping on.  Total pages: 1048437
+[    0.296420] Policy zone: Normal
+[    0.296422] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.301271] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.302405] Dynamic Preempt: lazy
+[    0.302513] rcu: Preemptible hierarchical RCU implementation.
+[    0.302513] rcu: 	RCU event tracing is enabled.
+[    0.302514] rcu: 	RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=4.
+[    0.302515] 	Trampoline variant of Tasks RCU enabled.
+[    0.302515] 	Tracing variant of Tasks RCU enabled.
+[    0.302516] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.302516] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+[    0.302532] RCU Tasks: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[    0.306005] NR_IRQS: 4352, nr_irqs: 456, preallocated irqs: 16
+[    0.306330] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.306366] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    0.318706] Console: colour VGA+ 80x25
+[    0.318764] printk: legacy console [ttyS0] enabled
+[    0.467717] ACPI: Core revision 20260408
+[    0.468642] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.470556] APIC: Switch to symmetric I/O mode setup
+[    0.471941] x2apic enabled
+[    0.472977] APIC: Switched APIC routing to: physical x2apic
+[    0.474144] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+[    0.475591] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+[    0.477345] kvm-guest: setup PV IPIs
+[    0.480147] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.481344] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x31026923fb3, max_idle_ns: 440795355848 ns
+[    0.483385] Calibrating delay loop (skipped) preset value.. 6800.05 BogoMIPS (lpj=3400028)
+[    0.485394] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    0.486674] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
+[    0.487385] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
+[    0.488391] mitigations: Enabled attack vectors: user_kernel, user_user, SMT mitigations: auto
+[    0.489385] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    0.490396] Speculative Return Stack Overflow: IBPB-extending microcode not applied!
+[    0.491385] Speculative Return Stack Overflow: WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options.
+[    0.491386] Transient Scheduler Attacks: Vulnerable: No microcode
+[    0.493385] Spectre V2 : Mitigation: Retpolines
+[    0.494385] Speculative Return Stack Overflow: Vulnerable: Safe RET, no microcode
+[    0.495384] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.496385] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.497385] Spectre V2 : Enabling Restricted Speculation for firmware calls
+[    0.498386] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.499385] active return thunk: srso_alias_return_thunk
+[    0.500431] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.501385] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.502385] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.503385] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    0.504384] x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using 'compacted' format.
+[    0.523896] pid_max: default: 32768 minimum: 301
+[    0.524464] SELinux:  Initializing.
+[    0.525737] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.526550] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.527700] VFS: Finished mounting rootfs on nullfs
+[    0.529983] smpboot: CPU0: AMD Ryzen 9 5950X 16-Core Processor (family: 0x19, model: 0x21, stepping: 0x2)
+[    0.531320] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+[    0.532396] ... version:                   0
+[    0.533306] ... bit width:                 48
+[    0.533391] ... generic counters:          6
+[    0.534300] ... generic bitmap:            000000000000003f
+[    0.534391] ... fixed-purpose counters:    0
+[    0.535299] ... fixed-purpose bitmap:      0000000000000000
+[    0.535390] ... value mask:                0000ffffffffffff
+[    0.536390] ... max period:                00007fffffffffff
+[    0.537389] ... global_ctrl mask:          000000000000003f
+[    0.538539] signal: max sigframe size: 1776
+[    0.539487] rcu: Hierarchical SRCU implementation.
+[    0.540393] rcu: 	Max phase no-delay instances is 400.
+[    0.541548] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.547496] smp: Bringing up secondary CPUs ...
+[    0.549006] smpboot: x86: Booting SMP configuration:
+[    0.549392] .... node  #0, CPUs:      #1 #2 #3
+[    0.555609] smp: Brought up 1 node, 4 CPUs
+[    0.557289] smpboot: Total of 4 processors activated (27200.22 BogoMIPS)
+[    0.558694] Memory: 4003452K/4193748K available (20952K kernel code, 3140K rwdata, 8480K rodata, 3112K init, 612K bss, 185804K reserved, 0K cma-reserved)
+[    0.560391] devtmpfs: initialized
+[    0.561670] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.562662] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.563495] xor: automatically using best checksumming function   avx       
+[    0.565017] PM: RTC time: 03:21:31, date: 2026-08-01
+[    0.565815] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.566595] audit: initializing netlink subsys (disabled)
+[    0.567441] audit: type=2000 audit(1785554492.757:1): state=initialized audit_enabled=0 res=1
+[    0.567552] thermal_sys: Registered thermal governor 'step_wise'
+[    0.568421] cpuidle: using governor menu
+[    0.571505] Freeing SMP alternatives memory: 60K
+[    0.572786] PCI: Using configuration type 1 for base access
+[    0.573390] PCI: Using configuration type 1 for extended access
+[    0.574492] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    0.575696] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    0.576393] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    0.579503] raid6: using avx2x2 recovery algorithm
+[    0.597391] raid6: avx2x1   gen() 35069 MB/s
+[    0.614388] raid6: avx2x2   gen() 44758 MB/s
+[    0.632389] raid6: avx2x4   gen() 49249 MB/s
+[    0.633683] raid6: using algorithm avx2x4 gen() 49249 MB/s
+[    0.651389] raid6: .... xor() 7112 MB/s, rmw enabled
+[    0.652443] ACPI: Added _OSI(Module Device)
+[    0.653366] ACPI: Added _OSI(Processor Device)
+[    0.653391] ACPI: Added _OSI(Processor Aggregator Device)
+[    0.655775] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    0.657601] ACPI: \_SB_: platform _OSC: OS support mask [002a7eee]
+[    0.658569] ACPI: Interpreter enabled
+[    0.659404] ACPI: PM: (supports S0 S3 S4 S5)
+[    0.660344] ACPI: Using IOAPIC for interrupt routing
+[    0.660404] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    0.661391] PCI: Using E820 reservations for host bridge windows
+[    0.662514] ACPI: Enabled 2 GPEs in block 00 to 0F
+[    0.667463] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    0.668395] acpi PNP0A03:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI HPX-Type3]
+[    0.669395] acpi PNP0A03:00: _OSC: OS requested [PME PCIeCapability LTR]
+[    0.670391] acpi PNP0A03:00: _OSC: platform willing to grant [PME PCIeCapability LTR]
+[    0.671391] acpi PNP0A03:00: _OSC: platform retains control of PCIe features (AE_ERROR)
+[    0.672552] PCI host bridge to bus 0000:00
+[    0.673394] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    0.674391] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    0.675392] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    0.676392] pci_bus 0000:00: root bus resource [mem 0xc0000000-0xfebfffff window]
+[    0.677390] pci_bus 0000:00: root bus resource [mem 0x380000000000-0x38007fffffff window]
+[    0.678391] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.679710] pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+[    0.681358] pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+[    0.682407] pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+[    0.684467] pci 0000:00:01.1: BAR 4 [io  0xc180-0xc18f]
+[    0.685476] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+[    0.686391] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+[    0.687391] pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+[    0.688392] pci 0000:00:01.1: BAR 3 [io  0x0376]: legacy IDE quirk
+[    0.689702] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+[    0.691132] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    0.691406] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+[    0.692810] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+[    0.695595] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+[    0.696430] pci 0000:00:02.0: BAR 2 [mem 0xfebf0000-0xfebf0fff]
+[    0.697449] pci 0000:00:02.0: ROM [mem 0xfebe0000-0xfebeffff pref]
+[    0.698934] pci 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    0.701271] pci 0000:00:03.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    0.703410] pci 0000:00:03.0: BAR 0 [io  0xc000-0xc07f]
+[    0.704406] pci 0000:00:03.0: BAR 1 [mem 0xfebf1000-0xfebf1fff]
+[    0.705451] pci 0000:00:03.0: BAR 4 [mem 0x380000000000-0x380000003fff 64bit pref]
+[    0.708839] pci 0000:00:04.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    0.711185] pci 0000:00:04.0: BAR 0 [io  0xc080-0xc0ff]
+[    0.711408] pci 0000:00:04.0: BAR 1 [mem 0xfebf2000-0xfebf2fff]
+[    0.712448] pci 0000:00:04.0: BAR 4 [mem 0x380000004000-0x380000007fff 64bit pref]
+[    0.715463] pci 0000:00:05.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    0.718121] pci 0000:00:05.0: BAR 0 [io  0xc100-0xc17f]
+[    0.718408] pci 0000:00:05.0: BAR 1 [mem 0xfebf3000-0xfebf3fff]
+[    0.719448] pci 0000:00:05.0: BAR 4 [mem 0x380000008000-0x38000000bfff 64bit pref]
+[    0.725691] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[    0.726540] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[    0.727574] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+[    0.728562] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    0.729488] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+[    0.731869] iommu: Default domain type: Translated
+[    0.732391] iommu: DMA domain TLB invalidation policy: lazy mode
+[    0.734810] SCSI subsystem initialized
+[    0.736404] ACPI: bus type USB registered
+[    0.737377] usbcore: registered new interface driver usbfs
+[    0.738424] usbcore: registered new interface driver hub
+[    0.739412] usbcore: registered new device driver usb
+[    0.740469] pps_core: LinuxPPS API ver. 1 registered
+[    0.741390] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    0.742406] PTP clock support registered
+[    0.743611] Advanced Linux Sound Architecture Driver Initialized.
+[    0.745392] NetLabel: Initializing
+[    0.746143] NetLabel:  domain hash size = 128
+[    0.746391] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    0.747524] NetLabel:  unlabeled traffic allowed by default
+[    0.748504] PCI: Using ACPI for IRQ routing
+[    0.749691] e820: register RAM buffer resource [mem 0x0009fc00-0x0009ffff]
+[    0.750399] e820: register RAM buffer resource [mem 0xbffd7000-0xbfffffff]
+[    0.751461] pci 0000:00:02.0: vgaarb: setting as boot VGA device
+[    0.752383] pci 0000:00:02.0: vgaarb: bridge control possible
+[    0.752383] pci 0000:00:02.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+[    0.752391] vgaarb: loaded
+[    0.753647] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+[    0.754389] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+[    0.759743] clocksource: Switched to clocksource kvm-clock
+[    0.761915] VFS: Disk quotas dquot_6.6.0
+[    0.762934] VFS: Dquot-cache hash table entries: 512 (4096 bytes)
+[    0.765089] pnp: PnP ACPI init
+[    0.766310] pnp: PnP ACPI: found 5 devices
+[    0.775908] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    0.777983] NET: Registered PF_INET protocol family
+[    0.780260] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    0.782774] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.784718] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.786432] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.788712] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+[    0.792379] TCP: Hash tables configured (established 32768 bind 32768)
+[    0.794141] UDP hash table entries: 2048 (order: 5, 131072 bytes, linear)
+[    0.796003] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.798252] RPC: Registered named UNIX socket transport module.
+[    0.799581] RPC: Registered udp transport module.
+[    0.800636] RPC: Registered tcp transport module.
+[    0.801661] RPC: Registered tcp-with-tls transport module.
+[    0.802902] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.804874] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    0.806296] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+[    0.807687] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[    0.809260] pci_bus 0000:00: resource 7 [mem 0xc0000000-0xfebfffff window]
+[    0.810779] pci_bus 0000:00: resource 8 [mem 0x380000000000-0x38007fffffff window]
+[    0.812505] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    0.813783] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    0.815289] PCI: CLS 0 bytes, default 64
+[    0.816325] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+[    0.817756] software IO TLB: mapped [mem 0x00000000bbfd7000-0x00000000bffd7000] (64MB)
+[    0.819630] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x31026923fb3, max_idle_ns: 440795355848 ns
+[    0.824117] Initialise system trusted keyrings
+[    0.825452] workingset: timestamp_bits=56 (anon: 51) max_order=20 bucket_order=0 (anon: 0)
+[    0.828089] NFS: Registering the id_resolver key type
+[    0.829261] Key type id_resolver registered
+[    0.830226] Key type id_legacy registered
+[    0.831136] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.832622] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    0.834381] 9p: Installing v9fs 9p2000 file system support
+[    0.836873] Key type asymmetric registered
+[    0.837805] Asymmetric key parser 'x509' registered
+[    0.838938] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    0.840659] io scheduler mq-deadline registered
+[    0.841705] io scheduler kyber registered
+[    0.843104] input: Power Button as /devices/platform/LNXPWRBN:00/input/input0
+[    0.844782] ACPI: button: Power Button [PWRF]
+[    0.873634] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+[    0.903536] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+[    0.933778] ACPI: \_SB_.LNKA: Enabled at IRQ 10
+[    0.937074] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[    0.938953] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    0.941909] Non-volatile memory driver v1.3
+[    0.943192] ACPI: bus type drm_connector registered
+[    0.951291] loop: module loaded
+[    0.952254] virtio_blk virtio0: 4/0/0 default/read/poll queues
+[    0.957385] virtio_blk virtio0: [vda] 12582912 512-byte logical blocks (6.44 GB/6.00 GiB)
+[    0.961427] virtio_blk virtio1: 4/0/0 default/read/poll queues
+[    0.966093] virtio_blk virtio1: [vdb] 16777216 512-byte logical blocks (8.59 GB/8.00 GiB)
+[    0.969790] virtio_blk virtio2: 4/0/0 default/read/poll queues
+[    0.974561] virtio_blk virtio2: [vdc] 16777216 512-byte logical blocks (8.59 GB/8.00 GiB)
+[    0.979819] scsi host0: ata_piix
+[    0.981128] scsi host1: ata_piix
+[    0.981886] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc180 irq 14 lpm-pol 0
+[    0.983610] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc188 irq 15 lpm-pol 0
+[    0.985635] e100: Intel(R) PRO/100 Network Driver
+[    0.986775] e100: Copyright(c) 1999-2006 Intel Corporation
+[    0.988926] e1000: Intel(R) PRO/1000 Network Driver
+[    0.990859] e1000: Copyright (c) 1999-2006 Intel Corporation.
+[    0.992188] e1000e: Intel(R) PRO/1000 Network Driver
+[    0.993281] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    0.994655] sky2: driver version 1.30
+[    0.995764] usbcore: registered new interface driver usblp
+[    0.997038] usbcore: registered new interface driver usb-storage
+[    0.998503] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    1.001476] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    1.002632] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    1.004277] rtc_cmos PNP0B00:00: RTC can wake from S4
+[    1.007417] rtc_cmos PNP0B00:00: registered as rtc0
+[    1.008666] rtc_cmos PNP0B00:00: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+[    1.010790] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    1.012934] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+[    1.015953] amd_pstate: the _CPC object is not present in SBIOS or ACPI disabled
+[    1.018988] hid: raw HID events driver (C) Jiri Kosina
+[    1.021400] usbcore: registered new interface driver usbhid
+[    1.024098] usbhid: USB HID core driver
+[    1.026922] nf_conntrack_irc: The irc conntrack helper is scheduled for removal.
+[    1.026922] Please contact the netfilter-devel mailing list if you still need this.
+[    1.031649] Initializing XFRM netlink socket
+[    1.032668] NET: Registered PF_INET6 protocol family
+[    1.035081] Segment Routing with IPv6
+[    1.035972] In-situ OAM (IOAM) with IPv6
+[    1.036960] NET: Registered PF_PACKET protocol family
+[    1.038282] 9pnet: Installing 9P2000 support
+[    1.039248] Key type dns_resolver registered
+[    1.041036] IPI shorthand broadcast: enabled
+[    1.047310] sched_clock: Marking stable (878011538, 169017111)->(1142742428, -95713779)
+[    1.049879] registered taskstats version 1
+[    1.050828] Loading compiled-in X.509 certificates
+[    1.054853] Demotion targets for Node 0: null
+[    1.056584] Btrfs loaded, zoned=no, fsverity=yes
+[    1.057829] PM:   Magic number: 6:225:360
+[    1.058840] netconsole: network logging started
+[    1.059930] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    1.062355] kworker/u16:3 (69) used greatest stack depth: 13976 bytes left
+[    1.063191] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    1.065401] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[    1.067052] ALSA device list:
+[    1.067764]   No soundcards found.
+[    1.068632] faux_driver regulatory: Direct firmware load for regulatory.db failed with error -2
+[    1.070635] cfg80211: failed to load regulatory.db
+[    1.147309] ata2: found unknown device (class 0)
+[    1.148697] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    1.151216] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+[    1.170700] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    1.185502] cdrom: Uniform CD-ROM driver Revision: 3.20
+[    1.193813] sr 1:0:0:0: Attached scsi generic sg0 type 5
+[    1.437122] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input3
+[    1.438845] md: Waiting for all devices to be available before autodetect
+[    1.439855] md: If you don't use raid, use raid=noautodetect
+[    1.440701] md: Autodetecting RAID arrays.
+[    1.441287] md: autorun ...
+[    1.441688] md: ... autorun DONE.
+[    1.451730] EXT4-fs (vda): mounted filesystem bf01d009-98bb-4268-8b40-9bbf1d882048 r/w with ordered data mode. Quota mode: none.
+[    1.453418] VFS: Mounted root (ext4 filesystem) on device 253:0.
+[    1.454619] devtmpfs: mounted
+[    1.455326] VFS: Pivoted into new rootfs
+[    1.460381] Freeing unused kernel image (initmem) memory: 3112K
+[    1.461362] Write protecting the kernel read-only data: 32768k
+[    1.465199] Freeing unused kernel image (text/rodata gap) memory: 1572K
+[    1.469107] Freeing unused kernel image (rodata/data gap) memory: 1760K
+[    1.506761] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.507724] Run /qemu-init as init process
+[    1.526594] busybox (80) used greatest stack depth: 12736 bytes left
+=== QEMU cross-check (7.2.0-rc5) ===
+--- running generic/044 generic/045 generic/046 x3 ---
+[    2.729979] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 8 /dev/vdb (253:16) scanned by mount (249)
+[    2.732439] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[    2.733793] BTRFS info (device vdb): using crc32c checksum algorithm
+[    2.739903] BTRFS info (device vdb): checking UUID tree
+[    2.740850] BTRFS info (device vdb): turning on async discard
+[    2.741709] BTRFS info (device vdb): enabling free space tree
+[    2.856798] BTRFS: device fsid 0a4f5e1e-5a9e-472b-b9eb-da3be26bb908 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (344)
+[    2.859195] BTRFS info (device vdc): first mount of filesystem 0a4f5e1e-5a9e-472b-b9eb-da3be26bb908
+[    2.860577] BTRFS info (device vdc): using crc32c checksum algorithm
+[    2.865626] BTRFS info (device vdc): checking UUID tree
+[    2.866558] BTRFS info (device vdc): turning on async discard
+[    2.867411] BTRFS info (device vdc): enabling free space tree
+[    2.873828] BTRFS info (device vdc): last unmount of filesystem 0a4f5e1e-5a9e-472b-b9eb-da3be26bb908
+[    2.886466] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[    2.896938] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 9 /dev/vdb (253:16) scanned by mount (378)
+[    2.899131] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[    2.900411] BTRFS info (device vdb): using crc32c checksum algorithm
+[    2.904266] BTRFS info (device vdb): turning on async discard
+[    2.905175] BTRFS info (device vdb): enabling free space tree
+[    2.914636] run fstests generic/044 at 2026-08-01 03:21:35
+[    3.074305] BTRFS: device fsid eb243a90-c4e8-4f93-aff3-19aa0f3b4e4b devid 1 transid 8 /dev/vdc (253:32) scanned by mount (577)
+[    3.076607] BTRFS info (device vdc): first mount of filesystem eb243a90-c4e8-4f93-aff3-19aa0f3b4e4b
+[    3.077859] BTRFS info (device vdc): using crc32c checksum algorithm
+[    3.083381] BTRFS info (device vdc): checking UUID tree
+[    3.084293] BTRFS info (device vdc): turning on async discard
+[    3.085154] BTRFS info (device vdc): enabling free space tree
+[    3.115123] BTRFS critical (device vdc state E): emergency shutdown
+[    3.118356] BTRFS info (device vdc state E): last unmount of filesystem eb243a90-c4e8-4f93-aff3-19aa0f3b4e4b
+[    3.173430] BTRFS: device fsid 58845a24-a46c-4748-a3aa-a919a392116b devid 1 transid 8 /dev/vdc (253:32) scanned by mount (625)
+[    3.175682] BTRFS info (device vdc): first mount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[    3.177202] BTRFS info (device vdc): using crc32c checksum algorithm
+[    3.182361] BTRFS info (device vdc): checking UUID tree
+[    3.183227] BTRFS info (device vdc): turning on async discard
+[    3.184068] BTRFS info (device vdc): enabling free space tree
+[   15.565766] BTRFS critical (device vdc state E): emergency shutdown
+[   15.570046] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1071 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.571857] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1071 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.573627] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1072 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.575389] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1072 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.577116] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1073 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.578812] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1073 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.580527] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1074 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.582245] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1074 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.583994] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1075 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.585718] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1075 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.587476] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1076 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.589221] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1076 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.590956] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1077 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.592681] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1077 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.594410] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1078 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.596130] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1078 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.597845] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1079 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.599614] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1079 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.601334] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1080 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.603056] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1080 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   15.604766] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1081 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.606523] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1082 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.608264] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1083 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.610052] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1084 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.611805] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1085 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.613552] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1086 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.615358] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1087 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.617147] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1088 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.618916] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1089 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.620685] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1090 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.622442] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1091 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.624205] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1092 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.625974] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1093 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.627733] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1094 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.629515] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1095 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.631292] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1096 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.633047] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1097 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.634833] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1098 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.636621] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1099 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.638412] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1100 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.640174] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1101 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.641925] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1102 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.643744] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1103 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.645515] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1104 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.647276] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1105 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.649004] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1106 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.650815] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1107 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.652572] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1108 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.654371] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1109 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.656184] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1110 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.657935] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1111 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.659741] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1112 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.661496] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1113 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.663264] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1114 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.665050] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1115 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.666813] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1116 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.668582] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1117 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.670348] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1118 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.672099] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1119 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.673870] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1120 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.675654] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1121 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.677424] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1122 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.679183] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1123 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.680938] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1124 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.682717] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1125 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.684469] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1126 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.686249] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1127 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.688047] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1128 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.689855] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1129 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.691618] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1130 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.693371] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1131 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.695130] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1132 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.696886] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1133 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.698708] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1134 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.700504] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1135 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.702285] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1136 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.704070] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1137 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.705821] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1138 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.707603] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1139 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.709356] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1140 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.711115] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1141 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.712865] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1142 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.714664] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1143 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.716441] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1144 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.718206] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1145 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.719979] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1146 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.721748] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1147 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.723527] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1148 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.725289] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1149 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.727049] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1150 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.728858] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1151 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.730665] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1152 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.732420] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1153 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.734236] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1154 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.736013] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1155 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.737815] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1156 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.739593] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1157 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.741346] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1158 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.743085] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1159 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.744863] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1160 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   15.757116] BTRFS info (device vdc state E): last unmount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   15.763443] BTRFS: device fsid 58845a24-a46c-4748-a3aa-a919a392116b devid 1 transid 11 /dev/vdc (253:32) scanned by mount (4649)
+[   15.765602] BTRFS info (device vdc): first mount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   15.766887] BTRFS info (device vdc): using crc32c checksum algorithm
+[   15.770914] BTRFS info (device vdc): turning on async discard
+[   15.771755] BTRFS info (device vdc): enabling free space tree
+[   15.774781] BTRFS info (device vdc): last unmount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   15.779842] BTRFS: device fsid 58845a24-a46c-4748-a3aa-a919a392116b devid 1 transid 11 /dev/vdc (253:32) scanned by mount (4669)
+[   15.781919] BTRFS info (device vdc): first mount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   15.783277] BTRFS info (device vdc): using crc32c checksum algorithm
+[   15.787434] BTRFS info (device vdc): turning on async discard
+[   15.788275] BTRFS info (device vdc): enabling free space tree
+[   19.122768] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   19.140617] BTRFS info (device vdc): last unmount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   19.148629] BTRFS: device fsid 58845a24-a46c-4748-a3aa-a919a392116b devid 1 transid 15 /dev/vdc (253:32) scanned by mount (15471)
+[   19.150777] BTRFS info (device vdc): first mount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   19.152037] BTRFS info (device vdc): using crc32c checksum algorithm
+[   19.155775] BTRFS info (device vdc): turning on async discard
+[   19.156641] BTRFS info (device vdc): enabling free space tree
+[   19.160294] BTRFS info (device vdc): last unmount of filesystem 58845a24-a46c-4748-a3aa-a919a392116b
+[   19.184404] run fstests generic/045 at 2026-08-01 03:21:51
+[   19.258750] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 10 /dev/vdb (253:16) scanned by mount (15654)
+[   19.260934] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   19.262273] BTRFS info (device vdb): using crc32c checksum algorithm
+[   19.266152] BTRFS info (device vdb): turning on async discard
+[   19.266982] BTRFS info (device vdb): enabling free space tree
+[   19.323267] BTRFS: device fsid 5f141723-951d-4f60-b74d-43d311fbcbbc devid 1 transid 8 /dev/vdc (253:32) scanned by mount (15704)
+[   19.325441] BTRFS info (device vdc): first mount of filesystem 5f141723-951d-4f60-b74d-43d311fbcbbc
+[   19.326735] BTRFS info (device vdc): using crc32c checksum algorithm
+[   19.330897] BTRFS info (device vdc): checking UUID tree
+[   19.331849] BTRFS info (device vdc): turning on async discard
+[   19.332667] BTRFS info (device vdc): enabling free space tree
+[   19.361104] BTRFS critical (device vdc state E): emergency shutdown
+[   19.364487] BTRFS info (device vdc state E): last unmount of filesystem 5f141723-951d-4f60-b74d-43d311fbcbbc
+[   19.415849] BTRFS: device fsid 96784966-1253-41c2-aa99-0a31a9ad0fe7 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (15752)
+[   19.417828] BTRFS info (device vdc): first mount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   19.419112] BTRFS info (device vdc): using crc32c checksum algorithm
+[   19.422594] BTRFS info (device vdc): checking UUID tree
+[   19.423523] BTRFS info (device vdc): turning on async discard
+[   19.424415] BTRFS info (device vdc): enabling free space tree
+[   31.667446] BTRFS critical (device vdc state E): emergency shutdown
+[   31.671723] _btrfs_printk: 95 callbacks suppressed
+[   31.671725] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=995 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.674255] writepage_delalloc: 175 callbacks suppressed
+[   31.674256] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=995 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.677053] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=996 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.678865] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=996 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.680593] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=997 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.682342] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=997 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.684064] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=998 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.685772] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=998 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.687491] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=999 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.689183] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=999 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.690991] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1000 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.692768] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1000 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.694605] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1001 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.696316] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1001 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.698056] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1002 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.699795] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1002 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.701503] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1003 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.703252] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1003 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.705053] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1004 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.706813] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1004 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   31.708513] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1005 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.710328] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1006 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.712097] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1007 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.713869] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1008 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.715642] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1009 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.717367] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1010 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.719133] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1011 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.720957] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1012 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.722724] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1013 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.724534] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1014 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.726316] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1015 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.728091] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1016 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.729844] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1017 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.731626] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1018 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.733405] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1019 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.735226] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1020 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.737080] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1021 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.738811] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1022 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.740613] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1023 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.742353] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1024 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.744118] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1025 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.745864] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1026 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.747626] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1027 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.749397] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1028 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.751174] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1029 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.753108] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1030 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.755043] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1031 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.756826] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1032 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.758642] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1033 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.760388] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1034 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.762179] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1035 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.763959] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1036 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.765742] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1037 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.767678] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1038 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.769519] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1039 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.771383] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1040 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.773163] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1041 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.774981] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1042 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.776781] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1043 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.778588] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1044 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.780358] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1045 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.782125] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1046 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.784097] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1047 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.785906] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1048 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.787721] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1049 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.789560] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1050 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.791398] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1051 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.793209] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1052 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.795015] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1053 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.796803] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1054 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.798736] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1055 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.800492] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1056 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.802313] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1057 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.804186] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1058 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.805990] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1059 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.807812] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1060 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.809587] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1061 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.811435] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1062 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.813217] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1063 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.815143] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1064 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.816925] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1065 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.818761] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1066 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.820597] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1067 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.822519] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1068 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.824327] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1069 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.826169] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1070 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.827979] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1071 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.829839] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1072 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.831772] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1073 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.833589] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1074 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.835430] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1075 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.837241] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1076 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.839088] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1077 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.840866] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1078 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.842686] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1079 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.844512] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1080 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.846429] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1081 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.848230] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1082 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.850067] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1083 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.851902] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1084 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   31.861354] BTRFS info (device vdc state E): last unmount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   31.869156] BTRFS: device fsid 96784966-1253-41c2-aa99-0a31a9ad0fe7 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (19771)
+[   31.871708] BTRFS info (device vdc): first mount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   31.873146] BTRFS info (device vdc): using crc32c checksum algorithm
+[   31.879268] BTRFS info (device vdc): turning on async discard
+[   31.880576] BTRFS info (device vdc): enabling free space tree
+[   31.884996] BTRFS info (device vdc): last unmount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   31.890811] BTRFS: device fsid 96784966-1253-41c2-aa99-0a31a9ad0fe7 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (19791)
+[   31.893306] BTRFS info (device vdc): first mount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   31.894690] BTRFS info (device vdc): using crc32c checksum algorithm
+[   31.898769] BTRFS info (device vdc): turning on async discard
+[   31.899659] BTRFS info (device vdc): enabling free space tree
+[   35.032075] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   35.044905] BTRFS info (device vdc): last unmount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   35.053601] BTRFS: device fsid 96784966-1253-41c2-aa99-0a31a9ad0fe7 devid 1 transid 15 /dev/vdc (253:32) scanned by mount (29681)
+[   35.055667] BTRFS info (device vdc): first mount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   35.056912] BTRFS info (device vdc): using crc32c checksum algorithm
+[   35.060628] BTRFS info (device vdc): turning on async discard
+[   35.061549] BTRFS info (device vdc): enabling free space tree
+[   35.065374] BTRFS info (device vdc): last unmount of filesystem 96784966-1253-41c2-aa99-0a31a9ad0fe7
+[   35.088938] run fstests generic/046 at 2026-08-01 03:22:07
+[   35.163378] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 11 /dev/vdb (253:16) scanned by mount (29864)
+[   35.165467] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   35.166773] BTRFS info (device vdb): using crc32c checksum algorithm
+[   35.170602] BTRFS info (device vdb): turning on async discard
+[   35.171449] BTRFS info (device vdb): enabling free space tree
+[   35.227407] BTRFS: device fsid 84c75996-c68a-430d-a595-61814550bb53 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (29914)
+[   35.229544] BTRFS info (device vdc): first mount of filesystem 84c75996-c68a-430d-a595-61814550bb53
+[   35.230850] BTRFS info (device vdc): using crc32c checksum algorithm
+[   35.234501] BTRFS info (device vdc): checking UUID tree
+[   35.235398] BTRFS info (device vdc): turning on async discard
+[   35.236302] BTRFS info (device vdc): enabling free space tree
+[   35.261189] BTRFS critical (device vdc state E): emergency shutdown
+[   35.264443] BTRFS info (device vdc state E): last unmount of filesystem 84c75996-c68a-430d-a595-61814550bb53
+[   35.317296] BTRFS: device fsid 35f10633-8efe-4a5b-839e-b40354a56c1e devid 1 transid 8 /dev/vdc (253:32) scanned by mount (29962)
+[   35.319455] BTRFS info (device vdc): first mount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   35.320710] BTRFS info (device vdc): using crc32c checksum algorithm
+[   35.324329] BTRFS info (device vdc): checking UUID tree
+[   35.325284] BTRFS info (device vdc): turning on async discard
+[   35.326160] BTRFS info (device vdc): enabling free space tree
+[   47.520475] BTRFS critical (device vdc state E): emergency shutdown
+[   47.525047] _btrfs_printk: 171 callbacks suppressed
+[   47.525048] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1002 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.527789] writepage_delalloc: 251 callbacks suppressed
+[   47.527790] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1002 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.530554] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1003 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.532434] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1003 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.534321] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1004 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.536114] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1004 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.537831] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1005 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.539614] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1005 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.541355] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1006 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.543076] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1006 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.544766] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1007 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.546493] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1007 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.548235] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1008 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.550004] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1008 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.551712] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1009 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.553426] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1009 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.555216] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1010 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.556921] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1010 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.558670] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1011 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.560353] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1011 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   47.562071] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1012 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.563821] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1013 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.565579] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1014 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.567361] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1015 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.569067] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1016 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.570849] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1017 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.572611] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1018 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.574358] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1019 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.576108] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1020 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.577871] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1021 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.579651] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1022 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.581388] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1023 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.583160] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1024 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.584933] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1025 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.586754] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1026 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.588502] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1027 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.590306] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1028 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.592046] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1029 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.593873] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1030 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.595617] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1031 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.597334] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1032 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.599081] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1033 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.600817] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1034 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.602672] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1035 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.604416] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1036 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.606153] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1037 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.607886] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1038 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.609649] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1039 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.611439] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1040 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.613182] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1041 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.614913] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1042 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.616670] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1043 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.618464] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1044 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.620220] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1045 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.621945] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1046 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.623745] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1047 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.625469] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1048 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.627222] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1049 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.628990] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1050 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.630775] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1051 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.632526] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1052 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.634343] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1053 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.636108] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1054 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.637847] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1055 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.639596] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1056 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.641358] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1057 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.643113] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1058 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.644894] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1059 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.646672] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1060 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.648489] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1061 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.650283] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1062 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.652006] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1063 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.653799] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1064 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.655586] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1065 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.657332] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1066 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.659066] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1067 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.660830] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1068 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.662580] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1069 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.664324] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1070 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.666081] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1071 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.667857] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1072 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.669619] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1073 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.671413] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1074 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.673186] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1075 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.674946] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1076 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.676691] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1077 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.678449] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1078 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.680215] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1079 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.682050] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1080 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.683808] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1081 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.685606] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1082 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.687381] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1083 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.689113] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1084 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.690881] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1085 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.692628] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1086 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.694401] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1087 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.696145] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1088 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.697942] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1089 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.699705] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1090 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.701448] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1091 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   47.710610] BTRFS info (device vdc state E): last unmount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   47.716690] BTRFS: device fsid 35f10633-8efe-4a5b-839e-b40354a56c1e devid 1 transid 11 /dev/vdc (253:32) scanned by mount (1515)
+[   47.718891] BTRFS info (device vdc): first mount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   47.720169] BTRFS info (device vdc): using crc32c checksum algorithm
+[   47.724300] BTRFS info (device vdc): turning on async discard
+[   47.725284] BTRFS info (device vdc): enabling free space tree
+[   47.728402] BTRFS info (device vdc): last unmount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   47.733451] BTRFS: device fsid 35f10633-8efe-4a5b-839e-b40354a56c1e devid 1 transid 11 /dev/vdc (253:32) scanned by mount (1539)
+[   47.735478] BTRFS info (device vdc): first mount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   47.736769] BTRFS info (device vdc): using crc32c checksum algorithm
+[   47.740492] BTRFS info (device vdc): turning on async discard
+[   47.741341] BTRFS info (device vdc): enabling free space tree
+[   49.718218] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   49.732424] BTRFS info (device vdc): last unmount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   49.740377] BTRFS: device fsid 35f10633-8efe-4a5b-839e-b40354a56c1e devid 1 transid 13 /dev/vdc (253:32) scanned by mount (7043)
+[   49.742557] BTRFS info (device vdc): first mount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+[   49.743805] BTRFS info (device vdc): using crc32c checksum algorithm
+[   49.747851] BTRFS info (device vdc): turning on async discard
+[   49.748781] BTRFS info (device vdc): enabling free space tree
+[   49.752386] BTRFS info (device vdc): last unmount of filesystem 35f10633-8efe-4a5b-839e-b40354a56c1e
+QITER 1 rc=0 all-passed
+Ran: generic/044 generic/045 generic/046
+Passed all 3 tests
+[   49.852750] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 12 /dev/vdb (253:16) scanned by mount (7241)
+[   49.854940] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   49.856239] BTRFS info (device vdb): using crc32c checksum algorithm
+[   49.860105] BTRFS info (device vdb): turning on async discard
+[   49.860933] BTRFS info (device vdb): enabling free space tree
+[   49.950937] BTRFS: device fsid e32dfd76-74cd-4ab8-a7ef-c1a1ecd2d7f5 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (7333)
+[   49.952984] BTRFS info (device vdc): first mount of filesystem e32dfd76-74cd-4ab8-a7ef-c1a1ecd2d7f5
+[   49.954279] BTRFS info (device vdc): using crc32c checksum algorithm
+[   49.958403] BTRFS info (device vdc): checking UUID tree
+[   49.959328] BTRFS info (device vdc): turning on async discard
+[   49.960196] BTRFS info (device vdc): enabling free space tree
+[   49.966294] BTRFS info (device vdc): last unmount of filesystem e32dfd76-74cd-4ab8-a7ef-c1a1ecd2d7f5
+[   49.975683] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   49.983746] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 12 /dev/vdb (253:16) scanned by mount (7367)
+[   49.985713] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   49.986992] BTRFS info (device vdb): using crc32c checksum algorithm
+[   49.990686] BTRFS info (device vdb): turning on async discard
+[   49.991537] BTRFS info (device vdb): enabling free space tree
+[   50.000656] run fstests generic/044 at 2026-08-01 03:22:22
+[   50.126720] BTRFS: device fsid 1bbf75c7-64b7-4c36-8f8a-e88aa776d2d0 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (7566)
+[   50.128770] BTRFS info (device vdc): first mount of filesystem 1bbf75c7-64b7-4c36-8f8a-e88aa776d2d0
+[   50.130012] BTRFS info (device vdc): using crc32c checksum algorithm
+[   50.133751] BTRFS info (device vdc): checking UUID tree
+[   50.134655] BTRFS info (device vdc): turning on async discard
+[   50.135494] BTRFS info (device vdc): enabling free space tree
+[   50.162237] BTRFS critical (device vdc state E): emergency shutdown
+[   50.165501] BTRFS info (device vdc state E): last unmount of filesystem 1bbf75c7-64b7-4c36-8f8a-e88aa776d2d0
+[   50.216318] BTRFS: device fsid 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c devid 1 transid 8 /dev/vdc (253:32) scanned by mount (7614)
+[   50.218548] BTRFS info (device vdc): first mount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   50.219814] BTRFS info (device vdc): using crc32c checksum algorithm
+[   50.223858] BTRFS info (device vdc): checking UUID tree
+[   50.224747] BTRFS info (device vdc): turning on async discard
+[   50.225591] BTRFS info (device vdc): enabling free space tree
+[   62.436656] BTRFS critical (device vdc state E): emergency shutdown
+[   62.440976] _btrfs_printk: 164 callbacks suppressed
+[   62.440988] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1154 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.443547] writepage_delalloc: 244 callbacks suppressed
+[   62.443549] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1154 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.446050] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1155 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.447852] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1155 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.449583] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1156 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.451335] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1156 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.453059] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1157 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.454859] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1157 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.456575] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1158 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.458337] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1158 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.460087] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1159 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.461828] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1159 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.463683] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1160 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.465423] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1160 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.467179] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1161 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.468889] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1161 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.470646] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1162 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.472389] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1162 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.474148] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1163 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.475882] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1163 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[   62.477602] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1164 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.479476] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1165 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.481243] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1166 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.483058] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1167 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.484850] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1168 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.486631] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1169 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.488403] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1170 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.490204] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1171 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.492008] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1172 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.493782] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1173 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.495648] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1174 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.497420] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1175 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.499203] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1176 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.500987] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1177 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.502770] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1178 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.504566] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1179 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.506364] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1180 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.508135] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1181 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.509951] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1182 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.511773] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1183 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.513551] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1184 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.515333] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1185 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.517121] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1186 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.518956] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1187 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.520731] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1188 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.522527] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1189 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.524304] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1190 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.526141] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1191 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.527927] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1192 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.529700] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1193 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.531505] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1194 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.533253] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1195 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.535071] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1196 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.536838] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1197 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.538624] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1198 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.540401] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1199 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.542341] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1200 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.544217] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1201 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.546053] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1202 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.547980] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1203 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.549848] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1204 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.551778] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1205 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.553666] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1206 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.555539] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1207 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.557473] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1208 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.559267] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1209 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.561046] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1210 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.562804] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1211 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.564631] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1212 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.566420] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1213 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.568176] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1214 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.569962] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1215 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.571824] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1216 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.573653] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1217 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.575432] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1218 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.577211] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1219 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.579053] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1220 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.580815] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1221 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.582619] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1222 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.584402] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1223 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.586214] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1224 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.588121] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1225 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.589895] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1226 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.591679] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1227 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.593462] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1228 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.595294] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1229 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.597050] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1230 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.598836] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1231 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.600635] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1232 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.602473] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1233 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.604264] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1234 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.606049] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1235 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.607857] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1236 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.609692] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1237 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.611461] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1238 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.613250] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1239 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.615066] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1240 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.616843] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1241 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.618646] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1242 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.620442] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1243 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[   62.631334] BTRFS info (device vdc state E): last unmount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   62.637100] BTRFS: device fsid 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c devid 1 transid 11 /dev/vdc (253:32) scanned by mount (11633)
+[   62.639504] BTRFS info (device vdc): first mount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   62.640894] BTRFS info (device vdc): using crc32c checksum algorithm
+[   62.645000] BTRFS info (device vdc): turning on async discard
+[   62.645866] BTRFS info (device vdc): enabling free space tree
+[   62.649131] BTRFS info (device vdc): last unmount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   62.654228] BTRFS: device fsid 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c devid 1 transid 11 /dev/vdc (253:32) scanned by mount (11653)
+[   62.656334] BTRFS info (device vdc): first mount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   62.657580] BTRFS info (device vdc): using crc32c checksum algorithm
+[   62.661310] BTRFS info (device vdc): turning on async discard
+[   62.662151] BTRFS info (device vdc): enabling free space tree
+[   66.248331] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   66.267105] BTRFS info (device vdc): last unmount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   66.275830] BTRFS: device fsid 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c devid 1 transid 15 /dev/vdc (253:32) scanned by mount (23451)
+[   66.277918] BTRFS info (device vdc): first mount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   66.279203] BTRFS info (device vdc): using crc32c checksum algorithm
+[   66.282959] BTRFS info (device vdc): turning on async discard
+[   66.283796] BTRFS info (device vdc): enabling free space tree
+[   66.287420] BTRFS info (device vdc): last unmount of filesystem 6022b207-0b8d-499f-8ee8-a0bcf7f3c92c
+[   66.313089] run fstests generic/045 at 2026-08-01 03:22:38
+[   66.387953] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 13 /dev/vdb (253:16) scanned by mount (23634)
+[   66.390182] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   66.391454] BTRFS info (device vdb): using crc32c checksum algorithm
+[   66.395397] BTRFS info (device vdb): turning on async discard
+[   66.396257] BTRFS info (device vdb): enabling free space tree
+[   66.451090] BTRFS: device fsid 3650f80b-8fe2-4d14-aef7-6756c59f7686 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (23684)
+[   66.453231] BTRFS info (device vdc): first mount of filesystem 3650f80b-8fe2-4d14-aef7-6756c59f7686
+[   66.454522] BTRFS info (device vdc): using crc32c checksum algorithm
+[   66.458604] BTRFS info (device vdc): checking UUID tree
+[   66.459493] BTRFS info (device vdc): turning on async discard
+[   66.460361] BTRFS info (device vdc): enabling free space tree
+[   66.488161] BTRFS critical (device vdc state E): emergency shutdown
+[   66.491423] BTRFS info (device vdc state E): last unmount of filesystem 3650f80b-8fe2-4d14-aef7-6756c59f7686
+[   66.543255] BTRFS: device fsid c5c30dc3-1f55-47c7-ae77-5f81561bf462 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (23732)
+[   66.545550] BTRFS info (device vdc): first mount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   66.546918] BTRFS info (device vdc): using crc32c checksum algorithm
+[   66.551077] BTRFS info (device vdc): checking UUID tree
+[   66.551958] BTRFS info (device vdc): turning on async discard
+[   66.552812] BTRFS info (device vdc): enabling free space tree
+[   78.777627] BTRFS critical (device vdc state E): emergency shutdown
+[   78.782488] _btrfs_printk: 12 callbacks suppressed
+[   78.782490] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1125 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.784940] writepage_delalloc: 92 callbacks suppressed
+[   78.784942] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1125 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.787505] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1126 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.789188] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1126 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.790932] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1127 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.792667] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1127 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.794438] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1128 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.796164] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1128 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.797874] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1129 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.799598] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1129 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.801314] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1130 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.803048] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1130 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.804763] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1131 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.806491] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1131 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.808185] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1132 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.809942] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1132 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.811675] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1133 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.813352] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1133 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.815052] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1134 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.816758] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1134 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   78.818513] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1135 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.820237] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1136 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.821974] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1137 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.823722] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1138 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.825465] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1139 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.827230] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1140 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.828991] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1141 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.830723] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1142 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.832499] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1143 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.834250] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1144 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.835996] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1145 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.837721] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1146 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.839498] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1147 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.841222] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1148 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.842966] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1149 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.844752] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1150 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.846493] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1151 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.848251] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1152 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.850014] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1153 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.851780] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1154 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.853565] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1155 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.855390] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1156 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.857120] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1157 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.858871] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1158 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.860623] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1159 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.862394] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1160 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.864143] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1161 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.865900] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1162 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.867620] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1163 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.869387] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1164 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.871170] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1165 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.872901] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1166 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.874645] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1167 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.876397] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1168 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.878131] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1169 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.879917] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1170 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.881640] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1171 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.883400] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1172 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.885194] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1173 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.886984] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1174 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.888748] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1175 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.890518] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1176 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.892258] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1177 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.894010] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1178 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.895815] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1179 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.897582] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1180 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.899351] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1181 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.901067] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1182 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.902825] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1183 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.904574] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1184 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.906365] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1185 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.908104] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1186 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.909834] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1187 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.911594] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1188 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.913322] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1189 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.915163] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1190 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.916896] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1191 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.918654] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1192 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.920384] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1193 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.922132] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1194 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.923900] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1195 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.925636] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1196 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.927423] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1197 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.929193] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1198 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.930960] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1199 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.932724] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1200 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.934473] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1201 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.936215] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1202 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.937965] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1203 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.939695] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1204 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.941552] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1205 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.943300] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1206 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.945047] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1207 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.946799] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1208 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.948529] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1209 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.950313] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1210 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.952049] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1211 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.953768] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1212 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.955531] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1213 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.957282] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1214 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   78.965218] BTRFS info (device vdc state E): last unmount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   78.971600] BTRFS: device fsid c5c30dc3-1f55-47c7-ae77-5f81561bf462 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (27751)
+[   78.973728] BTRFS info (device vdc): first mount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   78.975083] BTRFS info (device vdc): using crc32c checksum algorithm
+[   78.979096] BTRFS info (device vdc): turning on async discard
+[   78.979885] BTRFS info (device vdc): enabling free space tree
+[   78.983408] BTRFS info (device vdc): last unmount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   78.988556] BTRFS: device fsid c5c30dc3-1f55-47c7-ae77-5f81561bf462 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (27771)
+[   78.990728] BTRFS info (device vdc): first mount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   78.992154] BTRFS info (device vdc): using crc32c checksum algorithm
+[   78.996466] BTRFS info (device vdc): turning on async discard
+[   78.997404] BTRFS info (device vdc): enabling free space tree
+[   82.503106] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   82.516764] BTRFS info (device vdc): last unmount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   82.524938] BTRFS: device fsid c5c30dc3-1f55-47c7-ae77-5f81561bf462 devid 1 transid 15 /dev/vdc (253:32) scanned by mount (6759)
+[   82.527054] BTRFS info (device vdc): first mount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   82.528366] BTRFS info (device vdc): using crc32c checksum algorithm
+[   82.532311] BTRFS info (device vdc): turning on async discard
+[   82.533210] BTRFS info (device vdc): enabling free space tree
+[   82.536882] BTRFS info (device vdc): last unmount of filesystem c5c30dc3-1f55-47c7-ae77-5f81561bf462
+[   82.562785] run fstests generic/046 at 2026-08-01 03:22:54
+[   82.637612] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 14 /dev/vdb (253:16) scanned by mount (6942)
+[   82.639818] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   82.641126] BTRFS info (device vdb): using crc32c checksum algorithm
+[   82.645239] BTRFS info (device vdb): turning on async discard
+[   82.646118] BTRFS info (device vdb): enabling free space tree
+[   82.701551] BTRFS: device fsid a3a15a38-ea6c-4e96-a9b5-2b2977321da2 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (6992)
+[   82.703766] BTRFS info (device vdc): first mount of filesystem a3a15a38-ea6c-4e96-a9b5-2b2977321da2
+[   82.705066] BTRFS info (device vdc): using crc32c checksum algorithm
+[   82.708960] BTRFS info (device vdc): checking UUID tree
+[   82.709852] BTRFS info (device vdc): turning on async discard
+[   82.710729] BTRFS info (device vdc): enabling free space tree
+[   82.744123] BTRFS critical (device vdc state E): emergency shutdown
+[   82.747485] BTRFS info (device vdc state E): last unmount of filesystem a3a15a38-ea6c-4e96-a9b5-2b2977321da2
+[   82.798260] BTRFS: device fsid 37181d56-2a72-40f6-a15b-93bd96f9b5c1 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (7040)
+[   82.800358] BTRFS info (device vdc): first mount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   82.801653] BTRFS info (device vdc): using crc32c checksum algorithm
+[   82.805291] BTRFS info (device vdc): checking UUID tree
+[   82.806136] BTRFS info (device vdc): turning on async discard
+[   82.806936] BTRFS info (device vdc): enabling free space tree
+[   95.030197] BTRFS critical (device vdc state E): emergency shutdown
+[   95.034711] _btrfs_printk: 41 callbacks suppressed
+[   95.034713] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1209 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.037432] writepage_delalloc: 121 callbacks suppressed
+[   95.037433] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1209 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.040268] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1210 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.042250] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1210 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.044231] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1211 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.046094] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1211 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.047971] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1212 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.049812] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1212 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.051698] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1213 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.053541] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1213 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.055426] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1214 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.057275] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1214 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.059178] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1215 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.061026] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1215 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.062902] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1216 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.064683] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1216 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.066407] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1217 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.068076] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1217 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.069817] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1218 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.071554] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1218 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[   95.073251] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1219 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.074978] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1220 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.076712] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1221 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.078489] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1222 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.080190] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1223 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.081925] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1224 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.083701] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1225 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.085423] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1226 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.087166] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1227 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.088896] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1228 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.090628] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1229 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.092361] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1230 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.094085] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1231 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.095841] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1232 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.097574] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1233 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.099347] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1234 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.101096] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1235 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.102820] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1236 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.104538] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1237 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.106274] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1238 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.107975] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1239 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.109715] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1240 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.111478] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1241 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.113232] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1242 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.114992] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1243 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.116729] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1244 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.118455] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1245 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.120158] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1246 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.121898] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1247 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.123630] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1248 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.125346] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1249 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.127121] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1250 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.128876] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1251 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.130607] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1252 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.132336] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1253 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.134064] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1254 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.135807] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1255 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[   95.143434] BTRFS info (device vdc state E): last unmount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   95.149077] BTRFS: device fsid 37181d56-2a72-40f6-a15b-93bd96f9b5c1 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (11060)
+[   95.151217] BTRFS info (device vdc): first mount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   95.152490] BTRFS info (device vdc): using crc32c checksum algorithm
+[   95.156680] BTRFS info (device vdc): turning on async discard
+[   95.157512] BTRFS info (device vdc): enabling free space tree
+[   95.160682] BTRFS info (device vdc): last unmount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   95.165646] BTRFS: device fsid 37181d56-2a72-40f6-a15b-93bd96f9b5c1 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (11080)
+[   95.167700] BTRFS info (device vdc): first mount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   95.168993] BTRFS info (device vdc): using crc32c checksum algorithm
+[   95.172754] BTRFS info (device vdc): turning on async discard
+[   95.173626] BTRFS info (device vdc): enabling free space tree
+[   97.469873] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   97.483926] BTRFS info (device vdc): last unmount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   97.491934] BTRFS: device fsid 37181d56-2a72-40f6-a15b-93bd96f9b5c1 devid 1 transid 14 /dev/vdc (253:32) scanned by mount (17826)
+[   97.493871] BTRFS info (device vdc): first mount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+[   97.495039] BTRFS info (device vdc): using crc32c checksum algorithm
+[   97.498895] BTRFS info (device vdc): turning on async discard
+[   97.499704] BTRFS info (device vdc): enabling free space tree
+[   97.503242] BTRFS info (device vdc): last unmount of filesystem 37181d56-2a72-40f6-a15b-93bd96f9b5c1
+QITER 2 rc=0 all-passed
+Ran: generic/044 generic/045 generic/046
+Passed all 3 tests
+[   97.605700] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 15 /dev/vdb (253:16) scanned by mount (18024)
+[   97.607881] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   97.609170] BTRFS info (device vdb): using crc32c checksum algorithm
+[   97.612795] BTRFS info (device vdb): turning on async discard
+[   97.613675] BTRFS info (device vdb): enabling free space tree
+[   97.705449] BTRFS: device fsid 5f7c4077-4a89-4cff-8105-bfa1bce41537 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (18116)
+[   97.707607] BTRFS info (device vdc): first mount of filesystem 5f7c4077-4a89-4cff-8105-bfa1bce41537
+[   97.709039] BTRFS info (device vdc): using crc32c checksum algorithm
+[   97.712745] BTRFS info (device vdc): checking UUID tree
+[   97.713601] BTRFS info (device vdc): turning on async discard
+[   97.714499] BTRFS info (device vdc): enabling free space tree
+[   97.720050] BTRFS info (device vdc): last unmount of filesystem 5f7c4077-4a89-4cff-8105-bfa1bce41537
+[   97.729654] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   97.737866] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 15 /dev/vdb (253:16) scanned by mount (18150)
+[   97.739969] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[   97.741262] BTRFS info (device vdb): using crc32c checksum algorithm
+[   97.744935] BTRFS info (device vdb): turning on async discard
+[   97.745786] BTRFS info (device vdb): enabling free space tree
+[   97.754878] run fstests generic/044 at 2026-08-01 03:23:09
+[   97.882511] BTRFS: device fsid b2658c09-f7d8-46ab-94aa-d6864a994e42 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (18349)
+[   97.884639] BTRFS info (device vdc): first mount of filesystem b2658c09-f7d8-46ab-94aa-d6864a994e42
+[   97.886312] BTRFS info (device vdc): using crc32c checksum algorithm
+[   97.889745] BTRFS info (device vdc): checking UUID tree
+[   97.890648] BTRFS info (device vdc): turning on async discard
+[   97.891493] BTRFS info (device vdc): enabling free space tree
+[   97.922153] BTRFS critical (device vdc state E): emergency shutdown
+[   97.925637] BTRFS info (device vdc state E): last unmount of filesystem b2658c09-f7d8-46ab-94aa-d6864a994e42
+[   97.976713] BTRFS: device fsid a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd devid 1 transid 8 /dev/vdc (253:32) scanned by mount (18397)
+[   97.978892] BTRFS info (device vdc): first mount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[   97.980209] BTRFS info (device vdc): using crc32c checksum algorithm
+[   97.983698] BTRFS info (device vdc): checking UUID tree
+[   97.984603] BTRFS info (device vdc): turning on async discard
+[   97.985486] BTRFS info (device vdc): enabling free space tree
+[  110.216474] BTRFS critical (device vdc state E): emergency shutdown
+[  110.220830] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1251 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[  110.222662] writepage_delalloc: 37 callbacks suppressed
+[  110.222663] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1251 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[  110.225221] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1252 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[  110.227012] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1252 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[  110.228785] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1253 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[  110.230624] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1253 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[  110.232397] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1254 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[  110.234227] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1254 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[  110.236058] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1255 start=0 len=65536 cur_offset=0 cur_alloc_size=0: -EIO
+[  110.237826] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1255 folio=0 submit_bitmap=0 start=0 len=65536: -EIO
+[  110.248458] BTRFS info (device vdc state E): last unmount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  110.254604] BTRFS: device fsid a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd devid 1 transid 11 /dev/vdc (253:32) scanned by mount (22416)
+[  110.256819] BTRFS info (device vdc): first mount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  110.258177] BTRFS info (device vdc): using crc32c checksum algorithm
+[  110.262372] BTRFS info (device vdc): turning on async discard
+[  110.263230] BTRFS info (device vdc): enabling free space tree
+[  110.266510] BTRFS info (device vdc): last unmount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  110.271675] BTRFS: device fsid a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd devid 1 transid 11 /dev/vdc (253:32) scanned by mount (22436)
+[  110.273765] BTRFS info (device vdc): first mount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  110.275076] BTRFS info (device vdc): using crc32c checksum algorithm
+[  110.278876] BTRFS info (device vdc): turning on async discard
+[  110.279738] BTRFS info (device vdc): enabling free space tree
+[  114.246757] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[  114.264987] BTRFS info (device vdc): last unmount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  114.272975] BTRFS: device fsid a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd devid 1 transid 15 /dev/vdc (253:32) scanned by mount (2936)
+[  114.275004] BTRFS info (device vdc): first mount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  114.276131] BTRFS info (device vdc): using crc32c checksum algorithm
+[  114.280097] BTRFS info (device vdc): turning on async discard
+[  114.280844] BTRFS info (device vdc): enabling free space tree
+[  114.284383] BTRFS info (device vdc): last unmount of filesystem a458f9e8-797c-4cc3-be9e-fa3e33b3e7fd
+[  114.311304] run fstests generic/045 at 2026-08-01 03:23:26
+[  114.384678] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 16 /dev/vdb (253:16) scanned by mount (3119)
+[  114.386923] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[  114.388292] BTRFS info (device vdb): using crc32c checksum algorithm
+[  114.392086] BTRFS info (device vdb): turning on async discard
+[  114.392930] BTRFS info (device vdb): enabling free space tree
+[  114.450367] BTRFS: device fsid 7b59562a-45c9-43e0-bac3-569974079c46 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (3169)
+[  114.452434] BTRFS info (device vdc): first mount of filesystem 7b59562a-45c9-43e0-bac3-569974079c46
+[  114.453698] BTRFS info (device vdc): using crc32c checksum algorithm
+[  114.457383] BTRFS info (device vdc): checking UUID tree
+[  114.458280] BTRFS info (device vdc): turning on async discard
+[  114.459147] BTRFS info (device vdc): enabling free space tree
+[  114.488168] BTRFS critical (device vdc state E): emergency shutdown
+[  114.491588] BTRFS info (device vdc state E): last unmount of filesystem 7b59562a-45c9-43e0-bac3-569974079c46
+[  114.544520] BTRFS: device fsid 287714ef-802e-4938-b016-75807e66a32a devid 1 transid 8 /dev/vdc (253:32) scanned by mount (3217)
+[  114.546748] BTRFS info (device vdc): first mount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  114.548014] BTRFS info (device vdc): using crc32c checksum algorithm
+[  114.552054] BTRFS info (device vdc): checking UUID tree
+[  114.552942] BTRFS info (device vdc): turning on async discard
+[  114.553750] BTRFS info (device vdc): enabling free space tree
+[  126.797258] BTRFS critical (device vdc state E): emergency shutdown
+[  126.801592] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=995 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.803319] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=995 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.805062] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=996 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.806833] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=996 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.808493] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=997 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.810195] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=997 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.811874] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=998 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.813541] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=998 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.815250] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=999 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.816932] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=999 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.818603] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1000 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.820294] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1000 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.822005] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1001 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.823705] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1001 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.825417] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1002 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.827130] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1002 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.828821] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1003 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.830504] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1003 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.832207] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1004 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.833909] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1004 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  126.835606] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1005 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.837325] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1006 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.839103] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1007 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.840807] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1008 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.842521] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1009 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.844255] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1010 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.845977] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1011 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.847713] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1012 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.849456] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1013 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.851248] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1014 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.852983] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1015 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.854765] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1016 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.856490] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1017 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.858224] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1018 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.859969] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1019 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.861693] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1020 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.863433] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1021 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.865173] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1022 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.866907] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1023 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.868616] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1024 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.870460] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1025 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.872273] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1026 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.874045] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1027 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.875803] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1028 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.877548] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1029 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.879344] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1030 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.881069] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1031 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.882808] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1032 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.884591] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1033 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.886402] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1034 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.888161] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1035 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.889894] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1036 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.891655] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1037 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.893423] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1038 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.895181] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1039 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.896934] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1040 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.898680] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1041 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.900430] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1042 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.902211] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1043 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.903973] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1044 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.905774] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1045 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.907590] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1046 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.909349] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1047 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.911122] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1048 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.912877] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1049 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.914714] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1050 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.916507] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1051 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.918276] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1052 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.920010] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1053 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.921767] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1054 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.923538] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1055 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.925293] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1056 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.927074] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1057 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.928785] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1058 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.930649] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1059 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.932402] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1060 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.934152] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1061 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.935902] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1062 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.937640] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1063 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.939447] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1064 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.941230] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1065 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.942991] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1066 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.944772] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1067 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.946599] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1068 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.948373] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1069 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.950147] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1070 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.951884] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1071 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.953650] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1072 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.955433] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1073 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.957206] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1074 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.958972] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1075 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.960743] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1076 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.962585] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1077 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.964336] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1078 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.966092] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1079 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.967854] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1080 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.969590] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1081 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.971375] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1082 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.973082] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1083 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.974889] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1084 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  126.984001] BTRFS info (device vdc state E): last unmount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  126.989993] BTRFS: device fsid 287714ef-802e-4938-b016-75807e66a32a devid 1 transid 11 /dev/vdc (253:32) scanned by mount (7236)
+[  126.992279] BTRFS info (device vdc): first mount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  126.993510] BTRFS info (device vdc): using crc32c checksum algorithm
+[  126.997707] BTRFS info (device vdc): turning on async discard
+[  126.998561] BTRFS info (device vdc): enabling free space tree
+[  127.001477] BTRFS info (device vdc): last unmount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  127.006578] BTRFS: device fsid 287714ef-802e-4938-b016-75807e66a32a devid 1 transid 11 /dev/vdc (253:32) scanned by mount (7256)
+[  127.008638] BTRFS info (device vdc): first mount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  127.009870] BTRFS info (device vdc): using crc32c checksum algorithm
+[  127.014166] BTRFS info (device vdc): turning on async discard
+[  127.014995] BTRFS info (device vdc): enabling free space tree
+[  130.117463] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[  130.129720] BTRFS info (device vdc): last unmount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  130.138141] BTRFS: device fsid 287714ef-802e-4938-b016-75807e66a32a devid 1 transid 15 /dev/vdc (253:32) scanned by mount (17146)
+[  130.140194] BTRFS info (device vdc): first mount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  130.141459] BTRFS info (device vdc): using crc32c checksum algorithm
+[  130.145508] BTRFS info (device vdc): turning on async discard
+[  130.146331] BTRFS info (device vdc): enabling free space tree
+[  130.149880] BTRFS info (device vdc): last unmount of filesystem 287714ef-802e-4938-b016-75807e66a32a
+[  130.177721] run fstests generic/046 at 2026-08-01 03:23:42
+[  130.252631] BTRFS: device fsid bfc9acc7-4883-49da-a672-10c0b2e8b7b1 devid 1 transid 17 /dev/vdb (253:16) scanned by mount (17329)
+[  130.254927] BTRFS info (device vdb): first mount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[  130.256233] BTRFS info (device vdb): using crc32c checksum algorithm
+[  130.260071] BTRFS info (device vdb): turning on async discard
+[  130.260921] BTRFS info (device vdb): enabling free space tree
+[  130.315998] BTRFS: device fsid 0b37153f-3d4d-4c14-b89d-ad5c03a64c8b devid 1 transid 8 /dev/vdc (253:32) scanned by mount (17379)
+[  130.317856] BTRFS info (device vdc): first mount of filesystem 0b37153f-3d4d-4c14-b89d-ad5c03a64c8b
+[  130.319088] BTRFS info (device vdc): using crc32c checksum algorithm
+[  130.323044] BTRFS info (device vdc): checking UUID tree
+[  130.323929] BTRFS info (device vdc): turning on async discard
+[  130.324808] BTRFS info (device vdc): enabling free space tree
+[  130.350223] BTRFS critical (device vdc state E): emergency shutdown
+[  130.353493] BTRFS info (device vdc state E): last unmount of filesystem 0b37153f-3d4d-4c14-b89d-ad5c03a64c8b
+[  130.404574] BTRFS: device fsid 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3 devid 1 transid 8 /dev/vdc (253:32) scanned by mount (17427)
+[  130.406634] BTRFS info (device vdc): first mount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  130.407899] BTRFS info (device vdc): using crc32c checksum algorithm
+[  130.411560] BTRFS info (device vdc): checking UUID tree
+[  130.412435] BTRFS info (device vdc): turning on async discard
+[  130.413277] BTRFS info (device vdc): enabling free space tree
+[  142.605982] BTRFS critical (device vdc state E): emergency shutdown
+[  142.610171] _btrfs_printk: 171 callbacks suppressed
+[  142.610173] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1004 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.612492] writepage_delalloc: 251 callbacks suppressed
+[  142.612493] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1004 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.614899] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1005 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.616563] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1005 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.618282] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1006 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.620031] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1006 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.621727] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1007 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.623427] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1007 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.625063] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1008 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.626741] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1008 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.628410] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1009 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.630092] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1009 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.631760] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1010 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.633420] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1010 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.635140] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1011 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.636861] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1011 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.638558] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1012 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.640211] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1012 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.641793] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1013 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.643306] BTRFS error (device vdc state E): failed to run delalloc range, root=5 ino=1013 folio=0 submit_bitmap=0 start=0 len=32768: -EIO
+[  142.644846] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1014 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.646419] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1015 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.647955] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1016 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.649549] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1017 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.651118] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1018 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.652716] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1019 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.654299] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1020 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.655851] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1021 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.657432] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1022 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.658970] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1023 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.660537] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1024 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.662121] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1025 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.663668] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1026 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.665250] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1027 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.666858] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1028 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.668461] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1029 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.670008] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1030 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.671595] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1031 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.673159] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1032 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.674724] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1033 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.676296] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1034 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.677863] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1035 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.679442] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1036 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.680968] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1037 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.682598] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1038 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.684180] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1039 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.685735] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1040 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.687337] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1041 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.688887] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1042 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.690441] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1043 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.692014] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1044 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.693601] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1045 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.695222] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1046 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.696793] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1047 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.698401] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1048 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.699983] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1049 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.701544] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1050 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.703126] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1051 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.704670] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1052 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.706278] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1053 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.707858] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1054 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.709445] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1055 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.711015] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1056 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.712597] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1057 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.714195] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1058 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.715793] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1059 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.717349] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1060 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.718931] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1061 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.720482] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1062 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.722070] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1063 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.723682] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1064 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.725300] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1065 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.726887] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1066 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.728469] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1067 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.730206] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1068 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.731927] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1069 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.733500] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1070 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.735084] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1071 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.736626] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1072 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.738248] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1073 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.739826] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1074 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.741374] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1075 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.742980] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1076 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.744538] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1077 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.746140] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1078 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.747695] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1079 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.749242] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1080 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.750853] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1081 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.752412] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1082 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.753971] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1083 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.755608] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1084 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.757168] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1085 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.758795] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1086 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.760466] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1087 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.762070] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1088 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.763744] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1089 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.765362] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1090 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.767003] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1091 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.768616] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1092 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.770326] BTRFS error (device vdc state E): cow_file_range failed, root=5 inode=1093 start=0 len=32768 cur_offset=0 cur_alloc_size=0: -EIO
+[  142.779571] BTRFS info (device vdc state E): last unmount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  142.786114] BTRFS: device fsid 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (21447)
+[  142.788310] BTRFS info (device vdc): first mount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  142.789583] BTRFS info (device vdc): using crc32c checksum algorithm
+[  142.793445] BTRFS info (device vdc): turning on async discard
+[  142.794342] BTRFS info (device vdc): enabling free space tree
+[  142.797556] BTRFS info (device vdc): last unmount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  142.802892] BTRFS: device fsid 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3 devid 1 transid 11 /dev/vdc (253:32) scanned by mount (21467)
+[  142.804883] BTRFS info (device vdc): first mount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  142.806206] BTRFS info (device vdc): using crc32c checksum algorithm
+[  142.810308] BTRFS info (device vdc): turning on async discard
+[  142.811186] BTRFS info (device vdc): enabling free space tree
+[  144.800976] BTRFS info (device vdb): last unmount of filesystem bfc9acc7-4883-49da-a672-10c0b2e8b7b1
+[  144.815688] BTRFS info (device vdc): last unmount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  144.824589] BTRFS: device fsid 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3 devid 1 transid 13 /dev/vdc (253:32) scanned by mount (26983)
+[  144.826916] BTRFS info (device vdc): first mount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+[  144.828245] BTRFS info (device vdc): using crc32c checksum algorithm
+[  144.831881] BTRFS info (device vdc): turning on async discard
+[  144.832739] BTRFS info (device vdc): enabling free space tree
+[  144.836712] BTRFS info (device vdc): last unmount of filesystem 8fd07e56-43ed-4dde-9d5b-66616a6dbaf3
+QITER 3 rc=0 all-passed
+Ran: generic/044 generic/045 generic/046
+Passed all 3 tests
+=== QEMU RUN DONE rc=0 ===
+[  144.884715] ACPI: PM: Preparing to enter system sleep state S5
+[  144.885658] reboot: Power down

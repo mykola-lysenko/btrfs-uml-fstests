@@ -1,0 +1,30 @@
+[15:09:08] load fleet: 8 UMLs x ~30 fast tests
+[15:10:39] iter 1: Passed all 3 tests 
+[15:11:51] iter 2: Passed all 3 tests 
+[15:13:04] iter 3: Passed all 3 tests 
+[15:14:17] iter 4: Passed all 3 tests 
+[15:15:29] iter 5: Passed all 3 tests 
+[15:16:43] iter 6: Passed all 3 tests 
+[15:17:58] iter 7: Passed all 3 tests 
+[15:19:11] iter 8: Passed all 3 tests 
+[15:19:11] probe done -> /home/prozak/uml-smoke/results/flake-noholes-fix
+[16:08:26] load fleet: 8 UMLs x ~30 fast tests
+[16:09:56] iter 1: Passed all 3 tests 
+[16:11:10] iter 2: Passed all 3 tests 
+[16:12:23] iter 3: Passed all 3 tests 
+[16:13:35] iter 4: Passed all 3 tests 
+[16:14:47] iter 5: Passed all 3 tests 
+[16:16:00] iter 6: Passed all 3 tests 
+[16:17:12] iter 7: Passed all 3 tests 
+[16:18:25] iter 8: Passed all 3 tests 
+[16:18:25] probe done -> /home/prozak/uml-smoke/results/flake-noholes-fix
+[18:53:23] load fleet: 8 UMLs x ~30 fast tests
+[18:54:54] iter 1: Passed all 3 tests 
+[18:56:56] iter 2: Passed all 3 tests 
+[18:58:08] iter 3: Passed all 3 tests 
+[18:59:20] iter 4: Passed all 3 tests 
+[19:00:34] iter 5: Passed all 3 tests 
+[19:01:46] iter 6: Passed all 3 tests 
+[19:02:58] iter 7: Passed all 3 tests 
+[19:04:10] iter 8: Passed all 3 tests 
+[19:04:10] probe done -> /home/prozak/uml-smoke/results/flake-noholes-fix

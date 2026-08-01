@@ -1,7 +1,15 @@
 # btrfs (NO_HOLES): committed i_size outruns data — null files after crash
 
-**Status:** root-caused and A/B-proven 2026-07-15 late session. THIRD real
-finding. Deterministic real-hardware reproducer — no UML needed.
+**Status:** FIX COMPLETE 2026-07-31 — upstream-kernel/0003-btrfs-keep-
+file-extent-tree-on-NO_HOLES.patch, validated to the full-corpus bar:
+KVM same-SHA A/B 9/9 flip (docs/evidence/qemu-044-*.out), UML load A/B
+24/24, full 1130-test corpus 0 confirmed failures on the patched DEBUG
+kernel (docs/evidence/noholes-status.txt). Four fix iterations, each
+earned by an observed failure (assert lift, log-replay/fill_holes/
+clone implicit-hole marking) — see the patch message. Report draft
+reframed patch-first; send pending user.
+Originally: root-caused and A/B-proven 2026-07-15 late session. THIRD
+real finding. Deterministic real-hardware reproducer — no UML needed.
 **2026-07-16:** T9 done — framing decided (report-first, recommend kernel-side
 clamp, no patch attached). Lore prior-art check: no existing 044-046/no-holes
 thread found (lore Anubis-blocks us; searched via mirrors). Source comment on
