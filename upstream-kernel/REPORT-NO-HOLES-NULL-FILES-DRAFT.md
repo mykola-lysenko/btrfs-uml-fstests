@@ -8,11 +8,34 @@ with "should generic/044-046 be gated"; NOT recommended (see framing note).
 **Subject:** NO_HOLES: buffered write + same-size truncate can commit i_size
 without data — files full of zeroes after crash (generic/044-046)
 
-**Framing decision (ours):** report-first, no patch attached. Unlike the two
-raid56 patches, the fix here reverses a deliberate design choice in
-41a2ee75aab0 (skip the per-inode file extent tree on NO_HOLES), so the
-maintainers should pick the mechanism. We state a recommendation and offer
-to test/write the patch.
+**Framing decision (REVISED 2026-07-31, user directive):** PATCH-FIRST.
+Send upstream-kernel/0003-btrfs-keep-file-extent-tree-on-NO_HOLES.patch
+as [PATCH] (or [PATCH RFC] if preferred) with its self-contained commit
+message; this draft's body becomes the after-the---(cut) discussion.
+The patch reverses the deliberate 41a2ee75aab0 design choice, so DO
+flag the trade-off explicitly after the cut: cost = one extent_io_tree
+per in-memory regular inode on NO_HOLES (same as every other fs pays);
+alternatives (a lighter-weight clamp) are the maintainers' call — we
+validated this mechanism end to end.
+
+**SEND PREP:** apply 0003 to a git checkout of for-next, commit with the
+patch's message, git format-patch + checkpatch (the standalone file has
+3 cosmetic space-only context lines from hand-rolled hunks — format-patch
+regenerates them away), then git send-email. Same disclosure notes as
+0002.
+
+**Evidence matrix (all at for-next 374fd5d128d8, 2026-07-31):**
+| platform | config | unpatched | +0003 |
+|---|---|---|---|
+| KVM x86-64 | mkfs defaults, -o commit=1, 044-046 x3 | FAIL 9/9 | PASS 9/9 |
+| UML 8-guest load | defaults, 044-046 x8 iters | FAIL 8/8 | PASS 24/24 |
+| UML full corpus | auto-all, 1130 tests | 869P/0 confirmed fail | 875P/0 confirmed fail (parity+6) |
+| live probe | reflink-cp sparse file + fsverity, remounts | n/a (bug is crash-window) | size survives all cycles |
+Fix iterations (v1-v4) each earned by an observed failure: DEBUG assert
+(extent-io-tree.c encoded the tree-less invariant), log-replay hole
+marking, fill_holes(), clone_finish_inode_update() — all documented in
+the patch message; the DEBUG-kernel corpus is what caught the
+incomplete versions.
 
 ---
 
